@@ -35,7 +35,8 @@ fun InventraPriorityAlertsSection(
                 painter = item.painter,
                 title = item.title,
                 statusText = item.statusText,
-                urgency = item.urgency
+                urgency = item.urgency,
+                batch = "Lote 0001"
             )
         }
     }
