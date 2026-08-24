@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.inventra_mobile_2.feature.auth.ui.LoginRoute
+import com.example.inventra_mobile_2.feature.home.ui.HomeRoute
 import com.example.inventra_mobile_2.ui.theme.Inventra_mobile_2Theme
 
 class MainActivity : ComponentActivity() {
@@ -19,7 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            LoginRoute()
+            HomeRoute()
         }
     }
 }

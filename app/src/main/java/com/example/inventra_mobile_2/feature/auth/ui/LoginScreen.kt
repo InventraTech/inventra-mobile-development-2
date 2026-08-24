@@ -36,9 +36,9 @@ fun LoginScreen(
     login: String,
     onLoginChange: (String) -> Unit,
     senha: String,
-    onSenhaChange: (String) -> Unit,
-    onEntrarClick: () -> Unit,
-    onEsqueciSenhaClick: () -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onLoginClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -80,19 +80,19 @@ fun LoginScreen(
             InventraLabeledField(
                 label = "Senha",
                 value = senha,
-                onValueChange = onSenhaChange,
+                onValueChange = onPasswordChange,
                 isPassword = true,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Insira sua Senha"
             )
             InventraPrimaryButton(
                 text = "Entrar",
-                onClick = onEntrarClick,
+                onClick = onLoginClick,
                 modifier = Modifier.width(300.dp).padding(0.dp, 35.dp, 0.dp, 20.dp)
             )
             InventraTextLink(
                 text = "Esqueci minha senha",
-                onClick = onEsqueciSenhaClick
+                onClick = onForgotPasswordClick
             )
         }
     }
@@ -109,9 +109,9 @@ fun LoginRoute(
         login = uiState.login,
         onLoginChange = viewModel::onLoginChange,
         senha = uiState.password,
-        onSenhaChange = viewModel::onPasswordChange,
-        onEntrarClick = viewModel::onLoginClick,
-        onEsqueciSenhaClick = viewModel::onForgotPasswordClick,
+        onPasswordChange = viewModel::onPasswordChange,
+        onLoginClick = viewModel::onLoginClick,
+        onForgotPasswordClick = viewModel::onForgotPasswordClick,
         modifier = modifier
     )
 }
@@ -123,8 +123,8 @@ private fun LoginScreenPreview() {
         login = "",
         onLoginChange = {},
         senha = "",
-        onSenhaChange = {},
-        onEntrarClick = {},
-        onEsqueciSenhaClick = {}
+        onPasswordChange = {},
+        onLoginClick = {},
+        onForgotPasswordClick = {}
     )
 }

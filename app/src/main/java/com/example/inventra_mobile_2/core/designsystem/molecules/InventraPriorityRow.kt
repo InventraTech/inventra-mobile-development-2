@@ -41,18 +41,17 @@ fun InventraPriorityRow(
     val statusColor = if (urgency == InventraUrgency.Tomorrow) InventraDanger else InventraPurple
     Row(
         modifier = modifier
-            .padding(0.dp, 12.dp, 0.dp, 4.dp)
             .border(1.dp, color = Color.LightGray, shape = RoundedCornerShape(10.dp))
             .fillMaxWidth()
-            .height(70.dp),
+            .height(100.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        InventraThumbnail(painter = painter, modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp))
+        InventraThumbnail(painter = painter, modifier = Modifier.padding(15.dp, 0.dp, 15.dp, 0.dp))
         Column {
-            Text(title, fontFamily = Montserrat, fontWeight = FontWeight.Bold, color = InventraPurple)
-            Text(statusText, fontFamily = Montserrat, color = statusColor, fontSize = 13.sp)
-            Text(batch, fontFamily = Montserrat, color = statusColor, fontSize = 11.sp)
+            Text(title, fontFamily = Montserrat, fontWeight = FontWeight.Bold, color = InventraPurple, fontSize =  20.sp)
+            Text(statusText, fontFamily = Montserrat, color = statusColor, fontSize = 16.sp)
+            Text(batch, fontFamily = Montserrat, color = statusColor, fontSize = 18.sp)
         }
     }
 }

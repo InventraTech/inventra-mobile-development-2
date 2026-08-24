@@ -16,7 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,13 +27,18 @@ import com.example.inventra_mobile_2.core.designsystem.atoms.InventraStatusIconV
 import com.example.inventra_mobile_2.core.designsystem.molecules.InventraStatTone
 import com.example.inventra_mobile_2.core.designsystem.molecules.InventraUrgency
 import com.example.inventra_mobile_2.core.designsystem.organisms.InventraBottomBar
+import com.example.inventra_mobile_2.core.designsystem.organisms.InventraBottomDestination
 import com.example.inventra_mobile_2.core.designsystem.organisms.InventraPriorityAlertsSection
 import com.example.inventra_mobile_2.core.designsystem.organisms.InventraPriorityItem
 import com.example.inventra_mobile_2.core.designsystem.organisms.InventraQrScanFab
 import com.example.inventra_mobile_2.core.designsystem.organisms.InventraStat
 import com.example.inventra_mobile_2.core.designsystem.organisms.InventraStatGrid
 import com.example.inventra_mobile_2.core.designsystem.organisms.InventraTopBar
+import com.example.inventra_mobile_2.ui.theme.InventraPurple
 import com.example.inventra_mobile_2.ui.theme.Montserrat
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HomeScreen(
@@ -77,16 +84,23 @@ fun HomeScreen(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 InventraPriorityAlertsSection(items = priorityItems)
+                Text(
+                    text = "Dados do Mês",
+                    fontFamily = Montserrat,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(top = 20.dp),
+                    color = InventraPurple
+                )
                 InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp))
             }
             InventraBottomBar(
-                onHomeClick = {},
-                onStockClick = onStockClick,
-                onHistoryClick = onHistoryClick,
-                onNotificationsClick = onNotificationsClick
+                selected = InventraBottomDestination.Home,
+                onSelect = {}
             )
         }
         InventraQrScanFab(
@@ -99,6 +113,27 @@ fun HomeScreen(
     }
 }
 
+@Composable
+fun HomeRoute(
+    viewModel: HomeViewModel = viewModel(),
+    modifier: Modifier = Modifier
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    HomeScreen(
+        userName = uiState.userName,
+        dateText = uiState.dateText,
+        priorityItems = uiState.priorityItems,
+        stats = uiState.stats,
+        onQrScanClick = viewModel::onQrScanClick,
+        onBellClick = viewModel::onBellClick,
+        onStockClick = viewModel::onStockClick,
+        onHistoryClick = viewModel::onHistoryClick,
+        onNotificationsClick = viewModel::onNotificationsClick,
+        modifier = modifier
+    )
+}
+
 @Preview
 @Composable
 private fun HomeScreenPreview() {
@@ -107,21 +142,25 @@ private fun HomeScreenPreview() {
         dateText = "Quinta, 2 de julho de 2026",
         priorityItems = listOf(
             InventraPriorityItem(
-                painter = painterResource(R.drawable.ic_inventra_logo),
+                imageRes = R.drawable.ic_inventra_logo,
                 title = "Arroz Camil",
                 statusText = "Vence em 2 dias",
-                urgency = InventraUrgency.Normal
+                urgency = InventraUrgency.Normal,
+                batch = "Lote 0001"
             ),
             InventraPriorityItem(
-                painter = painterResource(R.drawable.ic_inventra_logo),
+                imageRes = R.drawable.ic_inventra_logo,
                 title = "Arroz Camil",
                 statusText = "Vence em 2 dias",
-                urgency = InventraUrgency.Normal
+                urgency = InventraUrgency.Normal,
+                batch = "Lote 0001"
             )
         ),
         stats = listOf(
             InventraStat("Economia", "R$ 6767,00", "↑ 67%", InventraStatTone.Positive),
-            InventraStat("Perdas", "R$ 6767,00", "↓ 67%", InventraStatTone.Negative)
+            InventraStat("Perdas", "R$ 6767,00", "↓ 67%", InventraStatTone.Negative),
+            InventraStat("Perdas", "R$ 6767,00", "↓ 67%", InventraStatTone.Negative),
+            InventraStat("Economia", "R$ 6767,00", "↑ 67%", InventraStatTone.Positive),
         ),
         onQrScanClick = {},
         onBellClick = {},
