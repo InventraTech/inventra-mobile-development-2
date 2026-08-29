@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.inventra_mobile_2"
+    namespace = "com.inventraoficial.inventra"
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.inventra_mobile_2"
+        applicationId = "com.inventraoficial.inventra"
         minSdk = 33
         targetSdk = 36
         versionCode = 1
