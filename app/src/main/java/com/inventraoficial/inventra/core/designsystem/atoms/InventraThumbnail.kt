@@ -9,6 +9,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -16,11 +17,12 @@ fun InventraThumbnail(
     painter: Painter,
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(10.dp),
+    size: Dp = 40.dp,
 ) {
     Image(
         painter = painter,
         contentDescription = null,
         contentScale = ContentScale.Crop,
-        modifier = modifier.size(40.dp).clip(shape),
+        modifier = modifier.size(size).clip(shape),
     )
 }

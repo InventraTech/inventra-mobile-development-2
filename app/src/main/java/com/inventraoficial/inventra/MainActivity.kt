@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
+import com.inventraoficial.inventra.feature.stock.list.ui.StockListRoute
 import com.inventraoficial.inventra.feature.suppliers.ui.SupplierRoute
 
 class MainActivity : ComponentActivity() {
@@ -12,7 +13,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SupplierRoute()
+            StockListRoute()
         }
     }
 }
