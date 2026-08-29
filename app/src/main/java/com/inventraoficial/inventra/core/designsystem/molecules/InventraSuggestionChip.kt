@@ -3,7 +3,6 @@ package com.inventraoficial.inventra.core.designsystem.molecules
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -25,9 +24,8 @@ fun InventraSuggestionChip(
     Box(
         modifier =
             modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
-                .border(1.5.dp, InventraPurple, RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(12.dp))
+                .border(1.5.dp, InventraPurple, RoundedCornerShape(12.dp))
                 .clickable(onClick = onClick)
                 .padding(14.dp),
     ) {
