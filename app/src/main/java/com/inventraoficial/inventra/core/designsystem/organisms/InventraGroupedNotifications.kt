@@ -28,7 +28,7 @@ fun InventraGroupedNotifications(
     groups: Map<String, List<InventraNotification>>,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(18.dp)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(24.dp)) {
         groups.forEach { (dateHeader, notifications) ->
             Text(dateHeader, color = InventraPurple, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             notifications.forEach { notification ->

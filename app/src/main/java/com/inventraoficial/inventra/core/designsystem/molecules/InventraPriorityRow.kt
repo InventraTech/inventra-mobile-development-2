@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +39,7 @@ fun InventraPriorityRow(
     Row(
         modifier =
             modifier
-                .border(1.dp, color = Color.LightGray, shape = RoundedCornerShape(10.dp))
+                .border(1.dp, color = InventraPurple.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
                 .fillMaxWidth()
                 .height(100.dp),
         verticalAlignment = Alignment.CenterVertically,

@@ -38,7 +38,7 @@ fun InventraBatchesCard(
                 .clip(RoundedCornerShape(14.dp))
                 .border(1.dp, InventraPurple.copy(alpha = 0.15f), RoundedCornerShape(14.dp))
                 .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         InventraSectionLabel(text = title)
         batches.forEach { batch ->

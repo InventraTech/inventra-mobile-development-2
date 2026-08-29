@@ -28,7 +28,7 @@ fun InventraPriorityAlertsSection(
     items: List<InventraPriorityItem>,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text("⚠ Produtos com prioridade", color = InventraDanger, fontFamily = Montserrat, fontWeight = FontWeight.Bold)
         items.forEach { item ->
             InventraPriorityRow(

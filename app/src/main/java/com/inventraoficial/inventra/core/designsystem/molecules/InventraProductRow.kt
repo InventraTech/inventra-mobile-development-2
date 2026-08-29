@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.core.designsystem.molecules
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ fun InventraProductRow(
         modifier =
             modifier
                 .clip(RoundedCornerShape(12.dp))
+                .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
                 .clickable(onClick = onClick)
                 .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
