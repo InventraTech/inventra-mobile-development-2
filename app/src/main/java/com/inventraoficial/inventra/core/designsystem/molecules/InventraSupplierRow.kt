@@ -1,11 +1,13 @@
 package com.inventraoficial.inventra.core.designsystem.molecules
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,7 +34,10 @@ fun InventraSupplierRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.clickable(onClick = onClick).padding(12.dp),
+        modifier = modifier
+            .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
