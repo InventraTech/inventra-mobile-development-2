@@ -1,0 +1,177 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>EmptyFunctionBlock:HomeViewModel.kt$HomeViewModel${ }</ID>
+    <ID>EmptyFunctionBlock:LoginViewModel.kt$LoginViewModel${ }</ID>
+    <ID>FunctionNaming:HomeScreen.kt$@Composable fun HomeRoute( viewModel: HomeViewModel = viewModel(), modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:HomeScreen.kt$@Composable fun HomeScreen( userName: String, dateText: String, priorityItems: List&lt;InventraPriorityItem&gt;, stats: List&lt;InventraStat&gt;, onQrScanClick: () -&gt; Unit, onBellClick: () -&gt; Unit, onStockClick: () -&gt; Unit, onHistoryClick: () -&gt; Unit, onNotificationsClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:HomeScreen.kt$@Preview @Composable private fun HomeScreenPreview()</ID>
+    <ID>FunctionNaming:InventraAuthHeader.kt$@Composable fun InventraAuthHeader( appName: String, subtitle: String, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraAuthHeader.kt$@Preview @Composable private fun InventraAuthHeaderPreview()</ID>
+    <ID>FunctionNaming:InventraBadge.kt$@Composable fun InventraBadge( text: String, variant: InventraBadgeVariant = InventraBadgeVariant.Brand, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraBadge.kt$@Preview @Composable private fun InventraBadgePreview()</ID>
+    <ID>FunctionNaming:InventraBatchRow.kt$@Composable fun InventraBatchRow( dateLabel: String, code: String, quantity: String, modifier: Modifier = Modifier, isUrgent: Boolean = false, )</ID>
+    <ID>FunctionNaming:InventraBatchRow.kt$@Preview @Composable private fun InventraBatchRowPreview()</ID>
+    <ID>FunctionNaming:InventraBatchesCard.kt$@Composable fun InventraBatchesCard( title: String, batches: List&lt;InventraBatch&gt;, onSeeAll: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraBatchesCard.kt$@Preview @Composable private fun InventraBatchesCardPreview()</ID>
+    <ID>FunctionNaming:InventraBottomBar.kt$@Composable fun InventraBottomBar( selected: InventraBottomDestination, onSelect: (InventraBottomDestination) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraBottomBar.kt$@Preview @Composable private fun InventraBottomBarPreview()</ID>
+    <ID>FunctionNaming:InventraBrandIcon.kt$@Composable fun InventraBrandIcon( modifier: Modifier = Modifier, badgeContent: @Composable () -&gt; Unit = {}, )</ID>
+    <ID>FunctionNaming:InventraBrandIcon.kt$@Preview @Composable private fun InventraBrandIconPreview()</ID>
+    <ID>FunctionNaming:InventraChatEmptyHeader.kt$@Composable fun InventraChatEmptyHeader( greeting: String, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraChatEmptyHeader.kt$@Preview @Composable private fun InventraChatEmptyHeaderPreview()</ID>
+    <ID>FunctionNaming:InventraChatInputBar.kt$@Composable fun InventraChatInputBar( value: String, onValueChange: (String) -&gt; Unit, onSend: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraChatInputBar.kt$@Preview @Composable private fun InventraChatInputBarPreview()</ID>
+    <ID>FunctionNaming:InventraFilterChip.kt$@Composable fun InventraFilterChip( label: String, selected: Boolean, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraFilterChip.kt$@Preview @Composable private fun InventraFilterChipPreview()</ID>
+    <ID>FunctionNaming:InventraFilterChipRow.kt$@Composable fun InventraFilterChipRow( options: List&lt;String&gt;, selected: String, onSelect: (String) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraFilterChipRow.kt$@Preview @Composable private fun InventraFilterChipRowPreview()</ID>
+    <ID>FunctionNaming:InventraGroupedNotifications.kt$@Composable fun InventraGroupedNotifications( groups: Map&lt;String, List&lt;InventraNotification&gt;&gt;, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraGroupedNotifications.kt$@Preview @Composable private fun InventraGroupedNotificationsPreview()</ID>
+    <ID>FunctionNaming:InventraHistorySection.kt$@Composable fun InventraHistorySection( onEntriesClick: () -&gt; Unit, onExitsClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraHistorySection.kt$@Preview @Composable private fun InventraHistorySectionPreview()</ID>
+    <ID>FunctionNaming:InventraLabeledField.kt$@Composable fun InventraLabeledField( label: String, value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, readOnly: Boolean = false, multiline: Boolean = false, isPassword: Boolean = false, placeholder: String, )</ID>
+    <ID>FunctionNaming:InventraLabeledField.kt$@Preview @Composable private fun InventraLabeledFieldPreview()</ID>
+    <ID>FunctionNaming:InventraNotificationRow.kt$@Composable fun InventraNotificationRow( variant: InventraStatusIconVariant, title: String, subtitle: String, timestamp: String, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraNotificationRow.kt$@Preview @Composable private fun InventraNotificationRowPreview()</ID>
+    <ID>FunctionNaming:InventraPrimaryButton.kt$@Composable fun InventraPrimaryButton( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraPrimaryButton.kt$@Preview @Composable private fun InventraPrimaryButtonPreview()</ID>
+    <ID>FunctionNaming:InventraPriorityAlertsSection.kt$@Composable fun InventraPriorityAlertsSection( items: List&lt;InventraPriorityItem&gt;, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraPriorityAlertsSection.kt$@Preview @Composable private fun InventraPriorityAlertsSectionPreview()</ID>
+    <ID>FunctionNaming:InventraPriorityRow.kt$@Composable fun InventraPriorityRow( painter: Painter, title: String, statusText: String, urgency: InventraUrgency, modifier: Modifier = Modifier, batch: String, )</ID>
+    <ID>FunctionNaming:InventraPriorityRow.kt$@Preview @Composable private fun InventraPriorityRowPreview()</ID>
+    <ID>FunctionNaming:InventraProductRow.kt$@Composable fun InventraProductRow( painter: Painter, title: String, metadata: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraProductRow.kt$@Preview @Composable private fun InventraProductRowPreview()</ID>
+    <ID>FunctionNaming:InventraQrScanFab.kt$@Composable fun InventraQrScanFab( onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraQrScanFab.kt$@Preview @Composable private fun InventraQrScanFabPreview()</ID>
+    <ID>FunctionNaming:InventraQuantityStepper.kt$@Composable fun InventraQuantityStepper( value: Int, onValueChange: (Int) -&gt; Unit, modifier: Modifier = Modifier, min: Int = 0, )</ID>
+    <ID>FunctionNaming:InventraQuantityStepper.kt$@Composable private fun StepperCircle( symbol: String, onClick: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:InventraQuantityStepper.kt$@Preview @Composable private fun InventraQuantityStepperPreview()</ID>
+    <ID>FunctionNaming:InventraScanOverlay.kt$@Composable fun InventraScanOverlay( instruction: String, onScan: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraScanOverlay.kt$@Preview @Composable private fun InventraScanOverlayPreview()</ID>
+    <ID>FunctionNaming:InventraSearchWithFilter.kt$@Composable fun InventraSearchWithFilter( query: String, onQueryChange: (String) -&gt; Unit, onFilterClick: () -&gt; Unit, modifier: Modifier = Modifier, placeholder: String = "Buscar...", )</ID>
+    <ID>FunctionNaming:InventraSearchWithFilter.kt$@Preview @Composable private fun InventraSearchWithFilterPreview()</ID>
+    <ID>FunctionNaming:InventraSecondaryButton.kt$@Composable fun InventraSecondaryButton( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraSecondaryButton.kt$@Preview @Composable private fun InventraSecondaryButtonPreview()</ID>
+    <ID>FunctionNaming:InventraSectionLabel.kt$@Composable fun InventraSectionLabel( text: String, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraSectionLabel.kt$@Preview @Composable private fun InventraSectionLabelPreview()</ID>
+    <ID>FunctionNaming:InventraStarRating.kt$@Composable fun InventraStarRating( rating: Int, modifier: Modifier = Modifier, maxStars: Int = 5, )</ID>
+    <ID>FunctionNaming:InventraStarRating.kt$@Preview @Composable private fun InventraStarRatingPreview()</ID>
+    <ID>FunctionNaming:InventraStatGrid.kt$@Composable fun InventraStatGrid( stats: List&lt;InventraStat&gt;, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraStatGrid.kt$@Preview @Composable private fun InventraStatGridPreview()</ID>
+    <ID>FunctionNaming:InventraStatTile.kt$@Composable fun InventraStatTile( label: String, value: String, trend: String, tone: InventraStatTone, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraStatTile.kt$@Preview @Composable private fun InventraStatTilePreview()</ID>
+    <ID>FunctionNaming:InventraStatusIcon.kt$@Composable fun InventraStatusIcon( variant: InventraStatusIconVariant, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraStatusIcon.kt$@Preview @Composable private fun InventraStatusIconPreview()</ID>
+    <ID>FunctionNaming:InventraSuggestionChip.kt$@Composable fun InventraSuggestionChip( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraSuggestionChip.kt$@Preview @Composable private fun InventraSuggestionChipPreview()</ID>
+    <ID>FunctionNaming:InventraSupplierRow.kt$@Composable fun InventraSupplierRow( painter: Painter, name: String, rating: Int, badgeText: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraSupplierRow.kt$@Preview @Composable private fun InventraSupplierRowPreview()</ID>
+    <ID>FunctionNaming:InventraTextLink.kt$@Composable fun InventraTextLink( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, showArrow: Boolean = false, )</ID>
+    <ID>FunctionNaming:InventraTextLink.kt$@Preview @Composable private fun InventraTextLinkPreview()</ID>
+    <ID>FunctionNaming:InventraThumbnail.kt$@Composable fun InventraThumbnail( painter: Painter, modifier: Modifier = Modifier, shape: Shape = RoundedCornerShape(10.dp), )</ID>
+    <ID>FunctionNaming:InventraTopBar.kt$@Composable fun InventraTopBar( title: @Composable () -&gt; Unit, modifier: Modifier = Modifier, navigationIcon: @Composable () -&gt; Unit = {}, actions: @Composable RowScope.() -&gt; Unit = {}, )</ID>
+    <ID>FunctionNaming:InventraTopBar.kt$@Preview @Composable private fun InventraTopBarBackTitlePreview()</ID>
+    <ID>FunctionNaming:InventraTopBar.kt$@Preview @Composable private fun InventraTopBarGreetingPreview()</ID>
+    <ID>FunctionNaming:InventraTotalCard.kt$@Composable fun InventraTotalCard( label: String, value: String, caption: String, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:InventraTotalCard.kt$@Preview @Composable private fun InventraTotalCardPreview()</ID>
+    <ID>FunctionNaming:LoginScreen.kt$@Composable fun LoginRoute( viewModel: LoginViewModel = viewModel(), modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:LoginScreen.kt$@Composable fun LoginScreen( login: String, onLoginChange: (String) -&gt; Unit, senha: String, onPasswordChange: (String) -&gt; Unit, onLoginClick: () -&gt; Unit, onForgotPasswordClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:LoginScreen.kt$@Preview @Composable private fun LoginScreenPreview()</ID>
+    <ID>FunctionNaming:ScanScreen.kt$@Composable fun ScanRoute( viewModel: ScanViewModel = viewModel(), modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:ScanScreen.kt$@Composable fun ScanScreen( instruction: String, onBackClick: () -&gt; Unit, onFlashClick: () -&gt; Unit, onScan: () -&gt; Unit, onPermissionResult: (Boolean) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:ScanScreen.kt$@Preview @Composable private fun ScanScreenPreview()</ID>
+    <ID>FunctionNaming:Theme.kt$@Composable fun Inventra_mobile_2Theme( darkTheme: Boolean = isSystemInDarkTheme(), // Dynamic color is available on Android 12+ dynamicColor: Boolean = true, content: @Composable () -&gt; Unit, )</ID>
+    <ID>LongMethod:HomeScreen.kt$@Composable fun HomeScreen( userName: String, dateText: String, priorityItems: List&lt;InventraPriorityItem&gt;, stats: List&lt;InventraStat&gt;, onQrScanClick: () -&gt; Unit, onBellClick: () -&gt; Unit, onStockClick: () -&gt; Unit, onHistoryClick: () -&gt; Unit, onNotificationsClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:LoginScreen.kt$@Composable fun LoginScreen( login: String, onLoginChange: (String) -&gt; Unit, senha: String, onPasswordChange: (String) -&gt; Unit, onLoginClick: () -&gt; Unit, onForgotPasswordClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:ScanScreen.kt$@Composable fun ScanScreen( instruction: String, onBackClick: () -&gt; Unit, onFlashClick: () -&gt; Unit, onScan: () -&gt; Unit, onPermissionResult: (Boolean) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:HomeScreen.kt$( userName: String, dateText: String, priorityItems: List&lt;InventraPriorityItem&gt;, stats: List&lt;InventraStat&gt;, onQrScanClick: () -&gt; Unit, onBellClick: () -&gt; Unit, onStockClick: () -&gt; Unit, onHistoryClick: () -&gt; Unit, onNotificationsClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:InventraLabeledField.kt$( label: String, value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, readOnly: Boolean = false, multiline: Boolean = false, isPassword: Boolean = false, placeholder: String, )</ID>
+    <ID>LongParameterList:InventraPriorityRow.kt$( painter: Painter, title: String, statusText: String, urgency: InventraUrgency, modifier: Modifier = Modifier, batch: String, )</ID>
+    <ID>LongParameterList:InventraSupplierRow.kt$( painter: Painter, name: String, rating: Int, badgeText: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:LoginScreen.kt$( login: String, onLoginChange: (String) -&gt; Unit, senha: String, onPasswordChange: (String) -&gt; Unit, onLoginClick: () -&gt; Unit, onForgotPasswordClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:ScanScreen.kt$( instruction: String, onBackClick: () -&gt; Unit, onFlashClick: () -&gt; Unit, onScan: () -&gt; Unit, onPermissionResult: (Boolean) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>MagicNumber:Color.kt$0xFF131018</ID>
+    <ID>MagicNumber:Color.kt$0xFF21804C</ID>
+    <ID>MagicNumber:Color.kt$0xFF4B0F91</ID>
+    <ID>MagicNumber:Color.kt$0xFF625b71</ID>
+    <ID>MagicNumber:Color.kt$0xFF6650a4</ID>
+    <ID>MagicNumber:Color.kt$0xFF7D5260</ID>
+    <ID>MagicNumber:Color.kt$0xFFC4281C</ID>
+    <ID>MagicNumber:Color.kt$0xFFCCC2DC</ID>
+    <ID>MagicNumber:Color.kt$0xFFD0BCFF</ID>
+    <ID>MagicNumber:Color.kt$0xFFEFB8C8</ID>
+    <ID>MagicNumber:Color.kt$0xFFF0B400</ID>
+    <ID>MagicNumber:InventraBadge.kt$50</ID>
+    <ID>MagicNumber:InventraBottomBar.kt$0.5f</ID>
+    <ID>MagicNumber:InventraBrandIcon.kt$0.06f</ID>
+    <ID>MagicNumber:InventraBrandIcon.kt$0.25f</ID>
+    <ID>MagicNumber:InventraBrandIcon.kt$0.5f</ID>
+    <ID>MagicNumber:InventraBrandIcon.kt$0.75f</ID>
+    <ID>MagicNumber:InventraBrandIcon.kt$0.94f</ID>
+    <ID>MagicNumber:InventraQrScanFab.kt$0xFF3A2900</ID>
+    <ID>MagicNumber:ScanViewModel.kt$ScanViewModel$1000</ID>
+    <ID>MagicNumber:Type.kt$400</ID>
+    <ID>MagicNumber:Type.kt$500</ID>
+    <ID>MagicNumber:Type.kt$700</ID>
+    <ID>MatchingDeclarationName:InventraBadge.kt$InventraBadgeVariant</ID>
+    <ID>MatchingDeclarationName:InventraBatchesCard.kt$InventraBatch</ID>
+    <ID>MatchingDeclarationName:InventraBottomBar.kt$InventraBottomDestination</ID>
+    <ID>MatchingDeclarationName:InventraGroupedNotifications.kt$InventraNotification</ID>
+    <ID>MatchingDeclarationName:InventraPriorityAlertsSection.kt$InventraPriorityItem</ID>
+    <ID>MatchingDeclarationName:InventraPriorityRow.kt$InventraUrgency</ID>
+    <ID>MatchingDeclarationName:InventraStatGrid.kt$InventraStat</ID>
+    <ID>MatchingDeclarationName:InventraStatTile.kt$InventraStatTone</ID>
+    <ID>MatchingDeclarationName:InventraStatusIcon.kt$InventraStatusIconVariant</ID>
+    <ID>MaxLineLength:InventraBadge.kt$Text(text = text, color = contentColor, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 11.5.sp)</ID>
+    <ID>MaxLineLength:InventraGroupedNotifications.kt$Text(dateHeader, color = InventraPurple, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 13.sp)</ID>
+    <ID>MaxLineLength:InventraGroupedNotifications.kt$listOf(InventraNotification(InventraStatusIconVariant.Danger, "Leite integral vence amanhã!", "Lote 000067", "08:30"))</ID>
+    <ID>MaxLineLength:InventraPriorityAlertsSection.kt$InventraPriorityItem(R.drawable.ic_inventra_logo, "Arroz Camil", "Vence em 2 dias", InventraUrgency.Normal, "Lote 0001")</ID>
+    <ID>MaxLineLength:InventraScanOverlay.kt$InventraPrimaryButton(text = "Escanear", onClick = onScan, modifier = Modifier.fillMaxWidth().padding(40.dp))</ID>
+    <ID>MaxLineLength:InventraStatTile.kt$InventraStatTile(label = "Economia", value = "R$ 6767,00", trend = "↑ 67% vs mês anterior", tone = InventraStatTone.Positive)</ID>
+    <ID>MaxLineLength:InventraTopBar.kt$Text("Quinta, 2 de julho de 2026", color = Color.White.copy(alpha = 0.8f), fontFamily = Montserrat, fontSize = 12.sp)</ID>
+    <ID>MaxLineLength:InventraTopBar.kt$Text("Seja bem-vindo, Jones!", color = Color.White, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 18.sp)</ID>
+    <ID>MaxLineLength:InventraTopBar.kt$title = { Text("Dar Baixa", color = Color.White, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 17.sp) }</ID>
+    <ID>UnusedParameter:HomeScreen.kt$onHistoryClick: () -&gt; Unit</ID>
+    <ID>UnusedParameter:HomeScreen.kt$onNotificationsClick: () -&gt; Unit</ID>
+    <ID>UnusedParameter:HomeScreen.kt$onStockClick: () -&gt; Unit</ID>
+    <ID>UnusedPrivateMember:HomeScreen.kt$@Preview @Composable private fun HomeScreenPreview()</ID>
+    <ID>UnusedPrivateMember:InventraAuthHeader.kt$@Preview @Composable private fun InventraAuthHeaderPreview()</ID>
+    <ID>UnusedPrivateMember:InventraBadge.kt$@Preview @Composable private fun InventraBadgePreview()</ID>
+    <ID>UnusedPrivateMember:InventraBatchRow.kt$@Preview @Composable private fun InventraBatchRowPreview()</ID>
+    <ID>UnusedPrivateMember:InventraBatchesCard.kt$@Preview @Composable private fun InventraBatchesCardPreview()</ID>
+    <ID>UnusedPrivateMember:InventraBottomBar.kt$@Preview @Composable private fun InventraBottomBarPreview()</ID>
+    <ID>UnusedPrivateMember:InventraBrandIcon.kt$@Preview @Composable private fun InventraBrandIconPreview()</ID>
+    <ID>UnusedPrivateMember:InventraChatEmptyHeader.kt$@Preview @Composable private fun InventraChatEmptyHeaderPreview()</ID>
+    <ID>UnusedPrivateMember:InventraChatInputBar.kt$@Preview @Composable private fun InventraChatInputBarPreview()</ID>
+    <ID>UnusedPrivateMember:InventraFilterChip.kt$@Preview @Composable private fun InventraFilterChipPreview()</ID>
+    <ID>UnusedPrivateMember:InventraFilterChipRow.kt$@Preview @Composable private fun InventraFilterChipRowPreview()</ID>
+    <ID>UnusedPrivateMember:InventraGroupedNotifications.kt$@Preview @Composable private fun InventraGroupedNotificationsPreview()</ID>
+    <ID>UnusedPrivateMember:InventraHistorySection.kt$@Preview @Composable private fun InventraHistorySectionPreview()</ID>
+    <ID>UnusedPrivateMember:InventraLabeledField.kt$@Preview @Composable private fun InventraLabeledFieldPreview()</ID>
+    <ID>UnusedPrivateMember:InventraNotificationRow.kt$@Preview @Composable private fun InventraNotificationRowPreview()</ID>
+    <ID>UnusedPrivateMember:InventraPrimaryButton.kt$@Preview @Composable private fun InventraPrimaryButtonPreview()</ID>
+    <ID>UnusedPrivateMember:InventraPriorityAlertsSection.kt$@Preview @Composable private fun InventraPriorityAlertsSectionPreview()</ID>
+    <ID>UnusedPrivateMember:InventraPriorityRow.kt$@Preview @Composable private fun InventraPriorityRowPreview()</ID>
+    <ID>UnusedPrivateMember:InventraProductRow.kt$@Preview @Composable private fun InventraProductRowPreview()</ID>
+    <ID>UnusedPrivateMember:InventraQrScanFab.kt$@Preview @Composable private fun InventraQrScanFabPreview()</ID>
+    <ID>UnusedPrivateMember:InventraQuantityStepper.kt$@Preview @Composable private fun InventraQuantityStepperPreview()</ID>
+    <ID>UnusedPrivateMember:InventraScanOverlay.kt$@Preview @Composable private fun InventraScanOverlayPreview()</ID>
+    <ID>UnusedPrivateMember:InventraSearchWithFilter.kt$@Preview @Composable private fun InventraSearchWithFilterPreview()</ID>
+    <ID>UnusedPrivateMember:InventraSecondaryButton.kt$@Preview @Composable private fun InventraSecondaryButtonPreview()</ID>
+    <ID>UnusedPrivateMember:InventraSectionLabel.kt$@Preview @Composable private fun InventraSectionLabelPreview()</ID>
+    <ID>UnusedPrivateMember:InventraStarRating.kt$@Preview @Composable private fun InventraStarRatingPreview()</ID>
+    <ID>UnusedPrivateMember:InventraStatGrid.kt$@Preview @Composable private fun InventraStatGridPreview()</ID>
+    <ID>UnusedPrivateMember:InventraStatTile.kt$@Preview @Composable private fun InventraStatTilePreview()</ID>
+    <ID>UnusedPrivateMember:InventraStatusIcon.kt$@Preview @Composable private fun InventraStatusIconPreview()</ID>
+    <ID>UnusedPrivateMember:InventraSuggestionChip.kt$@Preview @Composable private fun InventraSuggestionChipPreview()</ID>
+    <ID>UnusedPrivateMember:InventraSupplierRow.kt$@Preview @Composable private fun InventraSupplierRowPreview()</ID>
+    <ID>UnusedPrivateMember:InventraTextLink.kt$@Preview @Composable private fun InventraTextLinkPreview()</ID>
+    <ID>UnusedPrivateMember:InventraTopBar.kt$@Preview @Composable private fun InventraTopBarBackTitlePreview()</ID>
+    <ID>UnusedPrivateMember:InventraTopBar.kt$@Preview @Composable private fun InventraTopBarGreetingPreview()</ID>
+    <ID>UnusedPrivateMember:InventraTotalCard.kt$@Preview @Composable private fun InventraTotalCardPreview()</ID>
+    <ID>UnusedPrivateMember:LoginScreen.kt$@Preview @Composable private fun LoginScreenPreview()</ID>
+    <ID>UnusedPrivateMember:ScanScreen.kt$@Preview @Composable private fun ScanScreenPreview()</ID>
+  </CurrentIssues>
+</SmellBaseline>
