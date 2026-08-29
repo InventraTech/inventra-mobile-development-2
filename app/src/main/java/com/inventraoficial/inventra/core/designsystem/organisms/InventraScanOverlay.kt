@@ -57,7 +57,7 @@ fun InventraScanOverlay(
                             (size.height - frameHeight) / 2f,
                         ),
                     size = Size(frameWidth, frameHeight),
-                    cornerRadius = CornerRadius(28.dp.toPx()),
+//                    cornerRadius = CornerRadius(18.dp.toPx()),
                     blendMode = BlendMode.Clear,
                 )
             }

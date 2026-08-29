@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -42,33 +41,27 @@ fun ScanScreen(
     onFlashClick: () -> Unit,
     onScan: () -> Unit,
     onPermissionResult: (Boolean) -> Unit,
+    hasCameraPermission: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val previewView = remember { PreviewView(context) }
 
-    var hasCameraPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.CAMERA,
-            ) == PackageManager.PERMISSION_GRANTED,
-        )
-    }
-
     // 1. launcher de permissão
     val permissionLauncher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission(),
         ) { granted ->
-            hasCameraPermission = granted
             onPermissionResult(granted)
         }
 
     // dispara o pedido uma vez, quando a tela entra em composição (só se ainda não tiver permissão)
     LaunchedEffect(Unit) {
-        if (!hasCameraPermission) {
+        val alreadyGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        if (alreadyGranted) {
+            onPermissionResult(true)
+        } else {
             permissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
@@ -148,6 +141,7 @@ fun ScanRoute(
         onScan = viewModel::onScan,
         modifier = modifier,
         onPermissionResult = viewModel::onPermissionResult,
+        hasCameraPermission = uiState.hasCameraPermission,
     )
 }
 
@@ -160,5 +154,6 @@ private fun ScanScreenPreview() {
         onFlashClick = {},
         onScan = {},
         onPermissionResult = {},
+        hasCameraPermission = false,
     )
 }
