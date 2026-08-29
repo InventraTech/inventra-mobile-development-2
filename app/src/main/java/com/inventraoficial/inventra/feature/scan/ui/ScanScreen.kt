@@ -29,6 +29,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraScanOverlay
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.theme.Montserrat
@@ -92,12 +93,7 @@ fun ScanScreen(
         ) {
             InventraTopBar(
                 navigationIcon = {
-                    Text(
-                        "←",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        modifier = Modifier.clickable(onClick = onBackClick),
-                    )
+                    InventraBackButton(onClick = onBackClick)
                 },
                 title = {
                     Text(

@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -56,7 +57,7 @@ fun InventraTopBar(
 @Composable
 private fun InventraTopBarBackTitlePreview() {
     InventraTopBar(
-        navigationIcon = { Text("←", color = Color.White, fontSize = 20.sp) },
+        navigationIcon = { InventraBackButton(onClick = {}) },
         title = { Text("Dar Baixa", color = Color.White, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 17.sp) },
         actions = { Text("Cancelar", color = Color.White, fontFamily = Montserrat, fontSize = 13.sp) },
     )
