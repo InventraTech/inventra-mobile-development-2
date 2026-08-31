@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.core.designsystem.atoms
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,11 +56,15 @@ fun InventraLabeledField(
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
                     errorIndicatorColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                 ),
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(54.dp),
+                    .height(54.dp)
+                    .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
         )
     }
 }
