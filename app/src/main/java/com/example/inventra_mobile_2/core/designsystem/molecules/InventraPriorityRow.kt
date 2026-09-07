@@ -1,0 +1,56 @@
+package com.example.inventra_mobile_2.core.designsystem.molecules
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.inventra_mobile_2.R
+import com.example.inventra_mobile_2.core.designsystem.atoms.InventraThumbnail
+import com.example.inventra_mobile_2.ui.theme.InventraDanger
+import com.example.inventra_mobile_2.ui.theme.InventraPurple
+import com.example.inventra_mobile_2.ui.theme.Montserrat
+
+enum class InventraUrgency { Normal, Tomorrow }
+
+@Composable
+fun InventraPriorityRow(
+    painter: Painter,
+    title: String,
+    statusText: String,
+    urgency: InventraUrgency,
+    modifier: Modifier = Modifier
+) {
+    val statusColor = if (urgency == InventraUrgency.Tomorrow) InventraDanger else InventraPurple
+    Row(
+        modifier = modifier.padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        InventraThumbnail(painter = painter)
+        Column {
+            Text(title, fontFamily = Montserrat, fontWeight = FontWeight.Bold, color = InventraPurple)
+            Text(statusText, fontFamily = Montserrat, color = statusColor, fontSize = 13.sp)
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun InventraPriorityRowPreview() {
+    InventraPriorityRow(
+        painter = painterResource(R.drawable.ic_inventra_logo),
+        title = "Arroz Camil",
+        statusText = "Vence em 2 dias",
+        urgency = InventraUrgency.Normal
+    )
+}
