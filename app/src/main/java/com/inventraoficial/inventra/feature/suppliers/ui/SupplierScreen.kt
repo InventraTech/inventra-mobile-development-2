@@ -133,6 +133,7 @@ fun SupplierRoute(
     )
 }
 
+@Suppress("UnusedPrivateMember", "MagicNumber")
 @Preview
 @Composable
 private fun SupplierScreenPreview() {

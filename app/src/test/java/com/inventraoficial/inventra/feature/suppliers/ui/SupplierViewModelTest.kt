@@ -29,7 +29,10 @@ class SupplierViewModelTest {
 
         viewModel.onSearchQueryChange("fornecedor que nao existe")
 
-        assertTrue(viewModel.uiState.value.suppliers.isEmpty())
+        assertTrue(
+            viewModel.uiState.value.suppliers
+                .isEmpty(),
+        )
     }
 
     @Test

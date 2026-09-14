@@ -18,6 +18,7 @@ class SupplierViewModel : ViewModel() {
         refreshVisibleSuppliers()
     }
 
+    @Suppress("MagicNumber")
     private fun buildFakeSuppliers(): List<Supplier> =
         listOf(
             Supplier(R.drawable.ic_inventra_logo, "Seara Alimentos", 5, "VPQ 50", "Carnes"),
@@ -55,6 +56,7 @@ class SupplierViewModel : ViewModel() {
         // sem comportamento definido ainda
     }
 
+    @Suppress("UnusedParameter")
     fun onSupplierClick(supplier: Supplier) {
         // sem navegação configurada ainda
     }
@@ -63,6 +65,7 @@ class SupplierViewModel : ViewModel() {
         // sem navegação configurada ainda
     }
 
+    @Suppress("UnusedParameter")
     fun onBottomNavSelect(destination: InventraBottomDestination) {
         // sem navegação configurada ainda
     }

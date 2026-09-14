@@ -55,7 +55,12 @@ fun InventraSearchWithFilter(
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     if (query.isEmpty()) {
-                        Text(placeholder, fontFamily = Montserrat, fontSize = 15.sp, color = InventraPurple.copy(alpha = 0.5f))
+                        Text(
+                            placeholder,
+                            fontFamily = Montserrat,
+                            fontSize = 15.sp,
+                            color = InventraPurple.copy(alpha = 0.5f),
+                        )
                     }
                     innerTextField()
                 }

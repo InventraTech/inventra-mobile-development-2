@@ -59,7 +59,9 @@ fun ScanScreen(
 
     // dispara o pedido uma vez, quando a tela entra em composição (só se ainda não tiver permissão)
     LaunchedEffect(Unit) {
-        val alreadyGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        val alreadyGranted =
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED
         if (alreadyGranted) {
             onPermissionResult(true)
         } else {

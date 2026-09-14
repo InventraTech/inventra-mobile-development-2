@@ -159,6 +159,7 @@ fun ProductEditRoute(
     )
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun ProductEditScreenPreview() {

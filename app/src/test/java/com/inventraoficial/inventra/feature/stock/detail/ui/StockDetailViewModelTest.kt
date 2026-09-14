@@ -23,7 +23,8 @@ class StockDetailViewModelTest {
     fun `primeiro lote carregado e o mais urgente`() {
         val viewModel = StockDetailViewModel()
 
-        val firstBatch = viewModel.uiState.value.batches.first()
+        val firstBatch = viewModel.uiState.value.batches
+            .first()
 
         assertTrue(firstBatch.isUrgent)
         assertEquals("AMANHÃ", firstBatch.dateLabel)

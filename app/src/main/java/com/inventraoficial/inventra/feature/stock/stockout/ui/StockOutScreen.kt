@@ -148,6 +148,7 @@ fun StockOutRoute(
     )
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun StockOutScreenPreview() {

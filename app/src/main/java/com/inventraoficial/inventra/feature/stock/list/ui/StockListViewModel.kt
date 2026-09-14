@@ -56,6 +56,7 @@ class StockListViewModel : ViewModel() {
         // sem comportamento definido ainda
     }
 
+    @Suppress("UnusedParameter")
     fun onProductClick(product: Product) {
         // sem navegação configurada ainda
     }
@@ -64,6 +65,7 @@ class StockListViewModel : ViewModel() {
         // sem navegação configurada ainda
     }
 
+    @Suppress("UnusedParameter")
     fun onBottomNavSelect(destination: InventraBottomDestination) {
         // sem navegação configurada ainda
     }

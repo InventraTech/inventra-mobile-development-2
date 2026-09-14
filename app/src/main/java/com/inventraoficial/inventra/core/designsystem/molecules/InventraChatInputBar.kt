@@ -51,7 +51,12 @@ fun InventraChatInputBar(
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     if (value.isEmpty()) {
-                        Text("Digite sua pergunta...", fontFamily = Montserrat, fontSize = 15.sp, color = InventraPurple.copy(alpha = 0.5f))
+                        Text(
+                            "Digite sua pergunta...",
+                            fontFamily = Montserrat,
+                            fontSize = 15.sp,
+                            color = InventraPurple.copy(alpha = 0.5f),
+                        )
                     }
                     innerTextField()
                 }

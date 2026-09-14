@@ -27,6 +27,7 @@ fun InventraBackButton(
     )
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun InventraBackButtonPreview() {

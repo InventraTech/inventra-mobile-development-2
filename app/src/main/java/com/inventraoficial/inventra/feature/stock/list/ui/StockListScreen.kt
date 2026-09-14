@@ -136,6 +136,7 @@ fun StockListRoute(
     )
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun StockListScreenPreview() {
