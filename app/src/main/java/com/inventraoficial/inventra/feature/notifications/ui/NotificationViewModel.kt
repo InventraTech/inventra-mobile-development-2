@@ -24,6 +24,7 @@ class NotificationViewModel : ViewModel() {
         refreshGroupedNotifications()
     }
 
+    @Suppress("MagicNumber")
     private fun buildFakeNotifications(): List<InventraNotification> {
         val today = LocalDate.now()
         return listOf(
@@ -104,6 +105,7 @@ class NotificationViewModel : ViewModel() {
         // sem navegação configurada ainda
     }
 
+    @Suppress("UnusedParameter")
     fun onBottomNavSelect(destination: InventraBottomDestination) {
         // sem navegação configurada ainda
     }

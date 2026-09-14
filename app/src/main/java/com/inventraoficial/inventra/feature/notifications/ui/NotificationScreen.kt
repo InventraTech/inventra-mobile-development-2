@@ -28,6 +28,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.theme.Montserrat
 import java.time.LocalDate
 
+@Suppress("UnusedParameter")
 @Composable
 fun NotificationScreen(
     filterOptions: List<String>,
@@ -110,6 +111,7 @@ fun NotificationRoute(
     )
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun NotificationScreenPreview() {

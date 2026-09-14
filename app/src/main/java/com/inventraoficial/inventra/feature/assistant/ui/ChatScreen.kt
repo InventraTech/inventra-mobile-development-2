@@ -117,6 +117,7 @@ fun ChatRoute(
     )
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun ChatScreenPreview() {

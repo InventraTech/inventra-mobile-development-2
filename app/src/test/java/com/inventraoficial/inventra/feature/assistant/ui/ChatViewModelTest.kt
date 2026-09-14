@@ -27,8 +27,9 @@ class ChatViewModelTest {
     @Test
     fun `onSuggestionClick preenche o campo com a sugestao`() {
         val viewModel = ChatViewModel()
-        val suggestion = viewModel.uiState.value.suggestions
-            .first()
+        val suggestion =
+            viewModel.uiState.value.suggestions
+                .first()
 
         viewModel.onSuggestionClick(suggestion)
 
