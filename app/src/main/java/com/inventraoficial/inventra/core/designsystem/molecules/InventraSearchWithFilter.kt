@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -45,10 +44,11 @@ fun InventraSearchWithFilter(
             singleLine = true,
             textStyle = TextStyle(fontFamily = Montserrat, fontSize = 15.sp),
             cursorBrush = SolidColor(InventraPurple),
-            modifier = Modifier
-                .weight(1f)
-                .height(48.dp)
-                .border(1.5.dp, InventraPurple, RoundedCornerShape(12.dp)),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .height(48.dp)
+                    .border(1.5.dp, InventraPurple, RoundedCornerShape(12.dp)),
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier.padding(horizontal = 12.dp),

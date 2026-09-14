@@ -34,10 +34,11 @@ fun InventraSupplierRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick)
-            .padding(12.dp),
+        modifier =
+            modifier
+                .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+                .clickable(onClick = onClick)
+                .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
