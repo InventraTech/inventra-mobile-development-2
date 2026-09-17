@@ -1,0 +1,12 @@
+complexity:
+  LongMethod:
+    active: true
+    ignoreAnnotated: ['Composable']
+  LongParameterList:
+    active: true
+    ignoreAnnotated: ['Composable']
+
+naming:
+  FunctionNaming:
+    active: true
+    ignoreAnnotated: ['Composable']
