@@ -56,20 +56,4 @@ class HomeViewModel : ViewModel() {
                     ),
             )
     }
-
-    fun onQrScanClick() {
-        // sem navegação configurada ainda
-    }
-
-    fun onBellClick() {
-    }
-
-    fun onStockClick() {
-    }
-
-    fun onHistoryClick() {
-    }
-
-    fun onNotificationsClick() {
-    }
 }

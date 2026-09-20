@@ -27,6 +27,7 @@ data class InventraPriorityItem(
 fun InventraPriorityAlertsSection(
     items: List<InventraPriorityItem>,
     modifier: Modifier = Modifier,
+    onItemClick: (InventraPriorityItem) -> Unit = {},
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text("⚠ Produtos com prioridade", color = InventraDanger, fontFamily = Montserrat, fontWeight = FontWeight.Bold)
@@ -37,6 +38,7 @@ fun InventraPriorityAlertsSection(
                 statusText = item.statusText,
                 urgency = item.urgency,
                 batch = item.batch,
+                onClick = { onItemClick(item) },
             )
         }
     }

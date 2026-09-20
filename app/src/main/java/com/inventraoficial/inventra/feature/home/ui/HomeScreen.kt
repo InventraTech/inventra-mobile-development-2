@@ -2,11 +2,9 @@ package com.inventraoficial.inventra.feature.home.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,14 +24,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraStatTone
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUrgency
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomBar
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPriorityAlertsSection
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPriorityItem
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraQrScanFab
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraStat
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraStatGrid
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -42,74 +39,57 @@ fun HomeScreen(
     dateText: String,
     priorityItems: List<InventraPriorityItem>,
     stats: List<InventraStat>,
-    onQrScanClick: () -> Unit,
     onBellClick: () -> Unit,
-    onStockClick: () -> Unit,
-    onHistoryClick: () -> Unit,
-    onNotificationsClick: () -> Unit,
+    onPriorityItemClick: (InventraPriorityItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(Color.White),
+    ) {
+        InventraTopBar(
+            title = {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        "Seja bem-vindo, $userName!",
+                        color = Color.White,
+                        fontFamily = Montserrat,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                    )
+                    Text(
+                        dateText,
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontFamily = Montserrat,
+                        fontSize = 12.sp,
+                    )
+                }
+            },
+            actions = {
+                Text("🔔", fontSize = 20.sp, modifier = Modifier.clickable(onClick = onBellClick))
+            },
+        )
         Column(
             modifier =
                 Modifier
-                    .fillMaxSize()
-                    .background(Color.White),
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            InventraTopBar(
-                title = {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            "Seja bem-vindo, $userName!",
-                            color = Color.White,
-                            fontFamily = Montserrat,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                        )
-                        Text(
-                            dateText,
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontFamily = Montserrat,
-                            fontSize = 12.sp,
-                        )
-                    }
-                },
-                actions = {
-                    Text("🔔", fontSize = 20.sp, modifier = Modifier.clickable(onClick = onBellClick))
-                },
+            InventraPriorityAlertsSection(items = priorityItems, onItemClick = onPriorityItemClick)
+            Text(
+                text = "Dados do Mês",
+                fontFamily = Montserrat,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 20.dp),
+                color = InventraPurple,
             )
-            Column(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                InventraPriorityAlertsSection(items = priorityItems)
-                Text(
-                    text = "Dados do Mês",
-                    fontFamily = Montserrat,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(top = 20.dp),
-                    color = InventraPurple,
-                )
-                InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp))
-            }
-            InventraBottomBar(
-                selected = InventraBottomDestination.Home,
-                onSelect = {},
-            )
+            InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp))
         }
-        InventraQrScanFab(
-            onClick = onQrScanClick,
-            modifier =
-                Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 20.dp)
-                    .offset(y = (-90).dp),
-        )
     }
 }
 
@@ -117,6 +97,7 @@ fun HomeScreen(
 fun HomeRoute(
     viewModel: HomeViewModel = viewModel(),
     modifier: Modifier = Modifier,
+    backStack: SnapshotStateList<Screen>,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -125,11 +106,8 @@ fun HomeRoute(
         dateText = uiState.dateText,
         priorityItems = uiState.priorityItems,
         stats = uiState.stats,
-        onQrScanClick = viewModel::onQrScanClick,
-        onBellClick = viewModel::onBellClick,
-        onStockClick = viewModel::onStockClick,
-        onHistoryClick = viewModel::onHistoryClick,
-        onNotificationsClick = viewModel::onNotificationsClick,
+        onBellClick = { backStack.add(Screen.Notifications) },
+        onPriorityItemClick = { backStack.add(Screen.StockDetail) },
         modifier = modifier,
     )
 }
@@ -164,10 +142,7 @@ private fun HomeScreenPreview() {
                 InventraStat("Perdas", "R$ 6767,00", "↓ 67%", InventraStatTone.Negative),
                 InventraStat("Economia", "R$ 6767,00", "↑ 67%", InventraStatTone.Positive),
             ),
-        onQrScanClick = {},
         onBellClick = {},
-        onStockClick = {},
-        onHistoryClick = {},
-        onNotificationsClick = {},
+        onPriorityItemClick = {},
     )
 }
