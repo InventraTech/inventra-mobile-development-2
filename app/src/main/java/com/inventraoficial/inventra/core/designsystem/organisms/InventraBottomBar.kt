@@ -111,7 +111,7 @@ fun InventraBottomBar(
                         InventraNotchedBarShape(
                             cornerRadius = 22.dp,
                             notchRadius = 24.dp,
-                            notchMargin = 8.dp,
+                            notchMargin = 4.dp,
                             notchCenterFraction = notchCenterFraction,
                         ),
                     ).padding(vertical = 14.dp),
@@ -138,7 +138,7 @@ fun InventraBottomBar(
         Box(
             modifier =
                 Modifier
-                    .offset(x = circleX, y = (-18).dp)
+                    .offset(x = circleX, y = (-24).dp)
                     .size(circleSize)
                     .clip(CircleShape)
                     .background(InventraPurple)
