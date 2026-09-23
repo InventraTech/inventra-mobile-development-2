@@ -2,7 +2,6 @@ package com.inventraoficial.inventra.feature.suppliers.ui
 
 import androidx.lifecycle.ViewModel
 import com.inventraoficial.inventra.R
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,15 +57,6 @@ class SupplierViewModel : ViewModel() {
 
     @Suppress("UnusedParameter")
     fun onSupplierClick(supplier: Supplier) {
-        // sem navegação configurada ainda
-    }
-
-    fun onQrScanClick() {
-        // sem navegação configurada ainda
-    }
-
-    @Suppress("UnusedParameter")
-    fun onBottomNavSelect(destination: InventraBottomDestination) {
-        // sem navegação configurada ainda
+        // sem tela de detalhe de fornecedor ainda
     }
 }

@@ -23,6 +23,7 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraChatInpu
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSuggestionChip
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraChatEmptyHeader
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -99,6 +100,7 @@ fun ChatScreen(
 
 @Composable
 fun ChatRoute(
+    navigator: Navigator,
     viewModel: ChatViewModel = viewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -111,7 +113,7 @@ fun ChatRoute(
         inputValue = uiState.inputValue,
         onInputChange = viewModel::onInputChange,
         onSend = viewModel::onSend,
-        onBackClick = viewModel::onBackClick,
+        onBackClick = { navigator.back() },
         onMenuClick = viewModel::onMenuClick,
         modifier = modifier,
     )

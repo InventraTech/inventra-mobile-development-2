@@ -27,6 +27,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraQuantityStep
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSectionLabel
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -129,6 +130,7 @@ fun StockOutScreen(
 
 @Composable
 fun StockOutRoute(
+    navigator: Navigator,
     viewModel: StockOutViewModel = viewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -142,8 +144,8 @@ fun StockOutRoute(
         reason = uiState.reason,
         onReasonChange = viewModel::onReasonChange,
         onConfirmClick = viewModel::onConfirmClick,
-        onCancelClick = viewModel::onCancelClick,
-        onBackClick = viewModel::onBackClick,
+        onCancelClick = { navigator.back() },
+        onBackClick = { navigator.back() },
         modifier = modifier,
     )
 }

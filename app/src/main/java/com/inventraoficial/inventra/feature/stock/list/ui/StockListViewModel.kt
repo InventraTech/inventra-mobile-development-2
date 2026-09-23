@@ -2,7 +2,6 @@ package com.inventraoficial.inventra.feature.stock.list.ui
 
 import androidx.lifecycle.ViewModel
 import com.inventraoficial.inventra.R
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,19 +53,5 @@ class StockListViewModel : ViewModel() {
 
     fun onFilterIconClick() {
         // sem comportamento definido ainda
-    }
-
-    @Suppress("UnusedParameter")
-    fun onProductClick(product: Product) {
-        // sem navegação configurada ainda
-    }
-
-    fun onQrScanClick() {
-        // sem navegação configurada ainda
-    }
-
-    @Suppress("UnusedParameter")
-    fun onBottomNavSelect(destination: InventraBottomDestination) {
-        // sem navegação configurada ainda
     }
 }

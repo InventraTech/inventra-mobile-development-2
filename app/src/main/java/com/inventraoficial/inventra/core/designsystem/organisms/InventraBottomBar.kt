@@ -14,7 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inventory2
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,10 +43,11 @@ import com.inventraoficial.inventra.ui.theme.InventraPurple
 enum class InventraBottomDestination(
     val icon: ImageVector,
 ) {
-    Home(Icons.Default.Home),
+    Suppliers(Icons.Default.LocalShipping),
     Stock(Icons.Default.Inventory2),
+    Home(Icons.Default.Home),
     History(Icons.Default.History),
-    Notifications(Icons.Default.Notifications),
+    Perfil(Icons.Default.Person),
 }
 
 private class InventraNotchedBarShape(
@@ -109,7 +111,7 @@ fun InventraBottomBar(
                         InventraNotchedBarShape(
                             cornerRadius = 22.dp,
                             notchRadius = 24.dp,
-                            notchMargin = 8.dp,
+                            notchMargin = 4.dp,
                             notchCenterFraction = notchCenterFraction,
                         ),
                     ).padding(vertical = 14.dp),
@@ -136,7 +138,7 @@ fun InventraBottomBar(
         Box(
             modifier =
                 Modifier
-                    .offset(x = circleX, y = (-18).dp)
+                    .offset(x = circleX, y = (-24).dp)
                     .size(circleSize)
                     .clip(CircleShape)
                     .background(InventraPurple)

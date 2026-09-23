@@ -20,15 +20,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraStatusIconVariant
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraFilterChipRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraGroupedNotifications
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraNotification
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.Montserrat
 import java.time.LocalDate
 
-@Suppress("UnusedParameter")
 @Composable
 fun NotificationScreen(
     filterOptions: List<String>,
@@ -38,8 +37,6 @@ fun NotificationScreen(
     isHistoryExpanded: Boolean,
     onSeeAllClick: () -> Unit,
     onBackClick: () -> Unit,
-    selectedDestination: InventraBottomDestination,
-    onBottomNavSelect: (InventraBottomDestination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -92,6 +89,7 @@ fun NotificationScreen(
 
 @Composable
 fun NotificationRoute(
+    navigator: Navigator,
     viewModel: NotificationViewModel = viewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -104,9 +102,7 @@ fun NotificationRoute(
         groupedNotifications = uiState.groupedNotifications,
         isHistoryExpanded = uiState.isHistoryExpanded,
         onSeeAllClick = viewModel::onSeeAllClick,
-        onBackClick = viewModel::onBackClick,
-        selectedDestination = uiState.selectedDestination,
-        onBottomNavSelect = viewModel::onBottomNavSelect,
+        onBackClick = { navigator.back() },
         modifier = modifier,
     )
 }
@@ -152,7 +148,5 @@ private fun NotificationScreenPreview() {
         isHistoryExpanded = false,
         onSeeAllClick = {},
         onBackClick = {},
-        selectedDestination = InventraBottomDestination.Notifications,
-        onBottomNavSelect = {},
     )
 }

@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.core.designsystem.molecules
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,7 @@ fun InventraPriorityRow(
     urgency: InventraUrgency,
     modifier: Modifier = Modifier,
     batch: String,
+    onClick: () -> Unit = {},
 ) {
     val statusColor = if (urgency == InventraUrgency.Tomorrow) InventraDanger else InventraPurple
     Row(
@@ -41,7 +43,8 @@ fun InventraPriorityRow(
             modifier
                 .border(1.dp, color = InventraPurple.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
                 .fillMaxWidth()
-                .height(100.dp),
+                .height(100.dp)
+                .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {

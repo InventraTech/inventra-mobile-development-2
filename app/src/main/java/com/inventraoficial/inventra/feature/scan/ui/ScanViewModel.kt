@@ -12,10 +12,6 @@ class ScanViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ScanUiState())
     val uiState: StateFlow<ScanUiState> = _uiState.asStateFlow()
 
-    fun onBackClick() {
-        // sem navegação configurada ainda
-    }
-
     fun onFlashClick() {
         _uiState.value = _uiState.value.copy(isFlashOn = !_uiState.value.isFlashOn)
     }

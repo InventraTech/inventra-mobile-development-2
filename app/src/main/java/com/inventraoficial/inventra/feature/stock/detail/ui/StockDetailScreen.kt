@@ -33,6 +33,8 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatchesC
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraHistorySection
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTotalCard
+import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -131,6 +133,7 @@ fun StockDetailScreen(
 
 @Composable
 fun StockDetailRoute(
+    navigator: Navigator,
     viewModel: StockDetailViewModel = viewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -149,8 +152,8 @@ fun StockDetailRoute(
         storage = uiState.storage,
         onEntriesClick = viewModel::onEntriesClick,
         onExitsClick = viewModel::onExitsClick,
-        onStockOutClick = viewModel::onStockOutClick,
-        onBackClick = viewModel::onBackClick,
+        onStockOutClick = { navigator.navigate(Screen.StockOut) },
+        onBackClick = { navigator.back() },
         modifier = modifier,
     )
 }
