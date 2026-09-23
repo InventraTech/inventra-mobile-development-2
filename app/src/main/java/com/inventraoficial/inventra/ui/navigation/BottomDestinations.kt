@@ -6,15 +6,16 @@ fun InventraBottomDestination.toScreen(): Screen =
     when (this) {
         InventraBottomDestination.Home -> Screen.Home
         InventraBottomDestination.Stock -> Screen.StockList
-        InventraBottomDestination.Notifications -> Screen.Notifications
+        InventraBottomDestination.Suppliers -> Screen.Suppliers
         // Placeholder: ainda não existe Screen.History
-        InventraBottomDestination.History -> Screen.StockOut
+        InventraBottomDestination.History -> Screen.Home
+        InventraBottomDestination.Perfil -> Screen.Home
     }
 
 fun Screen.toBottomDestination(): InventraBottomDestination? =
     when (this) {
         Screen.Home -> InventraBottomDestination.Home
         Screen.StockList -> InventraBottomDestination.Stock
-        Screen.Notifications -> InventraBottomDestination.Notifications
+        Screen.Suppliers -> InventraBottomDestination.Suppliers
         else -> null
     }

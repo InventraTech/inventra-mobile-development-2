@@ -99,5 +99,4 @@ class NotificationViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(isHistoryExpanded = !_uiState.value.isHistoryExpanded)
         refreshGroupedNotifications()
     }
-
 }
