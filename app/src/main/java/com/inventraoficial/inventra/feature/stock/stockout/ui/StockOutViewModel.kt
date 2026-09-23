@@ -33,12 +33,4 @@ class StockOutViewModel : ViewModel() {
     fun onConfirmClick() {
         // sem persistência real configurada ainda
     }
-
-    fun onCancelClick() {
-        // sem navegação configurada ainda
-    }
-
-    fun onBackClick() {
-        // sem navegação configurada ainda
-    }
 }

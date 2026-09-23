@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +28,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraPriority
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraStat
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraStatGrid
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
@@ -95,9 +95,9 @@ fun HomeScreen(
 
 @Composable
 fun HomeRoute(
+    navigator: Navigator,
     viewModel: HomeViewModel = viewModel(),
     modifier: Modifier = Modifier,
-    backStack: SnapshotStateList<Screen>,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -106,8 +106,8 @@ fun HomeRoute(
         dateText = uiState.dateText,
         priorityItems = uiState.priorityItems,
         stats = uiState.stats,
-        onBellClick = { backStack.add(Screen.Notifications) },
-        onPriorityItemClick = { backStack.add(Screen.StockDetail) },
+        onBellClick = { navigator.navigate(Screen.Notifications) },
+        onPriorityItemClick = { navigator.navigate(Screen.StockDetail) },
         modifier = modifier,
     )
 }

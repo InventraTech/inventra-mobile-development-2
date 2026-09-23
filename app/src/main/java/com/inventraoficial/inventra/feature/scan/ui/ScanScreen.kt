@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraScanOverlay
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.Montserrat
 import androidx.camera.core.Preview as CameraPreview
 
@@ -127,6 +128,7 @@ fun ScanScreen(
 
 @Composable
 fun ScanRoute(
+    navigator: Navigator,
     viewModel: ScanViewModel = viewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -134,7 +136,7 @@ fun ScanRoute(
 
     ScanScreen(
         instruction = uiState.instruction,
-        onBackClick = viewModel::onBackClick,
+        onBackClick = { navigator.back() },
         onFlashClick = viewModel::onFlashClick,
         onScan = viewModel::onScan,
         modifier = modifier,

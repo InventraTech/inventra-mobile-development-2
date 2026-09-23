@@ -22,10 +22,6 @@ class ChatViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(inputValue = "")
     }
 
-    fun onBackClick() {
-        // sem navegação configurada ainda
-    }
-
     fun onMenuClick() {
         // sem comportamento definido ainda
     }

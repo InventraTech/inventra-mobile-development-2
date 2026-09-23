@@ -23,9 +23,12 @@ import com.inventraoficial.inventra.feature.suppliers.ui.SupplierRoute
 
 @Composable
 fun SetupNavigation() {
-    val backStack = remember { mutableStateListOf<Screen>(Screen.Home) }
+    val navigator =
+        remember {
+            Navigator(mutableStateListOf(Screen.Home))
+        }
 
-    val currentScreen = backStack.last()
+    val currentScreen = navigator.currentBackStack.last()
     val selectedTab = currentScreen.toBottomDestination()
 
     Scaffold(
@@ -34,7 +37,7 @@ fun SetupNavigation() {
                 InventraBottomBar(
                     selected = selectedTab,
                     onSelect = { destination ->
-                        backStack.navigateTopLevel(destination.toScreen())
+                        navigator.navigateTopLevel(destination.toScreen())
                     },
                 )
             }
@@ -42,43 +45,43 @@ fun SetupNavigation() {
         floatingActionButton = {
             if (selectedTab == InventraBottomDestination.Stock || selectedTab == InventraBottomDestination.Home) {
                 InventraQrScanFab(
-                    onClick = { backStack.add(Screen.Scan) },
+                    onClick = { navigator.navigate(Screen.Scan) },
                 )
             }
         },
     ) { innerPadding ->
         NavDisplay(
             modifier = Modifier.padding(innerPadding),
-            backStack = backStack,
-            onBack = { backStack.removeLastOrNull() },
+            backStack = navigator.currentBackStack,
+            onBack = { navigator.back() },
             entryProvider =
                 entryProvider {
                     entry<Screen.Chat> {
-                        ChatRoute()
+                        ChatRoute(navigator = navigator)
                     }
                     entry<Screen.StockList> {
-                        StockListRoute()
+                        StockListRoute(navigator = navigator)
                     }
                     entry<Screen.Notifications> {
-                        NotificationRoute()
+                        NotificationRoute(navigator = navigator)
                     }
                     entry<Screen.Suppliers> {
                         SupplierRoute()
                     }
                     entry<Screen.Scan> {
-                        ScanRoute()
+                        ScanRoute(navigator = navigator)
                     }
                     entry<Screen.StockDetail> {
-                        StockDetailRoute()
+                        StockDetailRoute(navigator = navigator)
                     }
                     entry<Screen.ProductEdit> {
-                        ProductEditRoute()
+                        ProductEditRoute(navigator = navigator)
                     }
                     entry<Screen.StockOut> {
-                        StockOutRoute()
+                        StockOutRoute(navigator = navigator)
                     }
                     entry<Screen.Home> {
-                        HomeRoute(backStack = backStack)
+                        HomeRoute(navigator = navigator)
                     }
                 },
         )

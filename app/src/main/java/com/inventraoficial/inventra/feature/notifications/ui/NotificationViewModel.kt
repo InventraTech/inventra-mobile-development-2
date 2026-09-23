@@ -2,7 +2,6 @@ package com.inventraoficial.inventra.feature.notifications.ui
 
 import androidx.lifecycle.ViewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraStatusIconVariant
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraNotification
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -101,12 +100,4 @@ class NotificationViewModel : ViewModel() {
         refreshGroupedNotifications()
     }
 
-    fun onBackClick() {
-        // sem navegação configurada ainda
-    }
-
-    @Suppress("UnusedParameter")
-    fun onBottomNavSelect(destination: InventraBottomDestination) {
-        // sem navegação configurada ainda
-    }
 }

@@ -48,12 +48,4 @@ class ProductEditViewModel : ViewModel() {
     fun onSaveClick() {
         // sem persistencia real configurada ainda
     }
-
-    fun onCancelClick() {
-        // sem navegação configurada ainda
-    }
-
-    fun onBackClick() {
-        // sem navegação configurada ainda
-    }
 }

@@ -1,7 +1,5 @@
 package com.inventraoficial.inventra.feature.suppliers.ui
 
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
-
 data class Supplier(
     val imageRes: Int,
     val name: String,
@@ -15,5 +13,4 @@ data class SupplierUiState(
     val filterOptions: List<String> = listOf("Todos", "Carnes", "Laticínios", "Grãos"),
     val selectedFilter: String = "Todos",
     val suppliers: List<Supplier> = emptyList(),
-    val selectedDestination: InventraBottomDestination = InventraBottomDestination.Stock,
 )

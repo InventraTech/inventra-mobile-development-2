@@ -32,23 +32,15 @@ class StockDetailViewModel : ViewModel() {
             )
     }
 
-    fun onBackClick() {
-        // sem navegação configurada ainda
-    }
-
     fun onSeeAllBatchesClick() {
-        // sem navegação configurada ainda
+        // sem tela de lista de lotes ainda
     }
 
     fun onEntriesClick() {
-        // sem navegação configurada ainda
+        // sem tela de histórico de entradas ainda
     }
 
     fun onExitsClick() {
-        // sem navegação configurada ainda
-    }
-
-    fun onStockOutClick() {
-        // sem navegação configurada ainda
+        // sem tela de histórico de saídas ainda
     }
 }

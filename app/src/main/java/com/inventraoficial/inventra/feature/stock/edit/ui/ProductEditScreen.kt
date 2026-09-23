@@ -25,6 +25,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -136,6 +137,7 @@ fun ProductEditScreen(
 
 @Composable
 fun ProductEditRoute(
+    navigator: Navigator,
     viewModel: ProductEditViewModel = viewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -153,8 +155,8 @@ fun ProductEditRoute(
         quantity = uiState.quantity,
         onQuantityChange = viewModel::onQuantityChange,
         onSaveClick = viewModel::onSaveClick,
-        onCancelClick = viewModel::onCancelClick,
-        onBackClick = viewModel::onBackClick,
+        onCancelClick = { navigator.back() },
+        onBackClick = { navigator.back() },
         modifier = modifier,
     )
 }
