@@ -18,6 +18,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomBa
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraQrScanFab
 import com.inventraoficial.inventra.feature.assistant.ui.ChatRoute
+import com.inventraoficial.inventra.feature.auth.ui.LoginRoute
 import com.inventraoficial.inventra.feature.home.ui.HomeRoute
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
 import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
@@ -31,7 +32,7 @@ import com.inventraoficial.inventra.feature.suppliers.ui.SupplierRoute
 fun SetupNavigation() {
     val navigator =
         remember {
-            Navigator(mutableStateListOf(Screen.Home))
+            Navigator(mutableStateListOf(Screen.Login))
         }
 
     val currentScreen = navigator.currentBackStack.last()
@@ -97,6 +98,9 @@ fun SetupNavigation() {
                     }
                     entry<Screen.Home> {
                         HomeRoute(navigator = navigator)
+                    }
+                    entry<Screen.Login> {
+                        LoginRoute(navigator = navigator)
                     }
                 },
         )

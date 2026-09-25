@@ -17,13 +17,14 @@ class LoginViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(password = password)
     }
 
-    fun onLoginClick() {
+    fun onLoginClick(): Boolean {
         val estadoAtual = _uiState.value
         if (estadoAtual.login.isBlank() || estadoAtual.password.isBlank()) {
             _uiState.value = _uiState.value.copy(errorMessage = "Preencha todos os campos")
-        } else {
-            // por enquanto, sem chamada real — pode só limpar o erro, ou deixar vazio mesmo
+            return false
         }
+        _uiState.value = _uiState.value.copy(errorMessage = null)
+        return true
     }
 
     fun onForgotPasswordClick() {
