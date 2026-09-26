@@ -37,11 +37,6 @@ fun SetupNavigation() {
     val currentScreen = navigator.currentBackStack.last()
     val selectedTab = currentScreen.toBottomDestination()
     val isLogin = currentScreen == Screen.Login
-
-    // O app desenha por baixo das barras do sistema: quem cobre cada uma delas e:
-    // - barra de status: a InventraTopBar (o Login tem fundo branco e nao usa top bar)
-    // - barra de navegacao: a InventraBottomBar nas abas; nas demais telas, este modificador
-    // - Login: vai de ponta a ponta, com as formas decorativas encostando nas bordas
     val insetsModifier =
         if (selectedTab == null && !isLogin) Modifier.navigationBarsPadding() else Modifier
 
