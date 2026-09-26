@@ -1,4 +1,4 @@
-package com.inventraoficial.inventra.feature.auth.ui
+package com.inventraoficial.inventra.feature.auth.login.ui
 
 data class LoginUiState(
     val login: String = "",

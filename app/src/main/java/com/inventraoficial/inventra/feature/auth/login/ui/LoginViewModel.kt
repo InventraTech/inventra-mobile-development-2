@@ -1,4 +1,4 @@
-package com.inventraoficial.inventra.feature.auth.ui
+package com.inventraoficial.inventra.feature.auth.login.ui
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,10 +23,21 @@ class LoginViewModel : ViewModel() {
             _uiState.value = _uiState.value.copy(errorMessage = "Preencha todos os campos")
             return false
         }
+
+        if (estadoAtual.login != TEST_LOGIN || estadoAtual.password != TEST_PASSWORD) {
+            _uiState.value = _uiState.value.copy(errorMessage = "Credenciais inválidas")
+            return false
+        }
+
         _uiState.value = _uiState.value.copy(errorMessage = null)
         return true
     }
 
     fun onForgotPasswordClick() {
+    }
+
+    private companion object {
+        const val TEST_LOGIN = "felipe.kogake@gmail.com"
+        const val TEST_PASSWORD = "kogake77"
     }
 }

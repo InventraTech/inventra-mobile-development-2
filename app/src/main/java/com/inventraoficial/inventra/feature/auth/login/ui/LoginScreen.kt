@@ -1,4 +1,4 @@
-package com.inventraoficial.inventra.feature.auth.ui
+package com.inventraoficial.inventra.feature.auth.login.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
+import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 
 @Composable
@@ -43,6 +45,7 @@ fun LoginScreen(
     onLoginClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
     onBiometricClick: () -> Unit,
+    errorMessage: String?,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -93,6 +96,9 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Insira sua Senha",
             )
+            errorMessage?.let { message ->
+                Text(text = message, color = InventraDanger)
+            }
             InventraPrimaryButton(
                 text = "Entrar",
                 onClick = onLoginClick,
@@ -139,6 +145,7 @@ fun LoginRoute(
         },
         onForgotPasswordClick = viewModel::onForgotPasswordClick,
         onBiometricClick = { navigator.navigateTopLevel(Screen.Home) },
+        errorMessage = uiState.errorMessage,
         modifier = modifier,
     )
 }
@@ -154,5 +161,6 @@ private fun LoginScreenPreview() {
         onLoginClick = {},
         onForgotPasswordClick = {},
         onBiometricClick = {},
+        errorMessage = null,
     )
 }

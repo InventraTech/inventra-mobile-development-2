@@ -18,7 +18,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomBa
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraQrScanFab
 import com.inventraoficial.inventra.feature.assistant.ui.ChatRoute
-import com.inventraoficial.inventra.feature.auth.ui.LoginRoute
+import com.inventraoficial.inventra.feature.auth.login.ui.LoginRoute
 import com.inventraoficial.inventra.feature.home.ui.HomeRoute
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
 import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
