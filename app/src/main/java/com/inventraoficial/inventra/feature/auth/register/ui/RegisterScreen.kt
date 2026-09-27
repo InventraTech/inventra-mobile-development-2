@@ -152,7 +152,11 @@ fun RegisterRoute(
         onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
         onRegisterClick = {
             if (viewModel.onRegisterClick()) {
-                navigator.navigateTopLevel(Screen.Home)
+                if (uiState.role == InventraUserRole.Supervisor) {
+                    navigator.replaceStack(Screen.CreateCozinha)
+                } else {
+                    navigator.replaceStack(Screen.SelectCozinha)
+                }
             }
         },
         onBackToLoginClick = { navigator.back() },

@@ -19,4 +19,15 @@ class Navigator(
     fun navigateTopLevel(screen: Screen) {
         backStack.navigateTopLevel(screen)
     }
+
+    /**
+     * Esquece toda a pilha atual e deixa so [screen]. Diferente de
+     * [navigateTopLevel], nao insere a Home por baixo - usado em
+     * transicoes de fluxo (ex: apos cadastro) onde nem a Home ainda
+     * faz sentido como destino.
+     */
+    fun replaceStack(screen: Screen) {
+        backStack.clear()
+        backStack.add(screen)
+    }
 }
