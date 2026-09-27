@@ -1,8 +1,7 @@
-package com.inventraoficial.inventra.feature.auth.login.ui
+package com.inventraoficial.inventra.feature.auth.register.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,9 +11,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,22 +26,25 @@ import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
+import com.inventraoficial.inventra.core.designsystem.molecules.InventraRoleSelector
+import com.inventraoficial.inventra.core.designsystem.molecules.InventraUserRole
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraDanger
-import com.inventraoficial.inventra.ui.theme.InventraPurple
 
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
+    role: InventraUserRole?,
+    onRoleSelect: (InventraUserRole) -> Unit,
     login: String,
     onLoginChange: (String) -> Unit,
     senha: String,
     onPasswordChange: (String) -> Unit,
-    onLoginClick: () -> Unit,
-    onForgotPasswordClick: () -> Unit,
-    onBiometricClick: () -> Unit,
-    onCreateAccountClick: () -> Unit,
+    confirmarSenha: String,
+    onConfirmPasswordChange: (String) -> Unit,
+    onRegisterClick: () -> Unit,
+    onBackToLoginClick: () -> Unit,
     errorMessage: String?,
     modifier: Modifier = Modifier,
 ) {
@@ -67,9 +66,7 @@ fun LoginScreen(
         Image(
             painter = painterResource(id = R.drawable.bg_shape_purple_bottom),
             contentDescription = "Background shape yellow bottom",
-            modifier =
-                Modifier
-                    .align(Alignment.BottomStart),
+            modifier = Modifier.align(Alignment.BottomStart),
         )
         Column(
             modifier =
@@ -80,7 +77,11 @@ fun LoginScreen(
         ) {
             InventraAuthHeader(
                 appName = "Inventra",
-                subtitle = "Seja bem-vindo(a) ao Inventra!",
+                subtitle = "Crie sua conta",
+            )
+            InventraRoleSelector(
+                selectedRole = role,
+                onRoleSelect = onRoleSelect,
             )
             InventraLabeledField(
                 label = "Login",
@@ -97,60 +98,56 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Insira sua Senha",
             )
+            InventraLabeledField(
+                label = "Confirmar senha",
+                value = confirmarSenha,
+                onValueChange = onConfirmPasswordChange,
+                isPassword = true,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = "Confirme sua Senha",
+            )
             errorMessage?.let { message ->
                 Text(text = message, color = InventraDanger)
             }
             InventraPrimaryButton(
-                text = "Entrar",
-                onClick = onLoginClick,
+                text = "Criar",
+                onClick = onRegisterClick,
                 modifier =
                     Modifier
                         .width(300.dp)
-                        .padding(0.dp, 35.dp, 0.dp, 20.dp),
+                        .padding(0.dp, 15.dp, 0.dp, 20.dp),
             )
             InventraTextLink(
-                text = "Esqueci minha senha",
-                onClick = onForgotPasswordClick,
-            )
-            InventraTextLink(
-                text = "Criar conta",
-                onClick = onCreateAccountClick,
-            )
-            Icon(
-                imageVector = Icons.Default.Fingerprint,
-                contentDescription = "Entrar com biometria",
-                modifier =
-                    Modifier
-                        .padding(top = 30.dp)
-                        .size(70.dp)
-                        .clickable(onClick = onBiometricClick),
-                tint = InventraPurple,
+                text = "Já tenho uma conta!",
+                onClick = onBackToLoginClick,
             )
         }
     }
 }
 
 @Composable
-fun LoginRoute(
+fun RegisterRoute(
     navigator: Navigator,
-    viewModel: LoginViewModel = viewModel(),
+    viewModel: RegisterViewModel = viewModel(),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    LoginScreen(
+    RegisterScreen(
+        role = uiState.role,
+        onRoleSelect = viewModel::onRoleSelect,
         login = uiState.login,
         onLoginChange = viewModel::onLoginChange,
         senha = uiState.password,
         onPasswordChange = viewModel::onPasswordChange,
-        onLoginClick = {
-            if (viewModel.onLoginClick()) {
+        confirmarSenha = uiState.confirmPassword,
+        onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
+        onRegisterClick = {
+            if (viewModel.onRegisterClick()) {
                 navigator.navigateTopLevel(Screen.Home)
             }
         },
-        onForgotPasswordClick = viewModel::onForgotPasswordClick,
-        onBiometricClick = { navigator.navigateTopLevel(Screen.Home) },
-        onCreateAccountClick = { navigator.navigate(Screen.Register) },
+        onBackToLoginClick = { navigator.back() },
         errorMessage = uiState.errorMessage,
         modifier = modifier,
     )
@@ -158,16 +155,18 @@ fun LoginRoute(
 
 @Preview
 @Composable
-private fun LoginScreenPreview() {
-    LoginScreen(
+private fun RegisterScreenPreview() {
+    RegisterScreen(
+        role = InventraUserRole.Supervisor,
+        onRoleSelect = {},
         login = "",
         onLoginChange = {},
         senha = "",
         onPasswordChange = {},
-        onLoginClick = {},
-        onForgotPasswordClick = {},
-        onBiometricClick = {},
-        onCreateAccountClick = {},
+        confirmarSenha = "",
+        onConfirmPasswordChange = {},
+        onRegisterClick = {},
+        onBackToLoginClick = {},
         errorMessage = null,
     )
 }

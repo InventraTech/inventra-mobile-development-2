@@ -19,6 +19,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDe
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraQrScanFab
 import com.inventraoficial.inventra.feature.assistant.ui.ChatRoute
 import com.inventraoficial.inventra.feature.auth.login.ui.LoginRoute
+import com.inventraoficial.inventra.feature.auth.register.ui.RegisterRoute
 import com.inventraoficial.inventra.feature.home.ui.HomeRoute
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
 import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
@@ -37,12 +38,12 @@ fun SetupNavigation() {
 
     val currentScreen = navigator.currentBackStack.last()
     val selectedTab = currentScreen.toBottomDestination()
-    val isLogin = currentScreen == Screen.Login
+    val isFullBleed = currentScreen.isFullBleed()
     val insetsModifier =
-        if (selectedTab == null && !isLogin) Modifier.navigationBarsPadding() else Modifier
+        if (selectedTab == null && !isFullBleed) Modifier.navigationBarsPadding() else Modifier
 
     SystemBarsIcons(
-        darkStatusBarIcons = isLogin,
+        darkStatusBarIcons = isFullBleed,
         darkNavigationBarIcons = selectedTab == null,
     )
 
@@ -101,6 +102,9 @@ fun SetupNavigation() {
                     }
                     entry<Screen.Login> {
                         LoginRoute(navigator = navigator)
+                    }
+                    entry<Screen.Register> {
+                        RegisterRoute(navigator = navigator)
                     }
                 },
         )
