@@ -7,6 +7,8 @@ sealed interface Screen : NavKey {
 
     data object Register : Screen
 
+    data object CreateCozinha : Screen
+
     data object Home : Screen
 
     data object Scan : Screen

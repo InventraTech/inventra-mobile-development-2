@@ -20,6 +20,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraQrScanFa
 import com.inventraoficial.inventra.feature.assistant.ui.ChatRoute
 import com.inventraoficial.inventra.feature.auth.login.ui.LoginRoute
 import com.inventraoficial.inventra.feature.auth.register.ui.RegisterRoute
+import com.inventraoficial.inventra.feature.cozinha.create.ui.CreateCozinhaRoute
 import com.inventraoficial.inventra.feature.home.ui.HomeRoute
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
 import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
@@ -105,6 +106,9 @@ fun SetupNavigation() {
                     }
                     entry<Screen.Register> {
                         RegisterRoute(navigator = navigator)
+                    }
+                    entry<Screen.CreateCozinha> {
+                        CreateCozinhaRoute(navigator = navigator)
                     }
                 },
         )
