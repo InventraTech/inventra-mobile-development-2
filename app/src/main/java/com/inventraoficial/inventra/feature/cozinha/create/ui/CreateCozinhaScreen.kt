@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -74,6 +75,7 @@ fun CreateCozinhaScreen(
             modifier =
                 Modifier
                     .weight(1f)
+                    .imePadding()
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
