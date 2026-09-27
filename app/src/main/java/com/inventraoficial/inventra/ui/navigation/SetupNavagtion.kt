@@ -21,6 +21,8 @@ import com.inventraoficial.inventra.feature.assistant.ui.ChatRoute
 import com.inventraoficial.inventra.feature.auth.login.ui.LoginRoute
 import com.inventraoficial.inventra.feature.auth.register.ui.RegisterRoute
 import com.inventraoficial.inventra.feature.cozinha.create.ui.CreateCozinhaRoute
+import com.inventraoficial.inventra.feature.cozinha.requestsent.ui.RequestSentRoute
+import com.inventraoficial.inventra.feature.cozinha.select.ui.SelectCozinhaRoute
 import com.inventraoficial.inventra.feature.home.ui.HomeRoute
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
 import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
@@ -109,6 +111,12 @@ fun SetupNavigation() {
                     }
                     entry<Screen.CreateCozinha> {
                         CreateCozinhaRoute(navigator = navigator)
+                    }
+                    entry<Screen.SelectCozinha> {
+                        SelectCozinhaRoute(navigator = navigator)
+                    }
+                    entry<Screen.RequestSent> {
+                        RequestSentRoute(navigator = navigator)
                     }
                 },
         )

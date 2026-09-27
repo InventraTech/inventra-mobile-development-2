@@ -9,6 +9,10 @@ sealed interface Screen : NavKey {
 
     data object CreateCozinha : Screen
 
+    data object SelectCozinha : Screen
+
+    data object RequestSent : Screen
+
     data object Home : Screen
 
     data object Scan : Screen
@@ -34,6 +38,6 @@ sealed interface Screen : NavKey {
  */
 fun Screen.isFullBleed(): Boolean =
     when (this) {
-        Screen.Login, Screen.Register -> true
+        Screen.Login, Screen.Register, Screen.RequestSent -> true
         else -> false
     }
