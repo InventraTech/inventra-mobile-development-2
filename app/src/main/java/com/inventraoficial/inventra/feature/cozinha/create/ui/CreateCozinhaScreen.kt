@@ -162,7 +162,7 @@ fun CreateCozinhaRoute(
                 navigator.navigateTopLevel(Screen.Home)
             }
         },
-        onCloseClick = { navigator.back() },
+        onCloseClick = { navigator.replaceStack(Screen.Login) },
         errorMessage = uiState.errorMessage,
         modifier = modifier,
     )

@@ -192,7 +192,7 @@ fun SelectCozinhaRoute(
                 navigator.navigate(Screen.RequestSent)
             }
         },
-        onCloseClick = { navigator.back() },
+        onCloseClick = { navigator.replaceStack(Screen.Login) },
         modifier = modifier,
     )
 }
