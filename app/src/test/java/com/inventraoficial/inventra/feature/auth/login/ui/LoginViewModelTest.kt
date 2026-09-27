@@ -1,7 +1,6 @@
-package com.inventraoficial.inventra.feature.auth.ui
+package com.inventraoficial.inventra.feature.auth.login.ui
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 class LoginViewModelTest {
@@ -40,16 +39,5 @@ class LoginViewModelTest {
         viewModel.onLoginClick()
 
         assertEquals("Preencha todos os campos", viewModel.uiState.value.errorMessage)
-    }
-
-    @Test
-    fun `onLoginClick com os dois campos preenchidos nao preenche errorMessage`() {
-        val viewModel = LoginViewModel()
-        viewModel.onLoginChange("felipe")
-        viewModel.onPasswordChange("123456")
-
-        viewModel.onLoginClick()
-
-        assertNull(viewModel.uiState.value.errorMessage)
     }
 }

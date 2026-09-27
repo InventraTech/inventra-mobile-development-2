@@ -1,7 +1,8 @@
-package com.inventraoficial.inventra.feature.auth.ui
+package com.inventraoficial.inventra.feature.auth.login.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,6 +31,10 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
+import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.navigation.Screen
+import com.inventraoficial.inventra.ui.theme.InventraDanger
+import com.inventraoficial.inventra.ui.theme.InventraPurple
 
 @Composable
 fun LoginScreen(
@@ -35,6 +44,9 @@ fun LoginScreen(
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
+    onBiometricClick: () -> Unit,
+    onCreateAccountClick: () -> Unit,
+    errorMessage: String?,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -85,14 +97,37 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Insira sua Senha",
             )
+            Text(
+                text = errorMessage.orEmpty(),
+                color = InventraDanger,
+                minLines = 1,
+                modifier = Modifier.fillMaxWidth(),
+            )
             InventraPrimaryButton(
                 text = "Entrar",
                 onClick = onLoginClick,
-                modifier = Modifier.width(300.dp).padding(0.dp, 35.dp, 0.dp, 20.dp),
+                modifier =
+                    Modifier
+                        .width(300.dp)
+                        .padding(0.dp, 35.dp, 0.dp, 20.dp),
             )
             InventraTextLink(
                 text = "Esqueci minha senha",
                 onClick = onForgotPasswordClick,
+            )
+            InventraTextLink(
+                text = "Criar conta",
+                onClick = onCreateAccountClick,
+            )
+            Icon(
+                imageVector = Icons.Default.Fingerprint,
+                contentDescription = "Entrar com biometria",
+                modifier =
+                    Modifier
+                        .padding(top = 30.dp)
+                        .size(70.dp)
+                        .clickable(onClick = onBiometricClick),
+                tint = InventraPurple,
             )
         }
     }
@@ -100,6 +135,7 @@ fun LoginScreen(
 
 @Composable
 fun LoginRoute(
+    navigator: Navigator,
     viewModel: LoginViewModel = viewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -110,8 +146,15 @@ fun LoginRoute(
         onLoginChange = viewModel::onLoginChange,
         senha = uiState.password,
         onPasswordChange = viewModel::onPasswordChange,
-        onLoginClick = viewModel::onLoginClick,
+        onLoginClick = {
+            if (viewModel.onLoginClick()) {
+                navigator.navigateTopLevel(Screen.Home)
+            }
+        },
         onForgotPasswordClick = viewModel::onForgotPasswordClick,
+        onBiometricClick = { navigator.navigateTopLevel(Screen.Home) },
+        onCreateAccountClick = { navigator.navigate(Screen.Register) },
+        errorMessage = uiState.errorMessage,
         modifier = modifier,
     )
 }
@@ -126,5 +169,8 @@ private fun LoginScreenPreview() {
         onPasswordChange = {},
         onLoginClick = {},
         onForgotPasswordClick = {},
+        onBiometricClick = {},
+        onCreateAccountClick = {},
+        errorMessage = null,
     )
 }

@@ -18,6 +18,8 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomBa
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraQrScanFab
 import com.inventraoficial.inventra.feature.assistant.ui.ChatRoute
+import com.inventraoficial.inventra.feature.auth.login.ui.LoginRoute
+import com.inventraoficial.inventra.feature.auth.register.ui.RegisterRoute
 import com.inventraoficial.inventra.feature.home.ui.HomeRoute
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
 import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
@@ -31,17 +33,17 @@ import com.inventraoficial.inventra.feature.suppliers.ui.SupplierRoute
 fun SetupNavigation() {
     val navigator =
         remember {
-            Navigator(mutableStateListOf(Screen.Home))
+            Navigator(mutableStateListOf(Screen.Login))
         }
 
     val currentScreen = navigator.currentBackStack.last()
     val selectedTab = currentScreen.toBottomDestination()
-    val isLogin = currentScreen == Screen.Login
+    val isFullBleed = currentScreen.isFullBleed()
     val insetsModifier =
-        if (selectedTab == null && !isLogin) Modifier.navigationBarsPadding() else Modifier
+        if (selectedTab == null && !isFullBleed) Modifier.navigationBarsPadding() else Modifier
 
     SystemBarsIcons(
-        darkStatusBarIcons = isLogin,
+        darkStatusBarIcons = isFullBleed,
         darkNavigationBarIcons = selectedTab == null,
     )
 
@@ -97,6 +99,12 @@ fun SetupNavigation() {
                     }
                     entry<Screen.Home> {
                         HomeRoute(navigator = navigator)
+                    }
+                    entry<Screen.Login> {
+                        LoginRoute(navigator = navigator)
+                    }
+                    entry<Screen.Register> {
+                        RegisterRoute(navigator = navigator)
                     }
                 },
         )

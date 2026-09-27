@@ -5,6 +5,8 @@ import androidx.navigation3.runtime.NavKey
 sealed interface Screen : NavKey {
     data object Login : Screen
 
+    data object Register : Screen
+
     data object Home : Screen
 
     data object Scan : Screen
@@ -23,3 +25,13 @@ sealed interface Screen : NavKey {
 
     data object Chat : Screen
 }
+
+/**
+ * Telas que ocupam a tela inteira, sem InventraTopBar e sem o padding
+ * da barra de navegacao do sistema (formas decorativas encostam nas bordas).
+ */
+fun Screen.isFullBleed(): Boolean =
+    when (this) {
+        Screen.Login, Screen.Register -> true
+        else -> false
+    }
