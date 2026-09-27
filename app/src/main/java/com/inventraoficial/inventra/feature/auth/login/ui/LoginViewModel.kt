@@ -17,6 +17,7 @@ class LoginViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(password = password)
     }
 
+    @Suppress("ReturnCount")
     fun onLoginClick(): Boolean {
         val estadoAtual = _uiState.value
         if (estadoAtual.login.isBlank() || estadoAtual.password.isBlank()) {

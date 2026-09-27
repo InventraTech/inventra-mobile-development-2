@@ -26,6 +26,7 @@ class RegisterViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(confirmPassword = confirmPassword)
     }
 
+    @Suppress("ReturnCount")
     fun onRegisterClick(): Boolean {
         val estadoAtual = _uiState.value
 

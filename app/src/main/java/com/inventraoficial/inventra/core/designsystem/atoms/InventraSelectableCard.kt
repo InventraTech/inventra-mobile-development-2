@@ -58,6 +58,7 @@ fun InventraSelectableCard(
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun InventraSelectableCardPreview() {

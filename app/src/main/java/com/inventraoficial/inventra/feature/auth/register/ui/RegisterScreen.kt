@@ -156,6 +156,7 @@ fun RegisterRoute(
     )
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun RegisterScreenPreview() {

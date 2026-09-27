@@ -12,11 +12,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSelectableCard
 
-enum class InventraUserRole {
-    Supervisor,
-    Estoquista,
-}
-
 @Composable
 fun InventraRoleSelector(
     selectedRole: InventraUserRole?,
@@ -44,6 +39,7 @@ fun InventraRoleSelector(
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun InventraRoleSelectorPreview() {
