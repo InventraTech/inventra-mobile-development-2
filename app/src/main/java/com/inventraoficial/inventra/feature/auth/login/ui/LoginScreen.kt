@@ -97,9 +97,12 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Insira sua Senha",
             )
-            errorMessage?.let { message ->
-                Text(text = message, color = InventraDanger)
-            }
+            Text(
+                text = errorMessage.orEmpty(),
+                color = InventraDanger,
+                minLines = 1,
+                modifier = Modifier.fillMaxWidth(),
+            )
             InventraPrimaryButton(
                 text = "Entrar",
                 onClick = onLoginClick,
