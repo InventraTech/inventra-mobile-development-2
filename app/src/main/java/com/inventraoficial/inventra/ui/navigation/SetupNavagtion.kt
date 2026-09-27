@@ -1,11 +1,17 @@
 package com.inventraoficial.inventra.ui.navigation
 
+import android.app.Activity
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomBar
@@ -30,8 +36,17 @@ fun SetupNavigation() {
 
     val currentScreen = navigator.currentBackStack.last()
     val selectedTab = currentScreen.toBottomDestination()
+    val isLogin = currentScreen == Screen.Login
+    val insetsModifier =
+        if (selectedTab == null && !isLogin) Modifier.navigationBarsPadding() else Modifier
+
+    SystemBarsIcons(
+        darkStatusBarIcons = isLogin,
+        darkNavigationBarIcons = selectedTab == null,
+    )
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (selectedTab != null) {
                 InventraBottomBar(
@@ -51,7 +66,7 @@ fun SetupNavigation() {
         },
     ) { innerPadding ->
         NavDisplay(
-            modifier = Modifier.padding(innerPadding),
+            modifier = insetsModifier.padding(innerPadding),
             backStack = navigator.currentBackStack,
             onBack = { navigator.back() },
             entryProvider =
@@ -85,5 +100,25 @@ fun SetupNavigation() {
                     }
                 },
         )
+    }
+}
+
+/**
+ * Ajusta a cor dos icones da barra de status e da barra de navegacao do sistema.
+ * "Dark" quer dizer icones escuros, para fundos claros.
+ */
+@Composable
+private fun SystemBarsIcons(
+    darkStatusBarIcons: Boolean,
+    darkNavigationBarIcons: Boolean,
+) {
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            val controller = WindowCompat.getInsetsController(window, view)
+            controller.isAppearanceLightStatusBars = darkStatusBarIcons
+            controller.isAppearanceLightNavigationBars = darkNavigationBarIcons
+        }
     }
 }

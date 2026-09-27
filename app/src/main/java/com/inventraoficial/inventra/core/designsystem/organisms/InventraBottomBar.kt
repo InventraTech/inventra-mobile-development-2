@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -114,7 +115,8 @@ fun InventraBottomBar(
                             notchMargin = 4.dp,
                             notchCenterFraction = notchCenterFraction,
                         ),
-                    ).padding(vertical = 14.dp),
+                    ).navigationBarsPadding()
+                    .padding(vertical = 14.dp),
         ) {
             destinations.forEach { destination ->
                 Box(
