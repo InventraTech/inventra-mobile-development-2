@@ -2,7 +2,6 @@ package com.inventraoficial.inventra.ui.navigation
 
 import android.app.Activity
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -69,7 +68,7 @@ fun SetupNavigation() {
         },
     ) { innerPadding ->
         NavDisplay(
-            modifier = insetsModifier.padding(innerPadding).imePadding(),
+            modifier = insetsModifier.padding(innerPadding),
             backStack = navigator.currentBackStack,
             onBack = { navigator.back() },
             entryProvider =
