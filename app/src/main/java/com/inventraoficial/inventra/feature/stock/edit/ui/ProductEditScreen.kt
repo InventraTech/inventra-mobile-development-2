@@ -78,8 +78,8 @@ fun ProductEditScreen(
             modifier =
                 Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())
                     .imePadding()
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {

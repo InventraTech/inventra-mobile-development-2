@@ -76,8 +76,8 @@ fun StockOutScreen(
             modifier =
                 Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())
                     .imePadding()
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
