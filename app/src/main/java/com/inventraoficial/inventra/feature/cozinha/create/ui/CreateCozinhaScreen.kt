@@ -15,6 +15,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,6 +47,9 @@ fun CreateCozinhaScreen(
     errorMessage: String?,
     modifier: Modifier = Modifier,
 ) {
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Column(
         modifier =
             modifier
@@ -121,7 +126,11 @@ fun CreateCozinhaScreen(
             )
             InventraPrimaryButton(
                 text = "Criar cozinha",
-                onClick = onCreateClick,
+                onClick = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    onCreateClick()
+                },
                 modifier = Modifier.fillMaxWidth(),
             )
             InventraSecondaryButton(
