@@ -1,4 +1,4 @@
-package com.inventraoficial.inventra.feature.suppliers.ui
+package com.inventraoficial.inventra.feature.suppliers.list.ui
 
 data class Supplier(
     val imageRes: Int,

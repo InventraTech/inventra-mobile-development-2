@@ -30,7 +30,8 @@ import com.inventraoficial.inventra.feature.stock.detail.ui.StockDetailRoute
 import com.inventraoficial.inventra.feature.stock.edit.ui.ProductEditRoute
 import com.inventraoficial.inventra.feature.stock.list.ui.StockListRoute
 import com.inventraoficial.inventra.feature.stock.stockout.ui.StockOutRoute
-import com.inventraoficial.inventra.feature.suppliers.ui.SupplierRoute
+import com.inventraoficial.inventra.feature.suppliers.detail.ui.SupplierDetailRoute
+import com.inventraoficial.inventra.feature.suppliers.list.ui.SupplierRoute
 
 @Composable
 fun SetupNavigation() {
@@ -86,7 +87,10 @@ fun SetupNavigation() {
                         NotificationRoute(navigator = navigator)
                     }
                     entry<Screen.Suppliers> {
-                        SupplierRoute()
+                        SupplierRoute(navigator = navigator)
+                    }
+                    entry<Screen.SupplierDetail> {
+                        SupplierDetailRoute(navigator = navigator)
                     }
                     entry<Screen.Scan> {
                         ScanRoute(navigator = navigator)

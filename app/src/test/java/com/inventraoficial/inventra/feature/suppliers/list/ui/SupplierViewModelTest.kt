@@ -1,4 +1,4 @@
-package com.inventraoficial.inventra.feature.suppliers.ui
+package com.inventraoficial.inventra.feature.suppliers.list.ui
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

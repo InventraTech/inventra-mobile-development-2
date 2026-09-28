@@ -1,4 +1,4 @@
-package com.inventraoficial.inventra.feature.suppliers.ui
+package com.inventraoficial.inventra.feature.suppliers.list.ui
 
 import androidx.lifecycle.ViewModel
 import com.inventraoficial.inventra.R
@@ -53,10 +53,5 @@ class SupplierViewModel : ViewModel() {
 
     fun onFilterIconClick() {
         // sem comportamento definido ainda
-    }
-
-    @Suppress("UnusedParameter")
-    fun onSupplierClick(supplier: Supplier) {
-        // sem tela de detalhe de fornecedor ainda
     }
 }
