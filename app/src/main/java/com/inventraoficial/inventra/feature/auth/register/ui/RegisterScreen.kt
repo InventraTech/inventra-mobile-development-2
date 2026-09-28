@@ -21,6 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,6 +53,9 @@ fun RegisterScreen(
     errorMessage: String?,
     modifier: Modifier = Modifier,
 ) {
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Box(
         modifier =
             Modifier
@@ -76,7 +81,7 @@ fun RegisterScreen(
                 modifier
                     .imePadding()
                     .verticalScroll(rememberScrollState())
-                    .padding(24.dp, 80.dp, 24.dp, 0.dp),
+                    .padding(24.dp, 50.dp, 24.dp, 0.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
@@ -119,11 +124,15 @@ fun RegisterScreen(
             )
             InventraPrimaryButton(
                 text = "Criar",
-                onClick = onRegisterClick,
+                onClick = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    onRegisterClick()
+                },
                 modifier =
                     Modifier
                         .width(300.dp)
-                        .padding(0.dp, 15.dp, 0.dp, 20.dp),
+                        .padding(0.dp, 0.dp, 0.dp, 0.dp),
             )
             InventraTextLink(
                 text = "Já tenho uma conta!",
@@ -152,7 +161,11 @@ fun RegisterRoute(
         onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
         onRegisterClick = {
             if (viewModel.onRegisterClick()) {
-                navigator.navigateTopLevel(Screen.Home)
+                if (uiState.role == InventraUserRole.Supervisor) {
+                    navigator.replaceStack(Screen.CreateCozinha)
+                } else {
+                    navigator.replaceStack(Screen.SelectCozinha)
+                }
             }
         },
         onBackToLoginClick = { navigator.back() },
