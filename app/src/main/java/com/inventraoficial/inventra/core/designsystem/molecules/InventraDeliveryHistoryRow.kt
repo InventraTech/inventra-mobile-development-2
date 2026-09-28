@@ -40,6 +40,7 @@ fun InventraDeliveryHistoryRow(
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun InventraDeliveryHistoryRowPreview() {

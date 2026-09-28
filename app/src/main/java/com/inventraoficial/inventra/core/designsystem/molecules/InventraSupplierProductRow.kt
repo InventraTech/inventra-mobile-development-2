@@ -58,6 +58,7 @@ fun InventraSupplierProductRow(
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun InventraSupplierProductRowPreview() {

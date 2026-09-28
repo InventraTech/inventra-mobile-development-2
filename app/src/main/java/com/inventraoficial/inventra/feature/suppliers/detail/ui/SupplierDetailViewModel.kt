@@ -31,8 +31,16 @@ class SupplierDetailViewModel : ViewModel() {
                     ),
                 deliveryHistory =
                     listOf(
-                        DeliveryHistoryEntry(date = "14/08/2026", productName = "Arroz Camil", quantityLabel = "12 un"),
-                        DeliveryHistoryEntry(date = "02/08/2026", productName = "Feijão Carioca", quantityLabel = "8 un"),
+                        DeliveryHistoryEntry(
+                            date = "14/08/2026",
+                            productName = "Arroz Camil",
+                            quantityLabel = "12 un",
+                        ),
+                        DeliveryHistoryEntry(
+                            date = "02/08/2026",
+                            productName = "Feijão Carioca",
+                            quantityLabel = "8 un",
+                        ),
                     ),
             )
     }

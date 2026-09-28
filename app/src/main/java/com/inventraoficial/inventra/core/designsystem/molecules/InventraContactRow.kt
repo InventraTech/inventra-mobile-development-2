@@ -33,6 +33,7 @@ fun InventraContactRow(
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun InventraContactRowPreview() {
