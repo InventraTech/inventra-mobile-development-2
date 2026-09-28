@@ -1,4 +1,4 @@
-package com.inventraoficial.inventra.feature.suppliers.ui
+package com.inventraoficial.inventra.feature.suppliers.list.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +23,8 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWi
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSupplierRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraFilterChipRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -89,6 +91,7 @@ fun SupplierScreen(
 
 @Composable
 fun SupplierRoute(
+    navigator: Navigator,
     viewModel: SupplierViewModel = viewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -102,7 +105,7 @@ fun SupplierRoute(
         selectedFilter = uiState.selectedFilter,
         onFilterSelect = viewModel::onFilterSelect,
         suppliers = uiState.suppliers,
-        onSupplierClick = viewModel::onSupplierClick,
+        onSupplierClick = { navigator.navigate(Screen.SupplierDetail) },
         modifier = modifier,
     )
 }

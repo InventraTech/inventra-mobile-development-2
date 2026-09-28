@@ -18,11 +18,12 @@ fun InventraThumbnail(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(10.dp),
     size: Dp = 40.dp,
+    contentScale: ContentScale = ContentScale.Crop,
 ) {
     Image(
         painter = painter,
         contentDescription = null,
-        contentScale = ContentScale.Crop,
+        contentScale = contentScale,
         modifier = modifier.size(size).clip(shape),
     )
 }

@@ -21,6 +21,8 @@ sealed interface Screen : NavKey {
 
     data object Suppliers : Screen
 
+    data object SupplierDetail : Screen
+
     data object StockList : Screen
 
     data object StockDetail : Screen
