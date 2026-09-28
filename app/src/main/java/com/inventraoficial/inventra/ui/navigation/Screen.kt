@@ -32,6 +32,16 @@ sealed interface Screen : NavKey {
     data object StockOut : Screen
 
     data object Chat : Screen
+
+    data object Profile : Screen
+
+    data object ProfileDetails : Screen
+
+    data object ManageMembers : Screen
+
+    data object AccountPreferences : Screen
+
+    data object CozinhaInfo : Screen
 }
 
 /**
