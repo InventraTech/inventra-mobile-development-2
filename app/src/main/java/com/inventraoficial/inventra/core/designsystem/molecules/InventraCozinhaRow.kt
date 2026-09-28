@@ -66,6 +66,7 @@ fun InventraCozinhaRow(
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun InventraCozinhaRowPreview() {

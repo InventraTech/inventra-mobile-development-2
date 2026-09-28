@@ -81,7 +81,7 @@ fun RegisterScreen(
                 modifier
                     .imePadding()
                     .verticalScroll(rememberScrollState())
-                    .padding(24.dp, 80.dp, 24.dp, 0.dp),
+                    .padding(24.dp, 50.dp, 24.dp, 0.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
@@ -132,7 +132,7 @@ fun RegisterScreen(
                 modifier =
                     Modifier
                         .width(300.dp)
-                        .padding(0.dp, 15.dp, 0.dp, 20.dp),
+                        .padding(0.dp, 0.dp, 0.dp, 0.dp),
             )
             InventraTextLink(
                 text = "Já tenho uma conta!",

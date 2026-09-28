@@ -111,17 +111,21 @@ fun SelectCozinhaScreen(
     }
 }
 
+private const val TOGGLE_CORNER_PERCENT = 50
+
 @Composable
 private fun ViewModeToggle(
     selected: CozinhaViewMode,
     onSelect: (CozinhaViewMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val toggleShape = RoundedCornerShape(percent = TOGGLE_CORNER_PERCENT)
+
     Row(
         modifier =
             modifier
                 .fillMaxWidth()
-                .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(50)),
+                .border(1.dp, InventraPurple.copy(alpha = 0.2f), toggleShape),
     ) {
         CozinhaViewMode.entries.forEach { mode ->
             val isSelected = mode == selected
@@ -129,7 +133,7 @@ private fun ViewModeToggle(
                 modifier =
                     Modifier
                         .weight(1f)
-                        .background(if (isSelected) InventraPurple else Color.White, RoundedCornerShape(50))
+                        .background(if (isSelected) InventraPurple else Color.White, toggleShape)
                         .clickable(onClick = { onSelect(mode) })
                         .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center,
