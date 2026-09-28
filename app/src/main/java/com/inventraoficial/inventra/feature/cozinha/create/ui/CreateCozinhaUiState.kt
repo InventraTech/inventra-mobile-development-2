@@ -1,6 +1,8 @@
 package com.inventraoficial.inventra.feature.cozinha.create.ui
 
-enum class EstablishmentType(val label: String) {
+enum class EstablishmentType(
+    val label: String,
+) {
     Matriz("Matriz"),
     Filial("Filial"),
     Restaurante("Restaurante"),
