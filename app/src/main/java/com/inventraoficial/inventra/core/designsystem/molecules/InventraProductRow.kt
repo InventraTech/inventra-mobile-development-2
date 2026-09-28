@@ -37,29 +37,29 @@ fun InventraProductRow(
     Row(
         modifier =
             modifier
-                .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(10.dp))
+                .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(10.dp))
                 .clickable(onClick = onClick)
-                .heightIn(min = 108.dp)
-                .padding(16.dp),
+                .heightIn(min = 72.dp)
+                .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        InventraThumbnail(painter = painter, size = 64.dp)
+        InventraThumbnail(painter = painter, size = 48.dp)
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 title,
                 fontFamily = Montserrat,
                 fontWeight = FontWeight.Bold,
                 color = InventraPurple,
-                fontSize = 20.sp,
+                fontSize = 15.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(quantity, fontFamily = Montserrat, color = InventraPurple.copy(alpha = 0.6f), fontSize = 17.sp)
-            Text(batchInfo, fontFamily = Montserrat, color = InventraPurple.copy(alpha = 0.6f), fontSize = 17.sp)
+            Text(quantity, fontFamily = Montserrat, color = InventraPurple.copy(alpha = 0.6f), fontSize = 12.sp)
+            Text(batchInfo, fontFamily = Montserrat, color = InventraPurple.copy(alpha = 0.6f), fontSize = 12.sp)
         }
-        Text("›", fontWeight = FontWeight.Bold, color = InventraPurple.copy(alpha = 0.4f), fontSize = 22.sp)
+        Text("›", fontWeight = FontWeight.Bold, color = InventraPurple.copy(alpha = 0.4f), fontSize = 18.sp)
     }
 }
 
