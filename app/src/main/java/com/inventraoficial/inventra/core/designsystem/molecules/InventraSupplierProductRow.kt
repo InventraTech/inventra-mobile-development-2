@@ -30,29 +30,29 @@ fun InventraSupplierProductRow(
         modifier =
             modifier
                 .fillMaxWidth()
-                .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
-                .padding(12.dp),
+                .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(10.dp))
+                .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Box(
             modifier =
                 Modifier
-                    .size(40.dp)
-                    .background(InventraPurple.copy(alpha = 0.15f), RoundedCornerShape(8.dp)),
+                    .size(28.dp)
+                    .background(InventraPurple.copy(alpha = 0.15f), RoundedCornerShape(6.dp)),
         )
         Text(
             text = name,
             fontFamily = Montserrat,
             fontWeight = FontWeight.Bold,
             color = InventraPurple,
-            fontSize = 15.sp,
+            fontSize = 13.sp,
             modifier = Modifier.weight(1f),
         )
         Text(
             text = infoText,
             fontFamily = Montserrat,
-            fontSize = 13.sp,
+            fontSize = 11.sp,
             color = InventraPurple.copy(alpha = 0.6f),
         )
     }

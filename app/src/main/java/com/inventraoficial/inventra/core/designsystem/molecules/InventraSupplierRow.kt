@@ -17,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBadge
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraStarRating
@@ -36,20 +37,26 @@ fun InventraSupplierRow(
     Row(
         modifier =
             modifier
-                .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+                .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(14.dp))
                 .clickable(onClick = onClick)
-                .padding(12.dp),
+                .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         InventraThumbnail(
             painter = painter,
-            shape = RoundedCornerShape(8.dp),
-            size = 56.dp,
+            shape = RoundedCornerShape(10.dp),
+            size = 72.dp,
             contentScale = ContentScale.Fit,
         )
         Column(modifier = Modifier.weight(1f)) {
-            Text(name, fontFamily = Montserrat, fontWeight = FontWeight.Bold, color = InventraPurple)
+            Text(
+                name,
+                fontFamily = Montserrat,
+                fontWeight = FontWeight.Bold,
+                color = InventraPurple,
+                fontSize = 17.sp,
+            )
             InventraStarRating(rating = rating)
         }
         InventraBadge(text = badgeText)
