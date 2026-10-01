@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "inventra_mobile_2"
+rootProject.name = "inventra"
 include(":app")
  
