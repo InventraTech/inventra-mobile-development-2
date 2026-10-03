@@ -1,6 +1,8 @@
 package com.inventraoficial.inventra.feature.profile.preferences.ui
 
-enum class AppTheme(val label: String) {
+enum class AppTheme(
+    val label: String,
+) {
     Light("Claro"),
     Dark("Escuro"),
     System("Sistema"),
