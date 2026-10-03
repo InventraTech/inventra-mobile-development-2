@@ -21,10 +21,15 @@ import com.inventraoficial.inventra.feature.assistant.ui.ChatRoute
 import com.inventraoficial.inventra.feature.auth.login.ui.LoginRoute
 import com.inventraoficial.inventra.feature.auth.register.ui.RegisterRoute
 import com.inventraoficial.inventra.feature.cozinha.create.ui.CreateCozinhaRoute
+import com.inventraoficial.inventra.feature.cozinha.info.ui.CozinhaInfoRoute
 import com.inventraoficial.inventra.feature.cozinha.requestsent.ui.RequestSentRoute
 import com.inventraoficial.inventra.feature.cozinha.select.ui.SelectCozinhaRoute
 import com.inventraoficial.inventra.feature.home.ui.HomeRoute
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
+import com.inventraoficial.inventra.feature.profile.details.ui.ProfileDetailsRoute
+import com.inventraoficial.inventra.feature.profile.members.ui.ManageMembersRoute
+import com.inventraoficial.inventra.feature.profile.preferences.ui.AccountPreferencesRoute
+import com.inventraoficial.inventra.feature.profile.ui.ProfileRoute
 import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
 import com.inventraoficial.inventra.feature.stock.detail.ui.StockDetailRoute
 import com.inventraoficial.inventra.feature.stock.edit.ui.ProductEditRoute
@@ -121,6 +126,21 @@ fun SetupNavigation() {
                     }
                     entry<Screen.RequestSent> {
                         RequestSentRoute(navigator = navigator)
+                    }
+                    entry<Screen.Profile> {
+                        ProfileRoute(navigator = navigator)
+                    }
+                    entry<Screen.ProfileDetails> {
+                        ProfileDetailsRoute(navigator = navigator)
+                    }
+                    entry<Screen.ManageMembers> {
+                        ManageMembersRoute(navigator = navigator)
+                    }
+                    entry<Screen.AccountPreferences> {
+                        AccountPreferencesRoute(navigator = navigator)
+                    }
+                    entry<Screen.CozinhaInfo> {
+                        CozinhaInfoRoute(navigator = navigator)
                     }
                 },
         )
