@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.data.repository
 
+import com.inventraoficial.inventra.data.local.FakeTokenStorage
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
@@ -9,6 +10,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.HttpException
@@ -17,6 +19,7 @@ import java.io.IOException
 
 class NetworkAuthRepositoryTest {
     private val json = Json { ignoreUnknownKeys = true }
+    private val tokenStorage = FakeTokenStorage()
 
     /** AuthApi falsa: executa [onLogin] no lugar da chamada HTTP. */
     private class FakeAuthApi(
@@ -41,11 +44,11 @@ class NetworkAuthRepositoryTest {
 
     private fun repositoryThatThrows(exception: Exception): NetworkAuthRepository {
         val api = FakeAuthApi { throw exception }
-        return NetworkAuthRepository(api, json)
+        return NetworkAuthRepository(api, json, tokenStorage)
     }
 
     @Test
-    fun `login com sucesso devolve o usuario e monta o LoginRequest`() =
+    fun `login com sucesso devolve o usuario, monta o LoginRequest e salva o token`() =
         runTest {
             val api =
                 FakeAuthApi {
@@ -56,12 +59,24 @@ class NetworkAuthRepositoryTest {
                         user = FakeAuthRepository.fakeUser,
                     )
                 }
-            val repository = NetworkAuthRepository(api, json)
+            val repository = NetworkAuthRepository(api, json, tokenStorage)
 
             val result = repository.login("teste@inventra.com", "senha123")
 
             assertEquals(FakeAuthRepository.fakeUser, result.getOrNull())
             assertEquals(LoginRequest("teste@inventra.com", "senha123"), api.lastRequest)
+            assertEquals("jwt", tokenStorage.currentToken)
+        }
+
+    @Test
+    fun `login com falha nao salva token`() =
+        runTest {
+            val body = """{"title":"Unauthorized","status":401,"detail":"E-mail ou senha inválidos."}"""
+            val repository = repositoryThatThrows(httpError(401, body))
+
+            repository.login("teste@inventra.com", "errada")
+
+            assertNull(tokenStorage.currentToken)
         }
 
     @Test

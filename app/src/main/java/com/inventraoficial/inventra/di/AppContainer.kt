@@ -1,6 +1,9 @@
 package com.inventraoficial.inventra.di
 
+import android.content.Context
 import com.inventraoficial.inventra.BuildConfig
+import com.inventraoficial.inventra.data.local.DataStoreTokenStorage
+import com.inventraoficial.inventra.data.local.TokenStorage
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
@@ -16,7 +19,11 @@ interface AppContainer {
     val authRepository: AuthRepository
 }
 
-class DefaultAppContainer : AppContainer {
+class DefaultAppContainer(
+    private val context: Context,
+) : AppContainer {
+    private val tokenStorage: TokenStorage by lazy { DataStoreTokenStorage(context) }
+
     private val json =
         Json {
             ignoreUnknownKeys = true
@@ -46,7 +53,7 @@ class DefaultAppContainer : AppContainer {
 
     private val authApi: AuthApi by lazy { retrofit.create(AuthApi::class.java) }
 
-    override val authRepository: AuthRepository by lazy { NetworkAuthRepository(authApi, json) }
+    override val authRepository: AuthRepository by lazy { NetworkAuthRepository(authApi, json, tokenStorage) }
 
     companion object {
         private const val BASE_URL = "https://ms-inventra-api.onrender.com/api/"
