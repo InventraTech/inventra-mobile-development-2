@@ -2,7 +2,6 @@ package com.inventraoficial.inventra.feature.auth.login.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,9 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +36,6 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHead
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraDanger
-import com.inventraoficial.inventra.ui.theme.InventraPurple
 
 @Composable
 fun LoginScreen(
@@ -50,7 +45,6 @@ fun LoginScreen(
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
-    onBiometricClick: () -> Unit,
     onCreateAccountClick: () -> Unit,
     errorMessage: String?,
     isLoading: Boolean,
@@ -136,16 +130,6 @@ fun LoginScreen(
                 text = "Criar conta",
                 onClick = onCreateAccountClick,
             )
-            Icon(
-                imageVector = Icons.Default.Fingerprint,
-                contentDescription = "Entrar com biometria",
-                modifier =
-                    Modifier
-                        .padding(top = 30.dp)
-                        .size(70.dp)
-                        .clickable(onClick = onBiometricClick),
-                tint = InventraPurple,
-            )
         }
     }
 }
@@ -168,7 +152,6 @@ fun LoginRoute(
         onPasswordChange = viewModel::onPasswordChange,
         onLoginClick = viewModel::onLoginClick,
         onForgotPasswordClick = viewModel::onForgotPasswordClick,
-        onBiometricClick = { navigator.navigateTopLevel(Screen.Home) },
         onCreateAccountClick = { navigator.navigate(Screen.Register) },
         errorMessage = uiState.errorMessage,
         isLoading = uiState.isLoading,
@@ -186,7 +169,6 @@ private fun LoginScreenPreview() {
         onPasswordChange = {},
         onLoginClick = {},
         onForgotPasswordClick = {},
-        onBiometricClick = {},
         onCreateAccountClick = {},
         errorMessage = null,
         isLoading = false,
