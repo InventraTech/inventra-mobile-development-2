@@ -4,6 +4,7 @@ import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.dto.auth.ErrorResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.UserResponse
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 import java.io.IOException
@@ -33,5 +34,7 @@ class NetworkAuthRepository(
             Result.failure(Exception(erro?.detail ?: "Erro inesperado. Tente novamente."))
         } catch (e: IOException) {
             Result.failure(Exception("Não foi possível conectar ao servidor. Verifique sua conexão.", e))
+        } catch (e: SerializationException) {
+            Result.failure(Exception("Resposta inesperada do servidor. Tente novamente.", e))
         }
 }

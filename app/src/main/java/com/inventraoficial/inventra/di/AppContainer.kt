@@ -17,7 +17,11 @@ interface AppContainer {
 }
 
 class DefaultAppContainer : AppContainer {
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            decodeEnumsCaseInsensitive = true
+        }
 
     private val logging =
         HttpLoggingInterceptor().apply {

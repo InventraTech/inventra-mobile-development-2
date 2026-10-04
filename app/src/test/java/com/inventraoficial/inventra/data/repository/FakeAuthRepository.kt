@@ -1,0 +1,42 @@
+package com.inventraoficial.inventra.data.repository
+
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
+import com.inventraoficial.inventra.data.remote.dto.auth.ProfileSummary
+import com.inventraoficial.inventra.data.remote.dto.auth.UserResponse
+
+/**
+ * Repositorio falso para testes: devolve [result] sem tocar na rede e
+ * registra os argumentos recebidos para que o teste possa conferi-los.
+ */
+class FakeAuthRepository(
+    var result: Result<UserResponse> = Result.success(fakeUser),
+) : AuthRepository {
+    var loginCalls = 0
+        private set
+    var lastEmail: String? = null
+        private set
+    var lastPassword: String? = null
+        private set
+
+    override suspend fun login(
+        email: String,
+        password: String,
+    ): Result<UserResponse> {
+        loginCalls++
+        lastEmail = email
+        lastPassword = password
+        return result
+    }
+
+    companion object {
+        val fakeUser =
+            UserResponse(
+                id = "00000000-0000-0000-0000-000000000001",
+                name = "Usuario Teste",
+                email = "teste@inventra.com",
+                profile = ProfileSummary(id = 1, accessType = AccessType.SUPERVISOR),
+                active = true,
+                createdAt = "2026-10-03T00:00:00Z",
+            )
+    }
+}

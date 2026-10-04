@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -52,6 +53,7 @@ fun LoginScreen(
     onBiometricClick: () -> Unit,
     onCreateAccountClick: () -> Unit,
     errorMessage: String?,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -120,6 +122,7 @@ fun LoginScreen(
                     keyboardController?.hide()
                     onLoginClick()
                 },
+                isLoading = isLoading,
                 modifier =
                     Modifier
                         .width(300.dp)
@@ -150,25 +153,25 @@ fun LoginScreen(
 @Composable
 fun LoginRoute(
     navigator: Navigator,
-    viewModel: LoginViewModel = viewModel(),
+    viewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    LaunchedEffect(uiState.isLoggedIn) {
+        if (uiState.isLoggedIn) navigator.navigateTopLevel(Screen.Home)
+    }
 
     LoginScreen(
         login = uiState.login,
         onLoginChange = viewModel::onLoginChange,
         senha = uiState.password,
         onPasswordChange = viewModel::onPasswordChange,
-        onLoginClick = {
-            if (viewModel.onLoginClick()) {
-                navigator.navigateTopLevel(Screen.Home)
-            }
-        },
+        onLoginClick = viewModel::onLoginClick,
         onForgotPasswordClick = viewModel::onForgotPasswordClick,
         onBiometricClick = { navigator.navigateTopLevel(Screen.Home) },
         onCreateAccountClick = { navigator.navigate(Screen.Register) },
         errorMessage = uiState.errorMessage,
+        isLoading = uiState.isLoading,
         modifier = modifier,
     )
 }
@@ -186,5 +189,6 @@ private fun LoginScreenPreview() {
         onBiometricClick = {},
         onCreateAccountClick = {},
         errorMessage = null,
+        isLoading = false,
     )
 }
