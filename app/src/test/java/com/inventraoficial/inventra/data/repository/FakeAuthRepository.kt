@@ -17,6 +17,12 @@ class FakeAuthRepository(
         private set
     var lastPassword: String? = null
         private set
+    var registerCalls = 0
+        private set
+    var lastName: String? = null
+        private set
+    var lastAccessType: AccessType? = null
+        private set
 
     override suspend fun login(
         email: String,
@@ -25,6 +31,20 @@ class FakeAuthRepository(
         loginCalls++
         lastEmail = email
         lastPassword = password
+        return result
+    }
+
+    override suspend fun register(
+        name: String,
+        email: String,
+        password: String,
+        accessType: AccessType,
+    ): Result<UserResponse> {
+        registerCalls++
+        lastName = name
+        lastEmail = email
+        lastPassword = password
+        lastAccessType = accessType
         return result
     }
 

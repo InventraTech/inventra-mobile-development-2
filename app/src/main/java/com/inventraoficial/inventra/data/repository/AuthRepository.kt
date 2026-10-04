@@ -2,8 +2,11 @@ package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.local.TokenStorage
 import com.inventraoficial.inventra.data.remote.api.AuthApi
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.ErrorResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
+import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
+import com.inventraoficial.inventra.data.remote.dto.auth.RegisterRequest
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -15,6 +18,13 @@ interface AuthRepository {
         email: String,
         password: String,
     ): Result<UserResponse>
+
+    suspend fun register(
+        name: String,
+        email: String,
+        password: String,
+        accessType: AccessType,
+    ): Result<UserResponse>
 }
 
 class NetworkAuthRepository(
@@ -22,12 +32,9 @@ class NetworkAuthRepository(
     private val json: Json,
     private val tokenStorage: TokenStorage,
 ) : AuthRepository {
-    override suspend fun login(
-        email: String,
-        password: String,
-    ): Result<UserResponse> =
+    private suspend fun authenticate(call: suspend () -> LoginResponse): Result<UserResponse> =
         try {
-            val result = authApi.login(LoginRequest(email, password))
+            val result = call()
 
             tokenStorage.saveToken(result.token)
             Result.success(result.user)
@@ -39,5 +46,23 @@ class NetworkAuthRepository(
             Result.failure(Exception("Não foi possível conectar ao servidor. Verifique sua conexão.", e))
         } catch (e: SerializationException) {
             Result.failure(Exception("Resposta inesperada do servidor. Tente novamente.", e))
+        }
+
+    override suspend fun login(
+        email: String,
+        password: String,
+    ): Result<UserResponse> =
+        authenticate {
+            authApi.login(LoginRequest(email, password))
+        }
+
+    override suspend fun register(
+        name: String,
+        email: String,
+        password: String,
+        accessType: AccessType,
+    ): Result<UserResponse> =
+        authenticate {
+            authApi.register(RegisterRequest(name, email, password, accessType))
         }
 }
