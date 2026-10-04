@@ -5,6 +5,7 @@ import com.inventraoficial.inventra.BuildConfig
 import com.inventraoficial.inventra.data.local.DataStoreTokenStorage
 import com.inventraoficial.inventra.data.local.TokenStorage
 import com.inventraoficial.inventra.data.remote.api.AuthApi
+import com.inventraoficial.inventra.data.remote.interceptor.AuthInterceptor
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
 import kotlinx.serialization.json.Json
@@ -23,6 +24,7 @@ class DefaultAppContainer(
     private val context: Context,
 ) : AppContainer {
     private val tokenStorage: TokenStorage by lazy { DataStoreTokenStorage(context) }
+    private val authInterceptor: AuthInterceptor by lazy { AuthInterceptor(tokenStorage) }
 
     private val json =
         Json {
@@ -33,6 +35,7 @@ class DefaultAppContainer(
     private val logging =
         HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+            redactHeader("Authorization")
         }
 
     private val okHttpClient =
@@ -40,6 +43,7 @@ class DefaultAppContainer(
             .Builder()
             .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .addInterceptor(authInterceptor)
             .addInterceptor(logging)
             .build()
 
