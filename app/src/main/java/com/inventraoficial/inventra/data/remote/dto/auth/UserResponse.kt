@@ -8,7 +8,7 @@ data class UserResponse(
     val name: String,
     val email: String,
     val kitchen: KitchenSummary? = null,
-    val profile: ProfileSumamry,
+    val profile: ProfileSummary,
     val active: Boolean,
     val lastLogin: String? = null,
     val createdAt: String,
