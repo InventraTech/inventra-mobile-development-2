@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.data.remote.dto.auth
 
+import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.serialization.Serializable
 
 @Serializable

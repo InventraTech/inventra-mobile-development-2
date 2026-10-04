@@ -1,5 +1,7 @@
-package com.inventraoficial.inventra.data.remote.dto.auth
+package com.inventraoficial.inventra.data.remote.dto.user
 
+import com.inventraoficial.inventra.data.remote.dto.auth.KitchenSummary
+import com.inventraoficial.inventra.data.remote.dto.auth.ProfileSummary
 import kotlinx.serialization.Serializable
 
 @Serializable

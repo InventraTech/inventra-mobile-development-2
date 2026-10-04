@@ -2,7 +2,7 @@ package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.ProfileSummary
-import com.inventraoficial.inventra.data.remote.dto.auth.UserResponse
+import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 
 /**
  * Repositorio falso para testes: devolve [result] sem tocar na rede e

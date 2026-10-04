@@ -4,7 +4,7 @@ import com.inventraoficial.inventra.data.local.TokenStorage
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.dto.auth.ErrorResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
-import com.inventraoficial.inventra.data.remote.dto.auth.UserResponse
+import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
