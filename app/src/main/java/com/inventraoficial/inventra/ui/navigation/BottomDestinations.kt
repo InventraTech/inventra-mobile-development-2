@@ -7,8 +7,7 @@ fun InventraBottomDestination.toScreen(): Screen =
         InventraBottomDestination.Home -> Screen.Home
         InventraBottomDestination.Stock -> Screen.StockList
         InventraBottomDestination.Suppliers -> Screen.Suppliers
-        // Placeholder: ainda não existe Screen.History
-        InventraBottomDestination.History -> Screen.Home
+        InventraBottomDestination.History -> Screen.RequirementsList
         InventraBottomDestination.Perfil -> Screen.Profile
     }
 
@@ -17,6 +16,8 @@ fun Screen.toBottomDestination(): InventraBottomDestination? =
         Screen.Home -> InventraBottomDestination.Home
         Screen.StockList -> InventraBottomDestination.Stock
         Screen.Suppliers -> InventraBottomDestination.Suppliers
+        Screen.RequirementsList -> InventraBottomDestination.History
+        Screen.RequirementsHistory -> InventraBottomDestination.History
         Screen.Profile -> InventraBottomDestination.Perfil
         else -> null
     }
