@@ -28,10 +28,13 @@ import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraThumbnail
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraSuccess
-import com.inventraoficial.inventra.ui.theme.InventraWarning
+import com.inventraoficial.inventra.ui.theme.InventraGold
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 private const val BUTTON_SIZE = 40
+private const val BUTTON_PADDING = 8
+private const val CARD_PADDING = 12
+private const val SPACING = 8
 
 @Composable
 fun RequirementAcceptanceCard(
@@ -46,9 +49,9 @@ fun RequirementAcceptanceCard(
         modifier =
             modifier
                 .fillMaxWidth()
-                .background(InventraWarning, RoundedCornerShape(12.dp))
-                .padding(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                .background(InventraGold, RoundedCornerShape(12.dp))
+                .padding(CARD_PADDING.dp),
+        horizontalArrangement = Arrangement.spacedBy(SPACING.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         InventraThumbnail(painter = painter)
@@ -73,7 +76,7 @@ fun RequirementAcceptanceCard(
         }
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(SPACING.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.Check,
@@ -84,7 +87,7 @@ fun RequirementAcceptanceCard(
                         .size(BUTTON_SIZE.dp)
                         .background(InventraSuccess, RoundedCornerShape(50))
                         .clickable(onClick = onAccept)
-                        .padding(8.dp),
+                        .padding(BUTTON_PADDING.dp),
             )
 
             Icon(
@@ -96,7 +99,7 @@ fun RequirementAcceptanceCard(
                         .size(BUTTON_SIZE.dp)
                         .background(InventraDanger, RoundedCornerShape(50))
                         .clickable(onClick = onReject)
-                        .padding(8.dp),
+                        .padding(BUTTON_PADDING.dp),
             )
         }
     }
