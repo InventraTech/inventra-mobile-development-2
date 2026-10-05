@@ -41,30 +41,27 @@ fun HistoryItemCard(
     status: RequirementStatus,
     modifier: Modifier = Modifier,
 ) {
-    val (
-        backgroundColor,
-        iconColor,
-        statusIcon,
-    ) = when (status) {
-        RequirementStatus.ACCEPTED ->
-            Triple(
-                InventraSuccess.copy(alpha = 0.1f),
-                InventraSuccess,
-                Icons.Default.Check,
-            )
-        RequirementStatus.REJECTED ->
-            Triple(
-                InventraDanger.copy(alpha = 0.1f),
-                InventraDanger,
-                Icons.Default.Close,
-            )
-        RequirementStatus.PENDING ->
-            Triple(
-                Color.Gray.copy(alpha = 0.1f),
-                Color.Gray,
-                Icons.Default.Close,
-            )
-    }
+    val (backgroundColor, iconColor, statusIcon) =
+        when (status) {
+            RequirementStatus.ACCEPTED ->
+                Triple(
+                    InventraSuccess.copy(alpha = 0.1f),
+                    InventraSuccess,
+                    Icons.Default.Check,
+                )
+            RequirementStatus.REJECTED ->
+                Triple(
+                    InventraDanger.copy(alpha = 0.1f),
+                    InventraDanger,
+                    Icons.Default.Close,
+                )
+            RequirementStatus.PENDING ->
+                Triple(
+                    Color.Gray.copy(alpha = 0.1f),
+                    Color.Gray,
+                    Icons.Default.Close,
+                )
+        }
 
     Row(
         modifier =

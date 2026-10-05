@@ -13,13 +13,14 @@ object RequirementsSharedData {
         _processedItems.asStateFlow()
 
     fun addProcessedItem(requirement: Requirement) {
-        val historyItem = HistoryItem(
-            id = requirement.id,
-            imageRes = requirement.imageRes,
-            productName = requirement.productName,
-            description = requirement.description,
-            status = requirement.status,
-        )
+        val historyItem =
+            HistoryItem(
+                id = requirement.id,
+                imageRes = requirement.imageRes,
+                productName = requirement.productName,
+                description = requirement.description,
+                status = requirement.status,
+            )
         val currentItems = _processedItems.value.toMutableList()
         currentItems.add(0, historyItem)
         _processedItems.value = currentItems
