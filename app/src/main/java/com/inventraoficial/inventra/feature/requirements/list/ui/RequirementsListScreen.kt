@@ -95,9 +95,10 @@ fun RequirementsListScreen(
                             selectedLabelColor = Color.White,
                             labelColor = InventraPurple,
                         ),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(TAB_HEIGHT.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(TAB_HEIGHT.dp),
                 )
             }
         }

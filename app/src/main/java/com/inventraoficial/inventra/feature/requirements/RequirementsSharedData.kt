@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 object RequirementsSharedData {
     private val _processedItems =
         MutableStateFlow<List<HistoryItem>>(emptyList())
-    val processedItems: StateFlow<List<HistoryItem>> = _processedItems.asStateFlow()
+    val processedItems: StateFlow<List<HistoryItem>> =
+        _processedItems.asStateFlow()
 
     fun addProcessedItem(requirement: Requirement) {
         val historyItem = HistoryItem(
