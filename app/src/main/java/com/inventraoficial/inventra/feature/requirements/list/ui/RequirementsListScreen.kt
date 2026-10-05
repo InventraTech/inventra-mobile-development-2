@@ -67,10 +67,11 @@ fun RequirementsListScreen(
         )
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(PADDING_HORIZONTAL.dp)
-                .height(TAB_HEIGHT.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(PADDING_HORIZONTAL.dp)
+                    .height(TAB_HEIGHT.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             tabs.forEachIndexed { index, tab ->

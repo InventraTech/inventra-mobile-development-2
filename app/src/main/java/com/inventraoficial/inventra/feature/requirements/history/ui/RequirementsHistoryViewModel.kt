@@ -15,19 +15,19 @@ private const val SUBSCRIPTION_TIMEOUT_MS = 5000L
 
 class RequirementsHistoryViewModel : ViewModel() {
     private val initialHistoryItems: List<HistoryItem> = buildFakeHistoryItems()
-    
+
     private val _uiState = MutableStateFlow(RequirementsHistoryUiState(historyItems = initialHistoryItems))
-    val uiState: StateFlow<RequirementsHistoryUiState> = 
+    val uiState: StateFlow<RequirementsHistoryUiState> =
         combine(
             _uiState,
-            RequirementsSharedData.processedItems
+            RequirementsSharedData.processedItems,
         ) { currentState, newItems ->
             val allItems = newItems + initialHistoryItems
             currentState.copy(historyItems = allItems)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MS),
-            initialValue = _uiState.value
+            initialValue = _uiState.value,
         )
 
     private fun buildFakeHistoryItems(): List<HistoryItem> =

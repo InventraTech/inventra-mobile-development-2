@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraThumbnail
 import com.inventraoficial.inventra.ui.theme.InventraDanger
-import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.InventraGold
+import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 private const val BUTTON_SIZE = 40

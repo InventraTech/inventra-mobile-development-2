@@ -17,16 +17,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.painterResource
 import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraThumbnail
 import com.inventraoficial.inventra.ui.theme.InventraDanger
-import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 private const val BACKGROUND_COLOR = 0xFFF5F5F5
@@ -39,17 +39,19 @@ fun RequirementRow(
     status: RequirementStatus,
     modifier: Modifier = Modifier,
 ) {
-    val statusIconColor = when (status) {
-        RequirementStatus.ACCEPTED -> InventraSuccess
-        RequirementStatus.REJECTED -> InventraDanger
-        RequirementStatus.PENDING -> Color.Gray
-    }
+    val statusIconColor =
+        when (status) {
+            RequirementStatus.ACCEPTED -> InventraSuccess
+            RequirementStatus.REJECTED -> InventraDanger
+            RequirementStatus.PENDING -> Color.Gray
+        }
 
-    val statusIcon = when (status) {
-        RequirementStatus.ACCEPTED -> Icons.Default.Check
-        RequirementStatus.REJECTED -> Icons.Default.Close
-        RequirementStatus.PENDING -> Icons.Default.Close
-    }
+    val statusIcon =
+        when (status) {
+            RequirementStatus.ACCEPTED -> Icons.Default.Check
+            RequirementStatus.REJECTED -> Icons.Default.Close
+            RequirementStatus.PENDING -> Icons.Default.Close
+        }
 
     Row(
         modifier =
