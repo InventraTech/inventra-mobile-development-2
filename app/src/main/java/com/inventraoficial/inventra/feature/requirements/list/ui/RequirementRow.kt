@@ -29,6 +29,8 @@ import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
+private const val BACKGROUND_COLOR = 0xFFF5F5F5
+
 @Composable
 fun RequirementRow(
     painter: Painter,
@@ -53,7 +55,7 @@ fun RequirementRow(
         modifier =
             modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF5F5F5), RoundedCornerShape(12.dp))
+                .background(Color(BACKGROUND_COLOR), RoundedCornerShape(12.dp))
                 .padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -92,6 +94,7 @@ fun RequirementRow(
 
 @Preview
 @Composable
+@Suppress("UnusedPrivateMember")
 private fun RequirementRowAcceptedPreview() {
     RequirementRow(
         painter = painterResource(R.drawable.ic_inventra_logo),
@@ -103,6 +106,7 @@ private fun RequirementRowAcceptedPreview() {
 
 @Preview
 @Composable
+@Suppress("UnusedPrivateMember")
 private fun RequirementRowRejectedPreview() {
     RequirementRow(
         painter = painterResource(R.drawable.ic_inventra_logo),

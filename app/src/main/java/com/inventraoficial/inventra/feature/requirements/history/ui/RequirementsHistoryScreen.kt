@@ -33,6 +33,11 @@ import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
+private const val TAB_HEIGHT = 56
+private const val TAB_FONT_SIZE = 18
+private const val PADDING_HORIZONTAL = 16
+private const val SPACING_BETWEEN_ITEMS = 12
+
 @Composable
 fun RequirementsHistoryScreen(
     historyItems: List<HistoryItem>,
@@ -62,8 +67,8 @@ fun RequirementsHistoryScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .height(56.dp),
+                .padding(PADDING_HORIZONTAL.dp)
+                .height(TAB_HEIGHT.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             tabs.forEachIndexed { index, tab ->
@@ -78,7 +83,7 @@ fun RequirementsHistoryScreen(
                             text = tab,
                             fontFamily = Montserrat,
                             fontWeight = FontWeight.Medium,
-                            fontSize = 18.sp,
+                            fontSize = TAB_FONT_SIZE.sp,
                         )
                     },
                     colors =
@@ -89,7 +94,7 @@ fun RequirementsHistoryScreen(
                         ),
                     modifier = Modifier
                         .weight(1f)
-                        .height(56.dp),
+                        .height(TAB_HEIGHT.dp),
                 )
             }
         }
@@ -98,10 +103,10 @@ fun RequirementsHistoryScreen(
             modifier =
                 Modifier
                     .weight(1f)
-                    .padding(16.dp),
+                    .padding(PADDING_HORIZONTAL.dp),
         ) {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(SPACING_BETWEEN_ITEMS.dp),
             ) {
                 items(historyItems) { item ->
                     HistoryItemCard(
@@ -133,6 +138,7 @@ fun RequirementsHistoryRoute(
 
 @Preview
 @Composable
+@Suppress("UnusedPrivateMember")
 private fun RequirementsHistoryScreenPreview() {
     RequirementsHistoryScreen(
         historyItems = emptyList(),

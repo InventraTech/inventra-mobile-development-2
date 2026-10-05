@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
+private const val SUBSCRIPTION_TIMEOUT_MS = 5000
+
 class RequirementsHistoryViewModel : ViewModel() {
     private val initialHistoryItems: List<HistoryItem> = buildFakeHistoryItems()
     
@@ -24,7 +26,7 @@ class RequirementsHistoryViewModel : ViewModel() {
             currentState.copy(historyItems = allItems)
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MS),
             initialValue = _uiState.value
         )
 

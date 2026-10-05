@@ -3,13 +3,11 @@ package com.inventraoficial.inventra.feature.requirements.list.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -29,10 +27,11 @@ import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraThumbnail
 import com.inventraoficial.inventra.ui.theme.InventraDanger
-import com.inventraoficial.inventra.ui.theme.InventraGold
 import com.inventraoficial.inventra.ui.theme.InventraSuccess
-import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraWarning
 import com.inventraoficial.inventra.ui.theme.Montserrat
+
+private const val BUTTON_SIZE = 40
 
 @Composable
 fun RequirementAcceptanceCard(
@@ -47,7 +46,7 @@ fun RequirementAcceptanceCard(
         modifier =
             modifier
                 .fillMaxWidth()
-                .background(InventraGold.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+                .background(InventraWarning, RoundedCornerShape(12.dp))
                 .padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -63,7 +62,7 @@ fun RequirementAcceptanceCard(
                 fontFamily = Montserrat,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
-                color = InventraPurple,
+                color = Color.Black,
             )
             Text(
                 text = description,
@@ -76,46 +75,41 @@ fun RequirementAcceptanceCard(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(InventraSuccess, CircleShape)
-                    .clickable { onAccept() },
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Aceitar",
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Accept",
+                tint = Color.White,
+                modifier =
+                    Modifier
+                        .size(BUTTON_SIZE.dp)
+                        .background(InventraSuccess, RoundedCornerShape(50))
+                        .clickable(onClick = onAccept)
+                        .padding(8.dp),
+            )
 
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(InventraDanger, CircleShape)
-                    .clickable { onReject() },
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Recusar",
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Reject",
+                tint = Color.White,
+                modifier =
+                    Modifier
+                        .size(BUTTON_SIZE.dp)
+                        .background(InventraDanger, RoundedCornerShape(50))
+                        .clickable(onClick = onReject)
+                        .padding(8.dp),
+            )
         }
     }
 }
 
 @Preview
 @Composable
+@Suppress("UnusedPrivateMember")
 private fun RequirementAcceptanceCardPreview() {
     RequirementAcceptanceCard(
         painter = painterResource(R.drawable.ic_inventra_logo),
         title = "Baião - Arroz Camil",
-        description = "Solicitação entrada como Estoquista",
+        description = "Solicitação de requisição",
         onAccept = {},
         onReject = {},
     )

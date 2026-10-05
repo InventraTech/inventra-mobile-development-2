@@ -2,13 +2,11 @@ package com.inventraoficial.inventra.feature.requirements.history.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -32,6 +30,8 @@ import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
+
+private const val ICON_SIZE = 24
 
 @Composable
 fun HistoryItemCard(
@@ -89,24 +89,18 @@ fun HistoryItemCard(
             )
         }
 
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .background(iconColor, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = statusIcon,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(24.dp),
-            )
-        }
+        Icon(
+            imageVector = statusIcon,
+            contentDescription = null,
+            tint = iconColor,
+            modifier = Modifier.size(ICON_SIZE.dp),
+        )
     }
 }
 
 @Preview
 @Composable
+@Suppress("UnusedPrivateMember")
 private fun HistoryItemCardAcceptedPreview() {
     HistoryItemCard(
         painter = painterResource(R.drawable.ic_inventra_logo),
@@ -118,6 +112,7 @@ private fun HistoryItemCardAcceptedPreview() {
 
 @Preview
 @Composable
+@Suppress("UnusedPrivateMember")
 private fun HistoryItemCardRejectedPreview() {
     HistoryItemCard(
         painter = painterResource(R.drawable.ic_inventra_logo),
