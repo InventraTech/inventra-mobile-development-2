@@ -33,6 +33,7 @@ import com.inventraoficial.inventra.ui.theme.Montserrat
 
 private const val BUTTON_SIZE = 40
 private const val BUTTON_PADDING = 8
+private const val BUTTON_CORNER_RADIUS = 50
 private const val CARD_PADDING = 12
 private const val SPACING = 8
 
@@ -85,7 +86,7 @@ fun RequirementAcceptanceCard(
                 modifier =
                     Modifier
                         .size(BUTTON_SIZE.dp)
-                        .background(InventraSuccess, RoundedCornerShape(50))
+                        .background(InventraSuccess, RoundedCornerShape(BUTTON_CORNER_RADIUS.dp))
                         .clickable(onClick = onAccept)
                         .padding(BUTTON_PADDING.dp),
             )
@@ -97,7 +98,7 @@ fun RequirementAcceptanceCard(
                 modifier =
                     Modifier
                         .size(BUTTON_SIZE.dp)
-                        .background(InventraDanger, RoundedCornerShape(50))
+                        .background(InventraDanger, RoundedCornerShape(BUTTON_CORNER_RADIUS.dp))
                         .clickable(onClick = onReject)
                         .padding(BUTTON_PADDING.dp),
             )
