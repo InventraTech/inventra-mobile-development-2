@@ -42,6 +42,10 @@ sealed interface Screen : NavKey {
     data object AccountPreferences : Screen
 
     data object CozinhaInfo : Screen
+
+    data object RequirementsList : Screen
+
+    data object RequirementsHistory : Screen
 }
 
 /**

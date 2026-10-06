@@ -30,6 +30,8 @@ import com.inventraoficial.inventra.feature.profile.details.ui.ProfileDetailsRou
 import com.inventraoficial.inventra.feature.profile.members.ui.ManageMembersRoute
 import com.inventraoficial.inventra.feature.profile.preferences.ui.AccountPreferencesRoute
 import com.inventraoficial.inventra.feature.profile.ui.ProfileRoute
+import com.inventraoficial.inventra.feature.requirements.history.ui.RequirementsHistoryRoute
+import com.inventraoficial.inventra.feature.requirements.list.ui.RequirementsListRoute
 import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
 import com.inventraoficial.inventra.feature.stock.detail.ui.StockDetailRoute
 import com.inventraoficial.inventra.feature.stock.edit.ui.ProductEditRoute
@@ -141,6 +143,12 @@ fun SetupNavigation() {
                     }
                     entry<Screen.CozinhaInfo> {
                         CozinhaInfoRoute(navigator = navigator)
+                    }
+                    entry<Screen.RequirementsList> {
+                        RequirementsListRoute(navigator = navigator)
+                    }
+                    entry<Screen.RequirementsHistory> {
+                        RequirementsHistoryRoute(navigator = navigator)
                     }
                 },
         )
