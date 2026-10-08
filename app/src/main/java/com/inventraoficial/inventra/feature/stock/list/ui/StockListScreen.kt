@@ -1,12 +1,16 @@
 package com.inventraoficial.inventra.feature.stock.list.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -37,6 +41,7 @@ fun StockListScreen(
     onFilterSelect: (String) -> Unit,
     products: List<Product>,
     onProductClick: (Product) -> Unit,
+    onScanClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -52,6 +57,14 @@ fun StockListScreen(
                     color = Color.White,
                     fontFamily = Montserrat,
                     fontSize = 17.sp,
+                )
+            },
+            actions = {
+                Icon(
+                    Icons.Default.QrCodeScanner,
+                    contentDescription = "Escanear produto",
+                    tint = Color.White,
+                    modifier = Modifier.clickable(onClick = onScanClick),
                 )
             },
         )
@@ -109,6 +122,7 @@ fun StockListRoute(
         onFilterSelect = viewModel::onFilterSelect,
         products = uiState.products,
         onProductClick = { navigator.navigate(Screen.StockDetail) },
+        onScanClick = { navigator.navigate(Screen.Scan) },
         modifier = modifier,
     )
 }
@@ -130,5 +144,6 @@ private fun StockListScreenPreview() {
                 Product(R.drawable.ic_inventra_logo, "Arroz Camil", "24 kg", "2 lotes", "Grãos"),
             ),
         onProductClick = {},
+        onScanClick = {},
     )
 }
