@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,6 +43,8 @@ import com.inventraoficial.inventra.ui.theme.InventraDanger
 fun RegisterScreen(
     role: InventraUserRole?,
     onRoleSelect: (InventraUserRole) -> Unit,
+    name: String,
+    onNameChange: (String) -> Unit,
     login: String,
     onLoginChange: (String) -> Unit,
     senha: String,
@@ -51,6 +54,7 @@ fun RegisterScreen(
     onRegisterClick: () -> Unit,
     onBackToLoginClick: () -> Unit,
     errorMessage: String?,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -94,11 +98,18 @@ fun RegisterScreen(
                 onRoleSelect = onRoleSelect,
             )
             InventraLabeledField(
-                label = "Login",
+                label = "Nome",
+                value = name,
+                onValueChange = onNameChange,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = "Insira seu nome",
+            )
+            InventraLabeledField(
+                label = "E-mail",
                 value = login,
                 onValueChange = onLoginChange,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = "Insira seu Login",
+                placeholder = "Insira seu e-mail",
             )
             InventraLabeledField(
                 label = "Senha",
@@ -129,6 +140,7 @@ fun RegisterScreen(
                     keyboardController?.hide()
                     onRegisterClick()
                 },
+                isLoading = isLoading,
                 modifier =
                     Modifier
                         .width(300.dp)
@@ -145,31 +157,32 @@ fun RegisterScreen(
 @Composable
 fun RegisterRoute(
     navigator: Navigator,
-    viewModel: RegisterViewModel = viewModel(),
+    viewModel: RegisterViewModel = viewModel(factory = RegisterViewModel.Factory),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    LaunchedEffect(uiState.isRegistered) {
+        // Provisorio: enquanto o fluxo de vincular/solicitar cozinha nao existe na API,
+        // o cadastro leva direto para a Home. Depois, Supervisor -> CreateCozinha e
+        // Estoquista -> SelectCozinha.
+        if (uiState.isRegistered) navigator.navigateTopLevel(Screen.Home)
+    }
 
     RegisterScreen(
         role = uiState.role,
         onRoleSelect = viewModel::onRoleSelect,
+        name = uiState.name,
+        onNameChange = viewModel::onNameChange,
         login = uiState.login,
         onLoginChange = viewModel::onLoginChange,
         senha = uiState.password,
         onPasswordChange = viewModel::onPasswordChange,
         confirmarSenha = uiState.confirmPassword,
         onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
-        onRegisterClick = {
-            if (viewModel.onRegisterClick()) {
-                if (uiState.role == InventraUserRole.Supervisor) {
-                    navigator.replaceStack(Screen.CreateCozinha)
-                } else {
-                    navigator.replaceStack(Screen.SelectCozinha)
-                }
-            }
-        },
+        onRegisterClick = viewModel::onRegisterClick,
         onBackToLoginClick = { navigator.back() },
         errorMessage = uiState.errorMessage,
+        isLoading = uiState.isLoading,
         modifier = modifier,
     )
 }
@@ -181,6 +194,8 @@ private fun RegisterScreenPreview() {
     RegisterScreen(
         role = InventraUserRole.Supervisor,
         onRoleSelect = {},
+        name = "",
+        onNameChange = {},
         login = "",
         onLoginChange = {},
         senha = "",
@@ -190,5 +205,6 @@ private fun RegisterScreenPreview() {
         onRegisterClick = {},
         onBackToLoginClick = {},
         errorMessage = null,
+        isLoading = false,
     )
 }

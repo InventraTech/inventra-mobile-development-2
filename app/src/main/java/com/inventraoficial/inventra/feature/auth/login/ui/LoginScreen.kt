@@ -2,7 +2,6 @@ package com.inventraoficial.inventra.feature.auth.login.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,11 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,7 +36,6 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHead
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraDanger
-import com.inventraoficial.inventra.ui.theme.InventraPurple
 
 @Composable
 fun LoginScreen(
@@ -49,9 +45,9 @@ fun LoginScreen(
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
-    onBiometricClick: () -> Unit,
     onCreateAccountClick: () -> Unit,
     errorMessage: String?,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -120,6 +116,7 @@ fun LoginScreen(
                     keyboardController?.hide()
                     onLoginClick()
                 },
+                isLoading = isLoading,
                 modifier =
                     Modifier
                         .width(300.dp)
@@ -133,16 +130,6 @@ fun LoginScreen(
                 text = "Criar conta",
                 onClick = onCreateAccountClick,
             )
-            Icon(
-                imageVector = Icons.Default.Fingerprint,
-                contentDescription = "Entrar com biometria",
-                modifier =
-                    Modifier
-                        .padding(top = 30.dp)
-                        .size(70.dp)
-                        .clickable(onClick = onBiometricClick),
-                tint = InventraPurple,
-            )
         }
     }
 }
@@ -150,25 +137,24 @@ fun LoginScreen(
 @Composable
 fun LoginRoute(
     navigator: Navigator,
-    viewModel: LoginViewModel = viewModel(),
+    viewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    LaunchedEffect(uiState.isLoggedIn) {
+        if (uiState.isLoggedIn) navigator.navigateTopLevel(Screen.Home)
+    }
 
     LoginScreen(
         login = uiState.login,
         onLoginChange = viewModel::onLoginChange,
         senha = uiState.password,
         onPasswordChange = viewModel::onPasswordChange,
-        onLoginClick = {
-            if (viewModel.onLoginClick()) {
-                navigator.navigateTopLevel(Screen.Home)
-            }
-        },
+        onLoginClick = viewModel::onLoginClick,
         onForgotPasswordClick = viewModel::onForgotPasswordClick,
-        onBiometricClick = { navigator.navigateTopLevel(Screen.Home) },
         onCreateAccountClick = { navigator.navigate(Screen.Register) },
         errorMessage = uiState.errorMessage,
+        isLoading = uiState.isLoading,
         modifier = modifier,
     )
 }
@@ -183,8 +169,8 @@ private fun LoginScreenPreview() {
         onPasswordChange = {},
         onLoginClick = {},
         onForgotPasswordClick = {},
-        onBiometricClick = {},
         onCreateAccountClick = {},
         errorMessage = null,
+        isLoading = false,
     )
 }
