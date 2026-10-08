@@ -28,6 +28,8 @@ interface AuthRepository {
     ): Result<UserResponse>
 
     suspend fun hasSession(): Boolean
+
+    suspend fun logout()
 }
 
 class NetworkAuthRepository(
@@ -70,4 +72,8 @@ class NetworkAuthRepository(
         }
 
     override suspend fun hasSession(): Boolean = tokenStorage.token.first() != null
+
+    override suspend fun logout() {
+        tokenStorage.clear()
+    }
 }
