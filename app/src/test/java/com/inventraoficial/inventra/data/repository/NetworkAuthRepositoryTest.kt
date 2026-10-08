@@ -171,4 +171,16 @@ class NetworkAuthRepositoryTest {
 
         assertTrue(encoded.contains("\"accessType\":\"SUPERVISOR\""))
     }
+
+    @Test
+    fun `hasSession e false sem token e true depois do login`() =
+        runTest {
+            val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, json, tokenStorage)
+
+            assertEquals(false, repository.hasSession())
+
+            repository.login("teste@inventra.com", "senha123")
+
+            assertEquals(true, repository.hasSession())
+        }
 }

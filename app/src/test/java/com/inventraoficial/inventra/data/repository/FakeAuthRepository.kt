@@ -10,6 +10,7 @@ import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
  */
 class FakeAuthRepository(
     var result: Result<UserResponse> = Result.success(fakeUser),
+    var hasSession: Boolean = false,
 ) : AuthRepository {
     var loginCalls = 0
         private set
@@ -47,6 +48,8 @@ class FakeAuthRepository(
         lastAccessType = accessType
         return result
     }
+
+    override suspend fun hasSession(): Boolean = hasSession
 
     companion object {
         val fakeUser =

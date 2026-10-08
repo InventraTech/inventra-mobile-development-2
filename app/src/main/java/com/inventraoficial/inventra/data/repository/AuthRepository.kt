@@ -8,6 +8,7 @@ import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.RegisterRequest
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
@@ -25,6 +26,8 @@ interface AuthRepository {
         password: String,
         accessType: AccessType,
     ): Result<UserResponse>
+
+    suspend fun hasSession(): Boolean
 }
 
 class NetworkAuthRepository(
@@ -65,4 +68,6 @@ class NetworkAuthRepository(
         authenticate {
             authApi.register(RegisterRequest(name, email, password, accessType))
         }
+
+    override suspend fun hasSession(): Boolean = tokenStorage.token.first() != null
 }

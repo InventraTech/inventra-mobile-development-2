@@ -1,17 +1,24 @@
 package com.inventraoficial.inventra.ui.navigation
 
 import android.app.Activity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomBar
@@ -41,10 +48,27 @@ import com.inventraoficial.inventra.feature.suppliers.detail.ui.SupplierDetailRo
 import com.inventraoficial.inventra.feature.suppliers.list.ui.SupplierRoute
 
 @Composable
-fun SetupNavigation() {
+fun SetupNavigation(startViewModel: StartViewModel = viewModel(factory = StartViewModel.Factory)) {
+    val startScreen by startViewModel.startScreen.collectAsState()
+
+    val screen = startScreen
+    if (screen == null) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.White),
+        )
+    } else {
+        AppNavigation(startScreen = screen)
+    }
+}
+
+@Composable
+private fun AppNavigation(startScreen: Screen) {
     val navigator =
         remember {
-            Navigator(mutableStateListOf(Screen.Login))
+            Navigator(mutableStateListOf(startScreen))
         }
 
     val currentScreen = navigator.currentBackStack.last()
