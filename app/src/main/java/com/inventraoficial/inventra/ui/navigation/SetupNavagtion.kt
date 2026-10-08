@@ -11,12 +11,14 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.core.view.WindowCompat
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomBar
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraQrScanFab
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraMascotFab
 import com.inventraoficial.inventra.feature.assistant.ui.ChatRoute
 import com.inventraoficial.inventra.feature.auth.login.ui.LoginRoute
 import com.inventraoficial.inventra.feature.auth.register.ui.RegisterRoute
@@ -71,9 +73,10 @@ fun SetupNavigation() {
             }
         },
         floatingActionButton = {
-            if (selectedTab == InventraBottomDestination.Stock || selectedTab == InventraBottomDestination.Home) {
-                InventraQrScanFab(
-                    onClick = { navigator.navigate(Screen.Scan) },
+            if (selectedTab == InventraBottomDestination.Home) {
+                InventraMascotFab(
+                    painter = painterResource(R.drawable.ic_mascote),
+                    onClick = { navigator.navigate(Screen.Chat) },
                 )
             }
         },
