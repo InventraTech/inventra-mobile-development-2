@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.data.remote.interceptor
 
 import com.inventraoficial.inventra.data.local.TokenStorage
+import com.inventraoficial.inventra.data.session.SessionManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -9,6 +10,7 @@ import java.net.HttpURLConnection
 
 class AuthInterceptor(
     private val tokenStorage: TokenStorage,
+    private val sessionManager: SessionManager,
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val token = runBlocking { tokenStorage.token.first() }
@@ -25,6 +27,7 @@ class AuthInterceptor(
         val response = chain.proceed(authenticationRequest)
         if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
             runBlocking { tokenStorage.clear() }
+            sessionManager.notifySessionExpired()
         }
         return response
     }

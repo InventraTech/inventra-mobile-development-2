@@ -27,7 +27,7 @@ class DefaultAppContainer(
 ) : AppContainer {
     private val tokenStorage: TokenStorage by lazy { DataStoreTokenStorage(context) }
     override val sessionManager = SessionManager()
-    private val authInterceptor: AuthInterceptor by lazy { AuthInterceptor(tokenStorage) }
+    private val authInterceptor: AuthInterceptor by lazy { AuthInterceptor(tokenStorage, sessionManager) }
 
     private val json =
         Json {
