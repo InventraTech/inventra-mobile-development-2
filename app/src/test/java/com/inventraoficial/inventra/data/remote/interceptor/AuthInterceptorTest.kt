@@ -1,6 +1,13 @@
 package com.inventraoficial.inventra.data.remote.interceptor
 
 import com.inventraoficial.inventra.data.local.FakeTokenStorage
+import com.inventraoficial.inventra.data.session.SessionManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.RecordedRequest
@@ -16,8 +23,19 @@ import org.junit.Test
  * Sobe um servidor HTTP falso local, faz a requisicao passar pelo
  * [AuthInterceptor] e confere quais headers chegaram no servidor.
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class AuthInterceptorTest {
     private val server = MockWebServer()
+    private val sessionManager = SessionManager()
+
+    /** Comeca a ouvir os avisos de sessao expirada e devolve a lista que vai sendo preenchida. */
+    private fun TestScope.ouvirAvisos(): List<Unit> {
+        val avisos = mutableListOf<Unit>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            sessionManager.sessionExpired.toList(avisos)
+        }
+        return avisos
+    }
 
     @Before
     fun setUp() {
@@ -33,9 +51,10 @@ class AuthInterceptorTest {
         tokenStorage: FakeTokenStorage,
         path: String,
         existingAuthorization: String? = null,
+        responseCode: Int = 200,
     ): RecordedRequest {
-        server.enqueue(MockResponse(code = 200))
-        val client = OkHttpClient.Builder().addInterceptor(AuthInterceptor(tokenStorage)).build()
+        server.enqueue(MockResponse(code = responseCode))
+        val client = OkHttpClient.Builder().addInterceptor(AuthInterceptor(tokenStorage, sessionManager)).build()
         val request =
             Request
                 .Builder()
@@ -74,4 +93,70 @@ class AuthInterceptorTest {
 
         assertEquals(listOf("Bearer jwt-novo"), recorded.headers.values("Authorization"))
     }
+
+    @Test
+    fun `401 numa requisicao com token apaga o token salvo`() {
+        val tokenStorage = FakeTokenStorage("jwt-expirado")
+
+        send(tokenStorage, "/api/kitchens", responseCode = 401)
+
+        assertNull(tokenStorage.currentToken)
+    }
+
+    @Test
+    fun `401 no login nao apaga o token porque significa senha errada`() {
+        val tokenStorage = FakeTokenStorage("jwt-valido")
+
+        send(tokenStorage, "/api/auth/login", responseCode = 401)
+
+        assertEquals("jwt-valido", tokenStorage.currentToken)
+    }
+
+    @Test
+    fun `resposta de sucesso mantem o token`() {
+        val tokenStorage = FakeTokenStorage("jwt-valido")
+
+        send(tokenStorage, "/api/kitchens", responseCode = 200)
+
+        assertEquals("jwt-valido", tokenStorage.currentToken)
+    }
+
+    @Test
+    fun `outros erros como 403 nao apagam o token`() {
+        val tokenStorage = FakeTokenStorage("jwt-valido")
+
+        send(tokenStorage, "/api/kitchens", responseCode = 403)
+
+        assertEquals("jwt-valido", tokenStorage.currentToken)
+    }
+
+    @Test
+    fun `401 numa requisicao com token avisa que a sessao expirou`() =
+        runTest {
+            val avisos = ouvirAvisos()
+
+            send(FakeTokenStorage("jwt-expirado"), "/api/kitchens", responseCode = 401)
+
+            assertEquals(1, avisos.size)
+        }
+
+    @Test
+    fun `401 no login nao avisa sessao expirada`() =
+        runTest {
+            val avisos = ouvirAvisos()
+
+            send(FakeTokenStorage("jwt-valido"), "/api/auth/login", responseCode = 401)
+
+            assertEquals(0, avisos.size)
+        }
+
+    @Test
+    fun `resposta de sucesso nao avisa sessao expirada`() =
+        runTest {
+            val avisos = ouvirAvisos()
+
+            send(FakeTokenStorage("jwt-valido"), "/api/kitchens", responseCode = 200)
+
+            assertEquals(0, avisos.size)
+        }
 }

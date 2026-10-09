@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,6 +49,7 @@ import com.inventraoficial.inventra.feature.stock.list.ui.StockListRoute
 import com.inventraoficial.inventra.feature.stock.stockout.ui.StockOutRoute
 import com.inventraoficial.inventra.feature.suppliers.detail.ui.SupplierDetailRoute
 import com.inventraoficial.inventra.feature.suppliers.list.ui.SupplierRoute
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun SetupNavigation(startViewModel: StartViewModel = viewModel(factory = StartViewModel.Factory)) {
@@ -62,16 +64,28 @@ fun SetupNavigation(startViewModel: StartViewModel = viewModel(factory = StartVi
                     .background(Color.White),
         )
     } else {
-        AppNavigation(startScreen = screen)
+        AppNavigation(
+            startScreen = screen,
+            sessionExpired = startViewModel.sessionExpired,
+        )
     }
 }
 
 @Composable
-private fun AppNavigation(startScreen: Screen) {
+private fun AppNavigation(
+    startScreen: Screen,
+    sessionExpired: SharedFlow<Unit>,
+) {
     val navigator =
         remember {
             Navigator(mutableStateListOf(startScreen))
         }
+
+    LaunchedEffect(Unit) {
+        sessionExpired.collect {
+            navigator.replaceStack(Screen.Login)
+        }
+    }
 
     val currentScreen = navigator.currentBackStack.last()
     val selectedTab = currentScreen.toBottomDestination()

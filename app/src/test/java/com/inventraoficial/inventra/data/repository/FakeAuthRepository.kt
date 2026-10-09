@@ -51,6 +51,14 @@ class FakeAuthRepository(
 
     override suspend fun hasSession(): Boolean = hasSession
 
+    var logoutCalls = 0
+        private set
+
+    override suspend fun logout() {
+        logoutCalls++
+        hasSession = false
+    }
+
     companion object {
         val fakeUser =
             UserResponse(

@@ -183,4 +183,16 @@ class NetworkAuthRepositoryTest {
 
             assertEquals(true, repository.hasSession())
         }
+
+    @Test
+    fun `logout apaga o token e encerra a sessao`() =
+        runTest {
+            val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, json, tokenStorage)
+            repository.login("teste@inventra.com", "senha123")
+
+            repository.logout()
+
+            assertNull(tokenStorage.currentToken)
+            assertEquals(false, repository.hasSession())
+        }
 }
