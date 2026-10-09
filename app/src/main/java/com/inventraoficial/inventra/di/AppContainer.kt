@@ -8,6 +8,7 @@ import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.interceptor.AuthInterceptor
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
+import com.inventraoficial.inventra.data.session.SessionManager
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -18,12 +19,14 @@ import java.util.concurrent.TimeUnit
 
 interface AppContainer {
     val authRepository: AuthRepository
+    val sessionManager: SessionManager
 }
 
 class DefaultAppContainer(
     private val context: Context,
 ) : AppContainer {
     private val tokenStorage: TokenStorage by lazy { DataStoreTokenStorage(context) }
+    override val sessionManager = SessionManager()
     private val authInterceptor: AuthInterceptor by lazy { AuthInterceptor(tokenStorage) }
 
     private val json =
