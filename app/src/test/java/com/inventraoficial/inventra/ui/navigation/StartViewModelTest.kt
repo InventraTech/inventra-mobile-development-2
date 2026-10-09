@@ -1,9 +1,13 @@
 package com.inventraoficial.inventra.ui.navigation
 
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
+import com.inventraoficial.inventra.data.session.SessionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -31,7 +35,7 @@ class StartViewModelTest {
     @Test
     fun `comeca sem destino enquanto a sessao nao foi verificada`() =
         runTest(testDispatcher) {
-            val viewModel = StartViewModel(FakeAuthRepository(hasSession = true))
+            val viewModel = StartViewModel(FakeAuthRepository(hasSession = true), SessionManager())
 
             assertNull(viewModel.startScreen.value)
         }
@@ -39,7 +43,7 @@ class StartViewModelTest {
     @Test
     fun `com sessao salva o destino inicial e a Home`() =
         runTest(testDispatcher) {
-            val viewModel = StartViewModel(FakeAuthRepository(hasSession = true))
+            val viewModel = StartViewModel(FakeAuthRepository(hasSession = true), SessionManager())
 
             advanceUntilIdle()
 
@@ -49,10 +53,26 @@ class StartViewModelTest {
     @Test
     fun `sem sessao o destino inicial e o Login`() =
         runTest(testDispatcher) {
-            val viewModel = StartViewModel(FakeAuthRepository(hasSession = false))
+            val viewModel = StartViewModel(FakeAuthRepository(hasSession = false), SessionManager())
 
             advanceUntilIdle()
 
             assertEquals(Screen.Login, viewModel.startScreen.value)
+        }
+
+    @Test
+    fun `repassa para a tela os avisos de sessao expirada`() =
+        runTest(testDispatcher) {
+            val sessionManager = SessionManager()
+            val viewModel = StartViewModel(FakeAuthRepository(hasSession = true), sessionManager)
+            val avisos = mutableListOf<Unit>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.sessionExpired.toList(avisos)
+            }
+
+            sessionManager.notifySessionExpired()
+            advanceUntilIdle()
+
+            assertEquals(1, avisos.size)
         }
 }
