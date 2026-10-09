@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
+import java.net.HttpURLConnection
 
 class AuthInterceptor(
     private val tokenStorage: TokenStorage,
@@ -20,6 +21,11 @@ class AuthInterceptor(
                 .newBuilder()
                 .header("Authorization", "Bearer $token")
                 .build()
-        return chain.proceed(authenticationRequest)
+
+        val response = chain.proceed(authenticationRequest)
+        if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            runBlocking { tokenStorage.clear() }
+        }
+        return response
     }
 }

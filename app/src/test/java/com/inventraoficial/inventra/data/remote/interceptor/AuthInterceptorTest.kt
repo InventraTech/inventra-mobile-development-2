@@ -33,8 +33,9 @@ class AuthInterceptorTest {
         tokenStorage: FakeTokenStorage,
         path: String,
         existingAuthorization: String? = null,
+        responseCode: Int = 200,
     ): RecordedRequest {
-        server.enqueue(MockResponse(code = 200))
+        server.enqueue(MockResponse(code = responseCode))
         val client = OkHttpClient.Builder().addInterceptor(AuthInterceptor(tokenStorage)).build()
         val request =
             Request
@@ -73,5 +74,41 @@ class AuthInterceptorTest {
         val recorded = send(FakeTokenStorage("jwt-novo"), "/api/kitchens", existingAuthorization = "Bearer antigo")
 
         assertEquals(listOf("Bearer jwt-novo"), recorded.headers.values("Authorization"))
+    }
+
+    @Test
+    fun `401 numa requisicao com token apaga o token salvo`() {
+        val tokenStorage = FakeTokenStorage("jwt-expirado")
+
+        send(tokenStorage, "/api/kitchens", responseCode = 401)
+
+        assertNull(tokenStorage.currentToken)
+    }
+
+    @Test
+    fun `401 no login nao apaga o token porque significa senha errada`() {
+        val tokenStorage = FakeTokenStorage("jwt-valido")
+
+        send(tokenStorage, "/api/auth/login", responseCode = 401)
+
+        assertEquals("jwt-valido", tokenStorage.currentToken)
+    }
+
+    @Test
+    fun `resposta de sucesso mantem o token`() {
+        val tokenStorage = FakeTokenStorage("jwt-valido")
+
+        send(tokenStorage, "/api/kitchens", responseCode = 200)
+
+        assertEquals("jwt-valido", tokenStorage.currentToken)
+    }
+
+    @Test
+    fun `outros erros como 403 nao apagam o token`() {
+        val tokenStorage = FakeTokenStorage("jwt-valido")
+
+        send(tokenStorage, "/api/kitchens", responseCode = 403)
+
+        assertEquals("jwt-valido", tokenStorage.currentToken)
     }
 }

@@ -61,7 +61,6 @@ class DefaultAppContainer(
 
     companion object {
         private const val BASE_URL = "https://ms-inventra-api.onrender.com/api/"
-//        private const val BASE_URL = "http://32.198.182.173/api/";
         private const val TIMEOUT_SECONDS = 60L
     }
 }
