@@ -75,4 +75,38 @@ class StartViewModelTest {
 
             assertEquals(1, avisos.size)
         }
+
+    @Test
+    fun `com sessao busca o usuario atualizado no servidor`() =
+        runTest(testDispatcher) {
+            val repository = FakeAuthRepository(hasSession = true)
+            StartViewModel(repository, SessionManager())
+
+            advanceUntilIdle()
+
+            assertEquals(1, repository.refreshCalls)
+        }
+
+    @Test
+    fun `sem sessao nao busca usuario no servidor`() =
+        runTest(testDispatcher) {
+            val repository = FakeAuthRepository(hasSession = false)
+            StartViewModel(repository, SessionManager())
+
+            advanceUntilIdle()
+
+            assertEquals(0, repository.refreshCalls)
+        }
+
+    @Test
+    fun `decide o destino antes de esperar a resposta do servidor`() =
+        runTest(testDispatcher) {
+            val repository = FakeAuthRepository(hasSession = true)
+            val viewModel = StartViewModel(repository, SessionManager())
+
+            advanceUntilIdle()
+
+            // a Home e anunciada mesmo que o refresh falhe ou demore: o app nao fica preso na tela branca
+            assertEquals(Screen.Home, viewModel.startScreen.value)
+        }
 }

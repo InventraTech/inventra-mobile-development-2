@@ -27,6 +27,7 @@ class StartViewModel(
         viewModelScope.launch {
             if (authRepository.hasSession()) {
                 _startScreen.value = Screen.Home
+                authRepository.refreshCurrentUser()
             } else {
                 _startScreen.value = Screen.Login
             }
