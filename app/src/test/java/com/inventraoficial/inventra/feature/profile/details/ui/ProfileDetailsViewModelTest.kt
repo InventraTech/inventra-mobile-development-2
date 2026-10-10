@@ -1,5 +1,7 @@
 package com.inventraoficial.inventra.feature.profile.details.ui
 
+import com.inventraoficial.inventra.data.local.SessionUser
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -88,4 +90,50 @@ class ProfileDetailsViewModelTest {
             assertFalse(viewModel.uiState.value.isLoggedOut)
             assertEquals(0, repository.logoutCalls)
         }
+
+    @Test
+    fun `mostra os dados do usuario logado`() =
+        runTest(testDispatcher) {
+            repository.emitUser(supervisorComCozinha)
+            advanceUntilIdle()
+
+            val state = viewModel.uiState.value
+            assertEquals("Felipe Kogake", state.fullName)
+            assertEquals("felipe@inventra.com", state.email)
+            assertEquals("Supervisor", state.roleLabel)
+            assertEquals("Sabor Filial Sul", state.cozinhaName)
+        }
+
+    @Test
+    fun `usuario sem cozinha mostra a mensagem no lugar do nome da cozinha`() =
+        runTest(testDispatcher) {
+            repository.emitUser(supervisorComCozinha.copy(kitchenId = null, kitchenName = null))
+            advanceUntilIdle()
+
+            assertEquals("Nenhuma cozinha vinculada", viewModel.uiState.value.cozinhaName)
+        }
+
+    @Test
+    fun `atualiza sozinho quando o usuario salvo muda`() =
+        runTest(testDispatcher) {
+            repository.emitUser(supervisorComCozinha.copy(kitchenId = null, kitchenName = null))
+            advanceUntilIdle()
+
+            repository.emitUser(supervisorComCozinha)
+            advanceUntilIdle()
+
+            assertEquals("Sabor Filial Sul", viewModel.uiState.value.cozinhaName)
+        }
+
+    private companion object {
+        val supervisorComCozinha =
+            SessionUser(
+                id = "00000000-0000-0000-0000-000000000001",
+                name = "Felipe Kogake",
+                email = "felipe@inventra.com",
+                accessType = AccessType.SUPERVISOR,
+                kitchenId = 7,
+                kitchenName = "Sabor Filial Sul",
+            )
+    }
 }

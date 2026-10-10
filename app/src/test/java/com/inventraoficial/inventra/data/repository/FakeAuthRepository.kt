@@ -19,6 +19,11 @@ class FakeAuthRepository(
     private val _currentUser = MutableStateFlow(initialUser)
     override val currentUser: Flow<SessionUser?> = _currentUser
 
+    /** Simula o usuario salvo mudando (ex.: aprovado numa cozinha). */
+    fun emitUser(user: SessionUser?) {
+        _currentUser.value = user
+    }
+
     var loginCalls = 0
         private set
     var lastEmail: String? = null
