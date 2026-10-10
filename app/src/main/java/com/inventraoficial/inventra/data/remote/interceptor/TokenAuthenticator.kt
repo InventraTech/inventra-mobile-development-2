@@ -35,7 +35,9 @@ class TokenAuthenticator(
     }
 
     private fun canTryRefresh(response: Response): Boolean {
-        val isAuthRoute = response.request.url.encodedPath.startsWith("/api/auth/")
+        val isAuthRoute =
+            response.request.url.encodedPath
+                .startsWith("/api/auth/")
         val alreadyRetried = response.priorResponse != null
         return !isAuthRoute && !alreadyRetried
     }

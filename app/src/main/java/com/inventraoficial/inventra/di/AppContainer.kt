@@ -7,6 +7,7 @@ import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.interceptor.AuthInterceptor
+import com.inventraoficial.inventra.data.remote.interceptor.TokenAuthenticator
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
 import com.inventraoficial.inventra.data.session.SessionManager
@@ -41,6 +42,25 @@ class DefaultAppContainer(
             redactHeader("Authorization")
         }
 
+    private val refreshApi: AuthApi by lazy {
+        val refreshClient =
+            OkHttpClient
+                .Builder()
+                .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .addInterceptor(logging)
+                .build()
+        Retrofit
+            .Builder()
+            .baseUrl(BASE_URL)
+            .client(refreshClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create(AuthApi::class.java)
+    }
+
+    private val tokenAuthenticator: TokenAuthenticator by lazy { TokenAuthenticator(sessionStorage, refreshApi) }
+
     private val okHttpClient =
         OkHttpClient
             .Builder()
@@ -48,6 +68,7 @@ class DefaultAppContainer(
             .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .addInterceptor(authInterceptor)
             .addInterceptor(logging)
+            .authenticator(tokenAuthenticator)
             .build()
 
     private val retrofit =
