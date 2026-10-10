@@ -144,7 +144,7 @@ fun ProfileScreen(
 @Composable
 fun ProfileRoute(
     navigator: Navigator,
-    viewModel: ProfileViewModel = viewModel(),
+    viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()

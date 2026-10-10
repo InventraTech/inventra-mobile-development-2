@@ -1,6 +1,6 @@
 package com.inventraoficial.inventra.data.remote.interceptor
 
-import com.inventraoficial.inventra.data.local.FakeTokenStorage
+import com.inventraoficial.inventra.data.local.FakeSessionStorage
 import com.inventraoficial.inventra.data.session.SessionManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -48,13 +48,13 @@ class AuthInterceptorTest {
     }
 
     private fun send(
-        tokenStorage: FakeTokenStorage,
+        sessionStorage: FakeSessionStorage,
         path: String,
         existingAuthorization: String? = null,
         responseCode: Int = 200,
     ): RecordedRequest {
         server.enqueue(MockResponse(code = responseCode))
-        val client = OkHttpClient.Builder().addInterceptor(AuthInterceptor(tokenStorage, sessionManager)).build()
+        val client = OkHttpClient.Builder().addInterceptor(AuthInterceptor(sessionStorage, sessionManager)).build()
         val request =
             Request
                 .Builder()
@@ -68,66 +68,66 @@ class AuthInterceptorTest {
 
     @Test
     fun `com token adiciona o header Authorization Bearer`() {
-        val recorded = send(FakeTokenStorage("jwt-123"), "/api/kitchens")
+        val recorded = send(FakeSessionStorage("jwt-123"), "/api/kitchens")
 
         assertEquals("Bearer jwt-123", recorded.headers["Authorization"])
     }
 
     @Test
     fun `sem token nao adiciona o header`() {
-        val recorded = send(FakeTokenStorage(null), "/api/kitchens")
+        val recorded = send(FakeSessionStorage(null), "/api/kitchens")
 
         assertNull(recorded.headers["Authorization"])
     }
 
     @Test
     fun `rota de autenticacao nunca recebe o token`() {
-        val recorded = send(FakeTokenStorage("token-velho"), "/api/auth/login")
+        val recorded = send(FakeSessionStorage("token-velho"), "/api/auth/login")
 
         assertNull(recorded.headers["Authorization"])
     }
 
     @Test
     fun `substitui um Authorization que ja existia em vez de duplicar`() {
-        val recorded = send(FakeTokenStorage("jwt-novo"), "/api/kitchens", existingAuthorization = "Bearer antigo")
+        val recorded = send(FakeSessionStorage("jwt-novo"), "/api/kitchens", existingAuthorization = "Bearer antigo")
 
         assertEquals(listOf("Bearer jwt-novo"), recorded.headers.values("Authorization"))
     }
 
     @Test
     fun `401 numa requisicao com token apaga o token salvo`() {
-        val tokenStorage = FakeTokenStorage("jwt-expirado")
+        val sessionStorage = FakeSessionStorage("jwt-expirado")
 
-        send(tokenStorage, "/api/kitchens", responseCode = 401)
+        send(sessionStorage, "/api/kitchens", responseCode = 401)
 
-        assertNull(tokenStorage.currentToken)
+        assertNull(sessionStorage.currentToken)
     }
 
     @Test
     fun `401 no login nao apaga o token porque significa senha errada`() {
-        val tokenStorage = FakeTokenStorage("jwt-valido")
+        val sessionStorage = FakeSessionStorage("jwt-valido")
 
-        send(tokenStorage, "/api/auth/login", responseCode = 401)
+        send(sessionStorage, "/api/auth/login", responseCode = 401)
 
-        assertEquals("jwt-valido", tokenStorage.currentToken)
+        assertEquals("jwt-valido", sessionStorage.currentToken)
     }
 
     @Test
     fun `resposta de sucesso mantem o token`() {
-        val tokenStorage = FakeTokenStorage("jwt-valido")
+        val sessionStorage = FakeSessionStorage("jwt-valido")
 
-        send(tokenStorage, "/api/kitchens", responseCode = 200)
+        send(sessionStorage, "/api/kitchens", responseCode = 200)
 
-        assertEquals("jwt-valido", tokenStorage.currentToken)
+        assertEquals("jwt-valido", sessionStorage.currentToken)
     }
 
     @Test
     fun `outros erros como 403 nao apagam o token`() {
-        val tokenStorage = FakeTokenStorage("jwt-valido")
+        val sessionStorage = FakeSessionStorage("jwt-valido")
 
-        send(tokenStorage, "/api/kitchens", responseCode = 403)
+        send(sessionStorage, "/api/kitchens", responseCode = 403)
 
-        assertEquals("jwt-valido", tokenStorage.currentToken)
+        assertEquals("jwt-valido", sessionStorage.currentToken)
     }
 
     @Test
@@ -135,7 +135,7 @@ class AuthInterceptorTest {
         runTest {
             val avisos = ouvirAvisos()
 
-            send(FakeTokenStorage("jwt-expirado"), "/api/kitchens", responseCode = 401)
+            send(FakeSessionStorage("jwt-expirado"), "/api/kitchens", responseCode = 401)
 
             assertEquals(1, avisos.size)
         }
@@ -145,7 +145,7 @@ class AuthInterceptorTest {
         runTest {
             val avisos = ouvirAvisos()
 
-            send(FakeTokenStorage("jwt-valido"), "/api/auth/login", responseCode = 401)
+            send(FakeSessionStorage("jwt-valido"), "/api/auth/login", responseCode = 401)
 
             assertEquals(0, avisos.size)
         }
@@ -155,7 +155,7 @@ class AuthInterceptorTest {
         runTest {
             val avisos = ouvirAvisos()
 
-            send(FakeTokenStorage("jwt-valido"), "/api/kitchens", responseCode = 200)
+            send(FakeSessionStorage("jwt-valido"), "/api/kitchens", responseCode = 200)
 
             assertEquals(0, avisos.size)
         }

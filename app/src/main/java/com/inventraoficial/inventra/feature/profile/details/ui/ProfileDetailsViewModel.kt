@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
 import com.inventraoficial.inventra.data.repository.AuthRepository
+import com.inventraoficial.inventra.feature.profile.toLabel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,18 +22,18 @@ class ProfileDetailsViewModel(
     val uiState: StateFlow<ProfileDetailsUiState> = _uiState.asStateFlow()
 
     init {
-        loadProfileDetails()
-    }
-
-    private fun loadProfileDetails() {
-        // simula o formato que a API deve devolver no futuro
-        _uiState.value =
-            _uiState.value.copy(
-                fullName = "Jones Arakaki Kogake Passos Maldo",
-                roleLabel = "Gerente",
-                cozinhaName = "Sabor Filial Sul",
-                login = "jones.silva",
-            )
+        viewModelScope.launch {
+            authRepository.currentUser.collect { user ->
+                _uiState.update {
+                    it.copy(
+                        fullName = user?.name.orEmpty(),
+                        email = user?.email.orEmpty(),
+                        roleLabel = user?.accessType?.toLabel().orEmpty(),
+                        cozinhaName = user?.kitchenName ?: "Nenhuma cozinha vinculada",
+                    )
+                }
+            }
+        }
     }
 
     /** Toque em "Sair da conta": so abre o modal de confirmacao. */

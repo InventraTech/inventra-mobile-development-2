@@ -32,7 +32,7 @@ import com.inventraoficial.inventra.ui.theme.Montserrat
 @Composable
 fun ProfileDetailsScreen(
     fullName: String,
-    login: String,
+    email: String,
     roleLabel: String,
     cozinhaName: String,
     onBackClick: () -> Unit,
@@ -90,8 +90,8 @@ fun ProfileDetailsScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
             InventraLabeledField(
-                label = "Login",
-                value = login,
+                label = "E-mail",
+                value = email,
                 onValueChange = {},
                 readOnly = true,
                 placeholder = "",
@@ -139,7 +139,7 @@ fun ProfileDetailsRoute(
 
     ProfileDetailsScreen(
         fullName = uiState.fullName,
-        login = uiState.login,
+        email = uiState.email,
         roleLabel = uiState.roleLabel,
         cozinhaName = uiState.cozinhaName,
         onBackClick = { navigator.back() },
@@ -157,7 +157,7 @@ fun ProfileDetailsRoute(
 private fun ProfileDetailsScreenPreview() {
     ProfileDetailsScreen(
         fullName = "Jones Arakaki Kogake Passos Maldo",
-        login = "jones.silva",
+        email = "jones.silva@gmail.com",
         roleLabel = "Gerente",
         cozinhaName = "Sabor Filial Sul",
         onBackClick = {},

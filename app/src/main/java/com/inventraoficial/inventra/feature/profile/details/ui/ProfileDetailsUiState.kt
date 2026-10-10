@@ -4,7 +4,7 @@ data class ProfileDetailsUiState(
     val fullName: String = "",
     val roleLabel: String = "",
     val cozinhaName: String = "",
-    val login: String = "",
+    val email: String = "",
     val isLogoutDialogVisible: Boolean = false,
     val isLoggedOut: Boolean = false,
 )

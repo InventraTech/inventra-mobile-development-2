@@ -2,9 +2,10 @@ package com.inventraoficial.inventra.di
 
 import android.content.Context
 import com.inventraoficial.inventra.BuildConfig
-import com.inventraoficial.inventra.data.local.DataStoreTokenStorage
-import com.inventraoficial.inventra.data.local.TokenStorage
+import com.inventraoficial.inventra.data.local.DataStoreSessionStorage
+import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.remote.api.AuthApi
+import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.interceptor.AuthInterceptor
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
@@ -25,15 +26,14 @@ interface AppContainer {
 class DefaultAppContainer(
     private val context: Context,
 ) : AppContainer {
-    private val tokenStorage: TokenStorage by lazy { DataStoreTokenStorage(context) }
-    override val sessionManager = SessionManager()
-    private val authInterceptor: AuthInterceptor by lazy { AuthInterceptor(tokenStorage, sessionManager) }
-
     private val json =
         Json {
             ignoreUnknownKeys = true
             decodeEnumsCaseInsensitive = true
         }
+    private val sessionStorage: SessionStorage by lazy { DataStoreSessionStorage(context, json) }
+    override val sessionManager = SessionManager()
+    private val authInterceptor: AuthInterceptor by lazy { AuthInterceptor(sessionStorage, sessionManager) }
 
     private val logging =
         HttpLoggingInterceptor().apply {
@@ -59,8 +59,16 @@ class DefaultAppContainer(
             .build()
 
     private val authApi: AuthApi by lazy { retrofit.create(AuthApi::class.java) }
+    private val userApi: UserApi by lazy { retrofit.create(UserApi::class.java) }
 
-    override val authRepository: AuthRepository by lazy { NetworkAuthRepository(authApi, json, tokenStorage) }
+    override val authRepository: AuthRepository by lazy {
+        NetworkAuthRepository(
+            authApi,
+            userApi,
+            json,
+            sessionStorage,
+        )
+    }
 
     companion object {
         private const val BASE_URL = "https://ms-inventra-api.onrender.com/api/"

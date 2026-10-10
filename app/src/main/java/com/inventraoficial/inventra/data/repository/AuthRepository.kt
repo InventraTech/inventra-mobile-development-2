@@ -1,13 +1,17 @@
 package com.inventraoficial.inventra.data.repository
 
-import com.inventraoficial.inventra.data.local.TokenStorage
+import com.inventraoficial.inventra.data.local.SessionStorage
+import com.inventraoficial.inventra.data.local.SessionUser
+import com.inventraoficial.inventra.data.local.toSessionUser
 import com.inventraoficial.inventra.data.remote.api.AuthApi
+import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.ErrorResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.RegisterRequest
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -15,6 +19,8 @@ import retrofit2.HttpException
 import java.io.IOException
 
 interface AuthRepository {
+    val currentUser: Flow<SessionUser?>
+
     suspend fun login(
         email: String,
         password: String,
@@ -30,18 +36,23 @@ interface AuthRepository {
     suspend fun hasSession(): Boolean
 
     suspend fun logout()
+
+    suspend fun refreshCurrentUser(): Result<Unit>
 }
 
 class NetworkAuthRepository(
     private val authApi: AuthApi,
+    private val userApi: UserApi,
     private val json: Json,
-    private val tokenStorage: TokenStorage,
+    private val sessionStorage: SessionStorage,
 ) : AuthRepository {
+    override val currentUser: Flow<SessionUser?> = sessionStorage.user
+
     private suspend fun authenticate(call: suspend () -> LoginResponse): Result<UserResponse> =
         try {
             val result = call()
 
-            tokenStorage.saveToken(result.token)
+            sessionStorage.saveSession(result.token, result.user.toSessionUser())
             Result.success(result.user)
         } catch (e: HttpException) {
             val corpo = e.response()?.errorBody()?.string()
@@ -71,9 +82,22 @@ class NetworkAuthRepository(
             authApi.register(RegisterRequest(name, email, password, accessType))
         }
 
-    override suspend fun hasSession(): Boolean = tokenStorage.token.first() != null
+    override suspend fun hasSession(): Boolean = sessionStorage.token.first() != null
 
     override suspend fun logout() {
-        tokenStorage.clear()
+        sessionStorage.clear()
     }
+
+    override suspend fun refreshCurrentUser(): Result<Unit> =
+        try {
+            val currentUser = userApi.me().toSessionUser()
+            sessionStorage.updateUser(currentUser)
+            Result.success(Unit)
+        } catch (e: HttpException) {
+            Result.failure(e)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: SerializationException) {
+            Result.failure(e)
+        }
 }
