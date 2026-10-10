@@ -69,7 +69,16 @@ class NetworkAuthRepositoryTest {
 
         override suspend fun refresh(refreshRequest: RefreshTokenRequest): LoginResponse = respond()
 
-        override suspend fun logout(refreshRequest: RefreshTokenRequest) = Unit
+        var lastLogoutRequest: RefreshTokenRequest? = null
+            private set
+
+        /** Se preenchido, o logout lanca este erro (simula servidor fora ou sem conexao). */
+        var logoutError: Exception? = null
+
+        override suspend fun logout(refreshRequest: RefreshTokenRequest) {
+            lastLogoutRequest = refreshRequest
+            logoutError?.let { throw it }
+        }
     }
 
     private fun httpError(
@@ -265,5 +274,45 @@ class NetworkAuthRepositoryTest {
 
             assertTrue(result.isFailure)
             assertEquals(FakeAuthRepository.fakeUser.toSessionUser(), sessionStorage.currentUser)
+        }
+
+    @Test
+    fun `logout cancela o refresh token no servidor e apaga a sessao`() =
+        runTest {
+            val api = FakeAuthApi { successResponse }
+            val repository = NetworkAuthRepository(api, userApi, json, sessionStorage)
+            repository.login("teste@inventra.com", "senha123")
+
+            repository.logout()
+
+            assertEquals(RefreshTokenRequest("refresh-jwt"), api.lastLogoutRequest)
+            assertNull(sessionStorage.currentRefreshToken)
+            assertNull(sessionStorage.currentToken)
+        }
+
+    @Test
+    fun `logout sem conexao apaga a sessao local mesmo assim`() =
+        runTest {
+            val api = FakeAuthApi { successResponse }
+            val repository = NetworkAuthRepository(api, userApi, json, sessionStorage)
+            repository.login("teste@inventra.com", "senha123")
+            api.logoutError = IOException("sem sinal")
+
+            repository.logout()
+
+            assertNull(sessionStorage.currentToken)
+            assertNull(sessionStorage.currentUser)
+            assertNull(sessionStorage.currentRefreshToken)
+        }
+
+    @Test
+    fun `logout sem refresh token salvo nao chama o servidor`() =
+        runTest {
+            val api = FakeAuthApi { successResponse }
+            val repository = NetworkAuthRepository(api, userApi, json, sessionStorage)
+
+            repository.logout()
+
+            assertNull(api.lastLogoutRequest)
         }
 }

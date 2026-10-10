@@ -9,6 +9,7 @@ import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.ErrorResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
+import com.inventraoficial.inventra.data.remote.dto.auth.RefreshTokenRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.RegisterRequest
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.coroutines.flow.Flow
@@ -85,6 +86,16 @@ class NetworkAuthRepository(
     override suspend fun hasSession(): Boolean = sessionStorage.token.first() != null
 
     override suspend fun logout() {
+        val refreshToken = sessionStorage.refreshToken.first()
+        if (refreshToken != null) {
+            try {
+                authApi.logout(RefreshTokenRequest(refreshToken))
+            } catch (ignored: HttpException) {
+                // O servidor recusou (carteirinha ja vencida ou invalida): nada a cancelar.
+            } catch (ignored: IOException) {
+                // Sem conexao: a carteirinha vence sozinha no servidor.
+            }
+        }
         sessionStorage.clear()
     }
 
