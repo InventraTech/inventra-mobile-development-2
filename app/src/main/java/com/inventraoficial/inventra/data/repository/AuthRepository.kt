@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.data.repository
 
-import com.inventraoficial.inventra.data.local.TokenStorage
+import com.inventraoficial.inventra.data.local.SessionStorage
+import com.inventraoficial.inventra.data.local.toSessionUser
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.ErrorResponse
@@ -35,13 +36,13 @@ interface AuthRepository {
 class NetworkAuthRepository(
     private val authApi: AuthApi,
     private val json: Json,
-    private val tokenStorage: TokenStorage,
+    private val sessionStorage: SessionStorage,
 ) : AuthRepository {
     private suspend fun authenticate(call: suspend () -> LoginResponse): Result<UserResponse> =
         try {
             val result = call()
 
-            tokenStorage.saveToken(result.token)
+            sessionStorage.saveSession(result.token, result.user.toSessionUser())
             Result.success(result.user)
         } catch (e: HttpException) {
             val corpo = e.response()?.errorBody()?.string()
@@ -71,9 +72,9 @@ class NetworkAuthRepository(
             authApi.register(RegisterRequest(name, email, password, accessType))
         }
 
-    override suspend fun hasSession(): Boolean = tokenStorage.token.first() != null
+    override suspend fun hasSession(): Boolean = sessionStorage.token.first() != null
 
     override suspend fun logout() {
-        tokenStorage.clear()
+        sessionStorage.clear()
     }
 }
