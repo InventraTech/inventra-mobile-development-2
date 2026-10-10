@@ -1,8 +1,11 @@
 package com.inventraoficial.inventra.data.repository
 
+import com.inventraoficial.inventra.data.local.SessionUser
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.ProfileSummary
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Repositorio falso para testes: devolve [result] sem tocar na rede e
@@ -11,7 +14,11 @@ import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 class FakeAuthRepository(
     var result: Result<UserResponse> = Result.success(fakeUser),
     var hasSession: Boolean = false,
+    initialUser: SessionUser? = null,
 ) : AuthRepository {
+    private val _currentUser = MutableStateFlow(initialUser)
+    override val currentUser: Flow<SessionUser?> = _currentUser
+
     var loginCalls = 0
         private set
     var lastEmail: String? = null
@@ -57,6 +64,7 @@ class FakeAuthRepository(
     override suspend fun logout() {
         logoutCalls++
         hasSession = false
+        _currentUser.value = null
     }
 
     companion object {

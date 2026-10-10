@@ -7,6 +7,7 @@ import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.RegisterRequest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -198,5 +199,19 @@ class NetworkAuthRepositoryTest {
             assertNull(sessionStorage.currentToken)
             assertNull(sessionStorage.currentUser)
             assertEquals(false, repository.hasSession())
+        }
+
+    @Test
+    fun `currentUser comeca nulo, recebe o usuario no login e volta a nulo no logout`() =
+        runTest {
+            val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, json, sessionStorage)
+
+            assertNull(repository.currentUser.first())
+
+            repository.login("teste@inventra.com", "senha123")
+            assertEquals(FakeAuthRepository.fakeUser.toSessionUser(), repository.currentUser.first())
+
+            repository.logout()
+            assertNull(repository.currentUser.first())
         }
 }
