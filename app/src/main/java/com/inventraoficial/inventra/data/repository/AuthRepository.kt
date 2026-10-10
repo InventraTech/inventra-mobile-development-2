@@ -4,6 +4,7 @@ import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.local.SessionUser
 import com.inventraoficial.inventra.data.local.toSessionUser
 import com.inventraoficial.inventra.data.remote.api.AuthApi
+import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.ErrorResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
@@ -35,10 +36,13 @@ interface AuthRepository {
     suspend fun hasSession(): Boolean
 
     suspend fun logout()
+
+    suspend fun refreshCurrentUser(): Result<Unit>
 }
 
 class NetworkAuthRepository(
     private val authApi: AuthApi,
+    private val userApi: UserApi,
     private val json: Json,
     private val sessionStorage: SessionStorage,
 ) : AuthRepository {
@@ -83,4 +87,17 @@ class NetworkAuthRepository(
     override suspend fun logout() {
         sessionStorage.clear()
     }
+
+    override suspend fun refreshCurrentUser(): Result<Unit> =
+        try {
+            val currentUser = userApi.me().toSessionUser()
+            sessionStorage.updateUser(currentUser)
+            Result.success(Unit)
+        } catch (e: HttpException) {
+            Result.failure(e)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: SerializationException) {
+            Result.failure(e)
+        }
 }

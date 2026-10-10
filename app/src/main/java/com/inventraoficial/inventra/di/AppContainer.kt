@@ -5,6 +5,7 @@ import com.inventraoficial.inventra.BuildConfig
 import com.inventraoficial.inventra.data.local.DataStoreSessionStorage
 import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.remote.api.AuthApi
+import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.interceptor.AuthInterceptor
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
@@ -58,8 +59,16 @@ class DefaultAppContainer(
             .build()
 
     private val authApi: AuthApi by lazy { retrofit.create(AuthApi::class.java) }
+    private val userApi: UserApi by lazy { retrofit.create(UserApi::class.java) }
 
-    override val authRepository: AuthRepository by lazy { NetworkAuthRepository(authApi, json, sessionStorage) }
+    override val authRepository: AuthRepository by lazy {
+        NetworkAuthRepository(
+            authApi,
+            userApi,
+            json,
+            sessionStorage,
+        )
+    }
 
     companion object {
         private const val BASE_URL = "https://ms-inventra-api.onrender.com/api/"

@@ -63,6 +63,14 @@ class FakeAuthRepository(
 
     override suspend fun hasSession(): Boolean = hasSession
 
+    var refreshCalls = 0
+        private set
+
+    override suspend fun refreshCurrentUser(): Result<Unit> {
+        refreshCalls++
+        return Result.success(Unit)
+    }
+
     var logoutCalls = 0
         private set
 

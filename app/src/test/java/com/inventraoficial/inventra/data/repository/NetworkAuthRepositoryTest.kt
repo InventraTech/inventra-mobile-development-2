@@ -3,10 +3,13 @@ package com.inventraoficial.inventra.data.repository
 import com.inventraoficial.inventra.data.local.FakeSessionStorage
 import com.inventraoficial.inventra.data.local.toSessionUser
 import com.inventraoficial.inventra.data.remote.api.AuthApi
+import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
+import com.inventraoficial.inventra.data.remote.dto.auth.KitchenSummary
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.RegisterRequest
+import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.SerializationException
@@ -32,6 +35,15 @@ class NetworkAuthRepositoryTest {
             expiresIn = 3600,
             user = FakeAuthRepository.fakeUser,
         )
+
+    /** UserApi falsa: executa [respond] no lugar do GET /users/me. */
+    private class FakeUserApi(
+        private val respond: () -> UserResponse,
+    ) : UserApi {
+        override suspend fun me(): UserResponse = respond()
+    }
+
+    private val userApi: UserApi = FakeUserApi { FakeAuthRepository.fakeUser }
 
     /** AuthApi falsa: executa [respond] no lugar da chamada HTTP, tanto no login quanto no cadastro. */
     private class FakeAuthApi(
@@ -63,14 +75,14 @@ class NetworkAuthRepositoryTest {
 
     private fun repositoryThatThrows(exception: Exception): NetworkAuthRepository {
         val api = FakeAuthApi { throw exception }
-        return NetworkAuthRepository(api, json, sessionStorage)
+        return NetworkAuthRepository(api, userApi, json, sessionStorage)
     }
 
     @Test
     fun `login com sucesso devolve o usuario, monta o LoginRequest e salva o token`() =
         runTest {
             val api = FakeAuthApi { successResponse }
-            val repository = NetworkAuthRepository(api, json, sessionStorage)
+            val repository = NetworkAuthRepository(api, userApi, json, sessionStorage)
 
             val result = repository.login("teste@inventra.com", "senha123")
 
@@ -143,7 +155,7 @@ class NetworkAuthRepositoryTest {
     fun `register com sucesso monta o RegisterRequest e salva o token`() =
         runTest {
             val api = FakeAuthApi { successResponse }
-            val repository = NetworkAuthRepository(api, json, sessionStorage)
+            val repository = NetworkAuthRepository(api, userApi, json, sessionStorage)
 
             val result = repository.register("Felipe", "teste@inventra.com", "senha1234", AccessType.ESTOQUISTA)
 
@@ -179,7 +191,7 @@ class NetworkAuthRepositoryTest {
     @Test
     fun `hasSession e false sem token e true depois do login`() =
         runTest {
-            val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, json, sessionStorage)
+            val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, userApi, json, sessionStorage)
 
             assertEquals(false, repository.hasSession())
 
@@ -191,7 +203,7 @@ class NetworkAuthRepositoryTest {
     @Test
     fun `logout apaga o token e encerra a sessao`() =
         runTest {
-            val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, json, sessionStorage)
+            val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, userApi, json, sessionStorage)
             repository.login("teste@inventra.com", "senha123")
 
             repository.logout()
@@ -204,7 +216,7 @@ class NetworkAuthRepositoryTest {
     @Test
     fun `currentUser comeca nulo, recebe o usuario no login e volta a nulo no logout`() =
         runTest {
-            val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, json, sessionStorage)
+            val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, userApi, json, sessionStorage)
 
             assertNull(repository.currentUser.first())
 
@@ -213,5 +225,36 @@ class NetworkAuthRepositoryTest {
 
             repository.logout()
             assertNull(repository.currentUser.first())
+        }
+
+    /** Repositorio ja logado (token "jwt" e o fakeUser salvos), usando a [api] de usuario informada. */
+    private suspend fun loggedRepository(api: UserApi): NetworkAuthRepository {
+        val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, api, json, sessionStorage)
+        repository.login("teste@inventra.com", "senha123")
+        return repository
+    }
+
+    @Test
+    fun `refreshCurrentUser troca o usuario salvo pelo do servidor e mantem o token`() =
+        runTest {
+            val cozinha = KitchenSummary(id = 7, name = "Sabor Filial Sul")
+            val repository = loggedRepository(FakeUserApi { FakeAuthRepository.fakeUser.copy(kitchen = cozinha) })
+
+            val result = repository.refreshCurrentUser()
+
+            assertTrue(result.isSuccess)
+            assertEquals(7, sessionStorage.currentUser?.kitchenId)
+            assertEquals("jwt", sessionStorage.currentToken)
+        }
+
+    @Test
+    fun `refreshCurrentUser sem conexao devolve falha e mantem o usuario antigo`() =
+        runTest {
+            val repository = loggedRepository(FakeUserApi { throw IOException("timeout") })
+
+            val result = repository.refreshCurrentUser()
+
+            assertTrue(result.isFailure)
+            assertEquals(FakeAuthRepository.fakeUser.toSessionUser(), sessionStorage.currentUser)
         }
 }
