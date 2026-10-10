@@ -25,13 +25,18 @@ class DataStoreSessionStorage(
             }
         }
 
+    override val refreshToken: Flow<String?> =
+        context.authDataStore.data.map { preferences -> preferences[REFRESH_TOKEN_KEY] }
+
     override suspend fun saveSession(
         token: String,
         user: SessionUser,
+        refreshToken: String,
     ) {
         context.authDataStore.edit { preferences ->
             preferences[TOKEN_KEY] = token
             preferences[USER_KEY] = json.encodeToString(user)
+            preferences[REFRESH_TOKEN_KEY] = refreshToken
         }
     }
 
@@ -39,6 +44,7 @@ class DataStoreSessionStorage(
         context.authDataStore.edit { preferences ->
             preferences.remove(TOKEN_KEY)
             preferences.remove(USER_KEY)
+            preferences.remove(REFRESH_TOKEN_KEY)
         }
     }
 
@@ -51,5 +57,6 @@ class DataStoreSessionStorage(
     companion object {
         private val TOKEN_KEY = stringPreferencesKey("token")
         private val USER_KEY = stringPreferencesKey("user")
+        private val REFRESH_TOKEN_KEY = stringPreferencesKey("refreshToken")
     }
 }
