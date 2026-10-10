@@ -8,6 +8,7 @@ import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.KitchenSummary
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
+import com.inventraoficial.inventra.data.remote.dto.auth.RefreshTokenRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.RegisterRequest
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.coroutines.flow.first
@@ -33,6 +34,8 @@ class NetworkAuthRepositoryTest {
             token = "jwt",
             tokenType = "Bearer",
             expiresIn = 3600,
+            refreshToken = "refresh-jwt",
+            refreshExpiresIn = 604800,
             user = FakeAuthRepository.fakeUser,
         )
 
@@ -63,6 +66,10 @@ class NetworkAuthRepositoryTest {
             lastRegisterRequest = registerRequest
             return respond()
         }
+
+        override suspend fun refresh(refreshRequest: RefreshTokenRequest): LoginResponse = respond()
+
+        override suspend fun logout(refreshRequest: RefreshTokenRequest) = Unit
     }
 
     private fun httpError(
@@ -90,6 +97,7 @@ class NetworkAuthRepositoryTest {
             assertEquals(LoginRequest("teste@inventra.com", "senha123"), api.lastRequest)
             assertEquals("jwt", sessionStorage.currentToken)
             assertEquals(FakeAuthRepository.fakeUser.toSessionUser(), sessionStorage.currentUser)
+            assertEquals("refresh-jwt", sessionStorage.currentRefreshToken)
         }
 
     @Test
@@ -211,6 +219,7 @@ class NetworkAuthRepositoryTest {
             assertNull(sessionStorage.currentToken)
             assertNull(sessionStorage.currentUser)
             assertEquals(false, repository.hasSession())
+            assertNull(sessionStorage.currentRefreshToken)
         }
 
     @Test

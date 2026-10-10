@@ -52,7 +52,7 @@ class NetworkAuthRepository(
         try {
             val result = call()
 
-            sessionStorage.saveSession(result.token, result.user.toSessionUser())
+            sessionStorage.saveSession(result.token, result.user.toSessionUser(), result.refreshToken)
             Result.success(result.user)
         } catch (e: HttpException) {
             val corpo = e.response()?.errorBody()?.string()
