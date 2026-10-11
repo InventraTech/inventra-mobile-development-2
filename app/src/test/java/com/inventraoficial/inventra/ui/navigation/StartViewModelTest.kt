@@ -108,7 +108,6 @@ class StartViewModelTest {
 
             advanceUntilIdle()
 
-            // a Home e anunciada mesmo que o refresh falhe ou demore: o app nao fica preso na tela branca
             assertEquals(Screen.Home, viewModel.startScreen.value)
         }
 

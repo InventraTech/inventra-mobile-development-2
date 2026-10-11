@@ -27,15 +27,10 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-/**
- * Monta o OkHttp como no app (AuthInterceptor + TokenAuthenticator) contra um
- * servidor falso, para conferir a renovacao automatica do token no 401.
- */
 class TokenAuthenticatorTest {
     private val server = MockWebServer()
     private val sessionManager = SessionManager()
 
-    /** AuthApi falsa: so o refresh importa aqui. */
     private class FakeRefreshApi(
         private val respond: () -> LoginResponse,
     ) : AuthApi {
@@ -178,7 +173,6 @@ class TokenAuthenticatorTest {
 
     @Test
     fun `varias requisicoes com 401 ao mesmo tempo renovam o token uma vez so`() {
-        // O servidor aceita so o token novo: com o vencido, sempre 401.
         server.dispatcher =
             object : Dispatcher() {
                 override fun dispatch(request: RecordedRequest): MockResponse {
@@ -189,7 +183,6 @@ class TokenAuthenticatorTest {
         val storage = loggedStorage()
         val refreshApi =
             FakeRefreshApi {
-                // Demora um pouco, para as outras requisicoes chegarem na fila enquanto esta renova.
                 Thread.sleep(REFRESH_DELAY_MS)
                 renewed
             }

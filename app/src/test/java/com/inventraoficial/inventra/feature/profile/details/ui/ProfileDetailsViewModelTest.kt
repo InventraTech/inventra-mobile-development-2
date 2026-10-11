@@ -86,7 +86,6 @@ class ProfileDetailsViewModelTest {
         runTest(testDispatcher) {
             viewModel.onLogoutConfirm()
 
-            // a coroutine ainda nao rodou: nada de navegar antes de apagar o token
             assertFalse(viewModel.uiState.value.isLoggedOut)
             assertEquals(0, repository.logoutCalls)
         }
