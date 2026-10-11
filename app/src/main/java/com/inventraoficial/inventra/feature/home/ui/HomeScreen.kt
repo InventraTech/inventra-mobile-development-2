@@ -2,6 +2,8 @@ package com.inventraoficial.inventra.feature.home.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,11 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.R
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraStatTone
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUrgency
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPriorityAlertsSection
@@ -42,8 +47,11 @@ fun HomeScreen(
     dateText: String,
     priorityItems: List<InventraPriorityItem>,
     stats: List<InventraStat>,
+    isLoading: Boolean,
+    errorMessage: String?,
     onBellClick: () -> Unit,
     onPriorityItemClick: (InventraPriorityItem) -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -79,32 +87,75 @@ fun HomeScreen(
                 )
             },
         )
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            InventraPriorityAlertsSection(items = priorityItems, onItemClick = onPriorityItemClick)
-            Text(
-                text = "Dados do Mês",
-                fontFamily = Montserrat,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(top = 20.dp),
-                color = InventraPurple,
-            )
-            InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp))
+        when {
+            isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
+            errorMessage != null ->
+                ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
+            else ->
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    InventraPriorityAlertsSection(items = priorityItems, onItemClick = onPriorityItemClick)
+                    if (priorityItems.isEmpty()) {
+                        Text(
+                            text = "Nenhum lote vence nos próximos ${HomeViewModel.EXPIRING_DAYS} dias.",
+                            fontFamily = Montserrat,
+                            fontSize = 14.sp,
+                            color = InventraPurple.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(top = 12.dp),
+                        )
+                    }
+                    if (stats.isNotEmpty()) {
+                        Text(
+                            text = "Resumo do estoque",
+                            fontFamily = Montserrat,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            modifier = Modifier.padding(top = 20.dp),
+                            color = InventraPurple,
+                        )
+                        InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp))
+                    }
+                }
         }
+    }
+}
+
+@Composable
+private fun CenteredLoading(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(color = InventraPurple)
+    }
+}
+
+@Composable
+private fun ErrorState(
+    message: String,
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(text = message, fontFamily = Montserrat, fontSize = 15.sp, textAlign = TextAlign.Center)
+        InventraSecondaryButton(text = "Tentar novamente", onClick = onRetryClick)
     }
 }
 
 @Composable
 fun HomeRoute(
     navigator: Navigator,
-    viewModel: HomeViewModel = viewModel(),
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -114,8 +165,11 @@ fun HomeRoute(
         dateText = uiState.dateText,
         priorityItems = uiState.priorityItems,
         stats = uiState.stats,
+        isLoading = uiState.isLoading,
+        errorMessage = uiState.errorMessage,
         onBellClick = { navigator.navigate(Screen.Notifications) },
         onPriorityItemClick = { navigator.navigate(Screen.StockDetail) },
+        onRetryClick = viewModel::onRetryClick,
         modifier = modifier,
     )
 }
@@ -150,7 +204,10 @@ private fun HomeScreenPreview() {
                 InventraStat("Perdas", "R$ 6767,00", "↓ 67%", InventraStatTone.Negative),
                 InventraStat("Economia", "R$ 6767,00", "↑ 67%", InventraStatTone.Positive),
             ),
+        isLoading = false,
+        errorMessage = null,
         onBellClick = {},
         onPriorityItemClick = {},
+        onRetryClick = {},
     )
 }
