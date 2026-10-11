@@ -4,6 +4,7 @@ import android.content.Context
 import com.inventraoficial.inventra.BuildConfig
 import com.inventraoficial.inventra.data.local.DataStoreSessionStorage
 import com.inventraoficial.inventra.data.local.SessionStorage
+import com.inventraoficial.inventra.data.remote.api.AlertApi
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.api.KitchenAccessApi
 import com.inventraoficial.inventra.data.remote.api.KitchenApi
@@ -11,9 +12,11 @@ import com.inventraoficial.inventra.data.remote.api.StockApi
 import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.interceptor.AuthInterceptor
 import com.inventraoficial.inventra.data.remote.interceptor.TokenAuthenticator
+import com.inventraoficial.inventra.data.repository.AlertRepository
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.KitchenRepository
 import com.inventraoficial.inventra.data.repository.MembersRepository
+import com.inventraoficial.inventra.data.repository.NetworkAlertRepository
 import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenRepository
 import com.inventraoficial.inventra.data.repository.NetworkMembersRepository
@@ -33,6 +36,7 @@ interface AppContainer {
     val kitchenRepository: KitchenRepository
     val membersRepository: MembersRepository
     val stockRepository: StockRepository
+    val alertRepository: AlertRepository
     val sessionManager: SessionManager
 }
 
@@ -96,6 +100,7 @@ class DefaultAppContainer(
     private val kitchenApi: KitchenApi by lazy { retrofit.create(KitchenApi::class.java) }
     private val kitchenAccessApi: KitchenAccessApi by lazy { retrofit.create(KitchenAccessApi::class.java) }
     private val stockApi: StockApi by lazy { retrofit.create(StockApi::class.java) }
+    private val alertApi: AlertApi by lazy { retrofit.create(AlertApi::class.java) }
 
     override val authRepository: AuthRepository by lazy {
         NetworkAuthRepository(
@@ -113,6 +118,8 @@ class DefaultAppContainer(
     }
 
     override val stockRepository: StockRepository by lazy { NetworkStockRepository(stockApi, json) }
+
+    override val alertRepository: AlertRepository by lazy { NetworkAlertRepository(alertApi, json) }
 
     companion object {
         private const val BASE_URL = "https://ms-inventra-api.onrender.com/api/"
