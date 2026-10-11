@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.feature.profile.toLabel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +30,7 @@ class ProfileViewModel(
                         fullName = user?.name.orEmpty(),
                         roleLabel = user?.accessType?.toLabel().orEmpty(),
                         cozinhaName = user?.kitchenName ?: "Nenhuma cozinha vinculada",
+                        canManageMembers = user?.accessType == AccessType.SUPERVISOR && user.kitchenId != null,
                     )
                 }
             }
