@@ -5,9 +5,6 @@ import com.inventraoficial.inventra.BuildConfig
 import com.inventraoficial.inventra.data.local.DataStoreSessionStorage
 import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.remote.api.AuthApi
-import com.inventraoficial.inventra.data.remote.api.KitchenAccessApi
-import com.inventraoficial.inventra.data.remote.api.KitchenApi
-import com.inventraoficial.inventra.data.remote.api.StockApi
 import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.interceptor.AuthInterceptor
 import com.inventraoficial.inventra.data.remote.interceptor.TokenAuthenticator
@@ -15,10 +12,6 @@ import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.KitchenRepository
 import com.inventraoficial.inventra.data.repository.MembersRepository
 import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
-import com.inventraoficial.inventra.data.repository.NetworkKitchenRepository
-import com.inventraoficial.inventra.data.repository.NetworkMembersRepository
-import com.inventraoficial.inventra.data.repository.NetworkStockRepository
-import com.inventraoficial.inventra.data.repository.StockRepository
 import com.inventraoficial.inventra.data.session.SessionManager
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -30,9 +23,6 @@ import java.util.concurrent.TimeUnit
 
 interface AppContainer {
     val authRepository: AuthRepository
-    val kitchenRepository: KitchenRepository
-    val membersRepository: MembersRepository
-    val stockRepository: StockRepository
     val sessionManager: SessionManager
 }
 
@@ -93,9 +83,6 @@ class DefaultAppContainer(
 
     private val authApi: AuthApi by lazy { retrofit.create(AuthApi::class.java) }
     private val userApi: UserApi by lazy { retrofit.create(UserApi::class.java) }
-    private val kitchenApi: KitchenApi by lazy { retrofit.create(KitchenApi::class.java) }
-    private val kitchenAccessApi: KitchenAccessApi by lazy { retrofit.create(KitchenAccessApi::class.java) }
-    private val stockApi: StockApi by lazy { retrofit.create(StockApi::class.java) }
 
     override val authRepository: AuthRepository by lazy {
         NetworkAuthRepository(
@@ -105,14 +92,6 @@ class DefaultAppContainer(
             sessionStorage,
         )
     }
-
-    override val kitchenRepository: KitchenRepository by lazy { NetworkKitchenRepository(kitchenApi, json) }
-
-    override val membersRepository: MembersRepository by lazy {
-        NetworkMembersRepository(kitchenAccessApi, userApi, json)
-    }
-
-    override val stockRepository: StockRepository by lazy { NetworkStockRepository(stockApi, json) }
 
     companion object {
         private const val BASE_URL = "https://ms-inventra-api.onrender.com/api/"
