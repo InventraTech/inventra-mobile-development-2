@@ -14,7 +14,6 @@ class StockOutViewModel : ViewModel() {
     }
 
     private fun loadBatch() {
-        // simula os dados que viriam da navegação (produto/lote selecionados na tela de detalhe)
         _uiState.value =
             _uiState.value.copy(
                 productName = "Arroz Camil",
@@ -30,7 +29,5 @@ class StockOutViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(reason = reason)
     }
 
-    fun onConfirmClick() {
-        // sem persistência real configurada ainda
-    }
+    fun onConfirmClick() = Unit
 }

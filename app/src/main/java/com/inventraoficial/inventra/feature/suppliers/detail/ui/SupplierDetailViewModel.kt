@@ -15,7 +15,6 @@ class SupplierDetailViewModel : ViewModel() {
 
     @Suppress("MagicNumber")
     private fun loadSupplierDetail() {
-        // simula o formato que a API deve devolver no futuro
         _uiState.value =
             _uiState.value.copy(
                 name = "Seara Alimentos",

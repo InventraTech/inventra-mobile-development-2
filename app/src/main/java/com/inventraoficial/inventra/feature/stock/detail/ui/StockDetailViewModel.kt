@@ -15,7 +15,6 @@ class StockDetailViewModel : ViewModel() {
     }
 
     private fun loadProductDetail() {
-        // simula o formato que a API deve devolver no futuro
         _uiState.value =
             _uiState.value.copy(
                 productName = "Leite Integral",
@@ -32,15 +31,9 @@ class StockDetailViewModel : ViewModel() {
             )
     }
 
-    fun onSeeAllBatchesClick() {
-        // sem tela de lista de lotes ainda
-    }
+    fun onSeeAllBatchesClick() = Unit
 
-    fun onEntriesClick() {
-        // sem tela de histórico de entradas ainda
-    }
+    fun onEntriesClick() = Unit
 
-    fun onExitsClick() {
-        // sem tela de histórico de saídas ainda
-    }
+    fun onExitsClick() = Unit
 }

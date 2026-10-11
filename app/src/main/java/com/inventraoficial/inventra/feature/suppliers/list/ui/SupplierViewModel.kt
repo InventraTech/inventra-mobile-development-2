@@ -10,7 +10,6 @@ class SupplierViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SupplierUiState())
     val uiState: StateFlow<SupplierUiState> = _uiState.asStateFlow()
 
-    // simula o formato que a API deve devolver no futuro
     private val allSuppliers: List<Supplier> = buildFakeSuppliers()
 
     init {
@@ -51,7 +50,5 @@ class SupplierViewModel : ViewModel() {
         refreshVisibleSuppliers()
     }
 
-    fun onFilterIconClick() {
-        // sem comportamento definido ainda
-    }
+    fun onFilterIconClick() = Unit
 }
