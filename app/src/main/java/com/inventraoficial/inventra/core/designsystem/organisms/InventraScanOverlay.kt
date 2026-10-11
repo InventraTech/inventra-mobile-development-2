@@ -39,8 +39,6 @@ fun InventraScanOverlay(
                 Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    // offscreen: permite que o BlendMode.Clear abaixo realmente
-                    // apague pixels (deixe transparente) em vez de misturar com preto
                     .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen),
             contentAlignment = Alignment.Center,
         ) {
@@ -56,7 +54,6 @@ fun InventraScanOverlay(
                             (size.height - frameHeight) / 2f,
                         ),
                     size = Size(frameWidth, frameHeight),
-//                    cornerRadius = CornerRadius(18.dp.toPx()),
                     blendMode = BlendMode.Clear,
                 )
             }

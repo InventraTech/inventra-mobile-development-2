@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
-/** Botao para acoes destrutivas ou irreversiveis (sair da conta, excluir...). */
 @Composable
 fun InventraDangerButton(
     text: String,

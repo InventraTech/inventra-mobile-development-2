@@ -38,7 +38,6 @@ fun InventraLabeledField(
         Text(
             text = label,
             fontFamily = Montserrat,
-//            fontWeight = FontWeight.,
             fontSize = 18.sp,
             color = InventraPurple,
         )

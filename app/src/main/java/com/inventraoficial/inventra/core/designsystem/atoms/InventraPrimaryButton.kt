@@ -29,8 +29,6 @@ fun InventraPrimaryButton(
     isLoading: Boolean = false,
 ) {
     Button(
-        // Durante o loading o botao continua habilitado (para nao ficar cinza),
-        // mas ignora cliques - evita disparar a mesma acao duas vezes.
         onClick = { if (!isLoading) onClick() },
         modifier = modifier,
         enabled = enabled,
@@ -44,8 +42,6 @@ fun InventraPrimaryButton(
             ),
         contentPadding = PaddingValues(vertical = 14.dp, horizontal = 24.dp),
     ) {
-        // O texto fica invisivel (mas ocupando espaco) durante o loading,
-        // para o botao nao mudar de tamanho quando o indicador aparece.
         Box(contentAlignment = Alignment.Center) {
             Text(
                 text = text,
