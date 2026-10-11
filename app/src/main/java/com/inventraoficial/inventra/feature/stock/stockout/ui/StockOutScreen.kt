@@ -29,6 +29,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryBut
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSectionLabel
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -48,7 +49,7 @@ fun StockOutScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(InventraBackground),
     ) {
         InventraTopBar(
             navigationIcon = {

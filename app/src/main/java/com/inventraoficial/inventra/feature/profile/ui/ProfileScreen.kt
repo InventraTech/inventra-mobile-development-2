@@ -34,7 +34,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraMenuRow
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
-import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraBackground
+import com.inventraoficial.inventra.ui.theme.InventraBrand
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 private val HEADER_HEIGHT = 135.dp
@@ -56,7 +58,7 @@ fun ProfileScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(InventraBackground),
     ) {
         Box(
             modifier =
@@ -69,7 +71,7 @@ fun ProfileScreen(
                     Modifier
                         .fillMaxWidth()
                         .height(HEADER_HEIGHT - AVATAR_SIZE / 2)
-                        .background(InventraPurple, RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)),
+                        .background(InventraBrand, RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)),
             )
             Box(
                 modifier =
@@ -104,7 +106,7 @@ fun ProfileScreen(
             text = "$roleLabel · $cozinhaName",
             fontFamily = Montserrat,
             fontSize = 13.sp,
-            color = Color.Gray,
+            color = InventraMuted,
             textAlign = TextAlign.Center,
             modifier =
                 Modifier

@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
-import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraBrand
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -36,9 +36,9 @@ fun InventraTopBar(
         modifier =
             modifier
                 .fillMaxWidth()
-                .background(InventraPurple, RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
+                .background(InventraBrand, RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
                 .statusBarsPadding()
-                .height(80.dp)
+                .heightIn(min = 80.dp)
                 .padding(horizontal = 20.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

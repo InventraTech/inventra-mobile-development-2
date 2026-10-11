@@ -30,7 +30,9 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryBut
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
+import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraDanger
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -52,7 +54,7 @@ fun CreateCozinhaScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(InventraBackground),
     ) {
         InventraTopBar(
             navigationIcon = {
@@ -97,7 +99,7 @@ fun CreateCozinhaScreen(
                         "Você poderá convidar sua equipe assim que a cozinha for criada.",
                 fontFamily = Montserrat,
                 fontSize = 13.sp,
-                color = Color.Gray,
+                color = InventraMuted,
             )
             Text(
                 text = errorMessage.orEmpty(),

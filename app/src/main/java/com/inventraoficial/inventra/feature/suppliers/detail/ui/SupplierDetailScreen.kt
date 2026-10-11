@@ -37,6 +37,7 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraDelivery
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSupplierProductRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -58,7 +59,7 @@ fun SupplierDetailScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(InventraBackground),
     ) {
         InventraTopBar(
             navigationIcon = {

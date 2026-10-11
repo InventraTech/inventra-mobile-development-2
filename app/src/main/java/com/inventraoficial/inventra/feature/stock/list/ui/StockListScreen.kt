@@ -29,6 +29,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraFilterCh
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
+import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -48,7 +49,7 @@ fun StockListScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(InventraBackground),
     ) {
         InventraTopBar(
             title = {

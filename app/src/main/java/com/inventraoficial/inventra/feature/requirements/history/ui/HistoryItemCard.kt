@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +26,7 @@ import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraThumbnail
 import com.inventraoficial.inventra.feature.requirements.list.ui.RequirementStatus
 import com.inventraoficial.inventra.ui.theme.InventraDanger
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.Montserrat
@@ -57,8 +57,8 @@ fun HistoryItemCard(
                 )
             RequirementStatus.PENDING ->
                 Triple(
-                    Color.Gray.copy(alpha = 0.1f),
-                    Color.Gray,
+                    InventraMuted.copy(alpha = 0.1f),
+                    InventraMuted,
                     Icons.Default.Close,
                 )
         }
@@ -89,7 +89,7 @@ fun HistoryItemCard(
                 text = description,
                 fontFamily = Montserrat,
                 fontSize = 12.sp,
-                color = Color.Gray,
+                color = InventraMuted,
             )
         }
 

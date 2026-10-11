@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraThumbnail
 import com.inventraoficial.inventra.ui.theme.InventraDanger
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.Montserrat
@@ -43,7 +44,7 @@ fun RequirementRow(
         when (status) {
             RequirementStatus.ACCEPTED -> InventraSuccess
             RequirementStatus.REJECTED -> InventraDanger
-            RequirementStatus.PENDING -> Color.Gray
+            RequirementStatus.PENDING -> InventraMuted
         }
 
     val statusIcon =
@@ -81,7 +82,7 @@ fun RequirementRow(
                 text = description,
                 fontFamily = Montserrat,
                 fontSize = 12.sp,
-                color = Color.Gray,
+                color = InventraMuted,
             )
         }
 

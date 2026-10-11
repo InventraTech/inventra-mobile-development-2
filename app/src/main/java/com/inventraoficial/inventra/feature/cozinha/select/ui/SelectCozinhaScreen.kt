@@ -36,7 +36,10 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWi
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
+import com.inventraoficial.inventra.ui.theme.InventraBackground
+import com.inventraoficial.inventra.ui.theme.InventraBrand
 import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraSurface
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -55,7 +58,7 @@ fun SelectCozinhaScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(InventraBackground),
     ) {
         InventraTopBar(
             navigationIcon = {
@@ -133,7 +136,7 @@ private fun ViewModeToggle(
                 modifier =
                     Modifier
                         .weight(1f)
-                        .background(if (isSelected) InventraPurple else Color.White, toggleShape)
+                        .background(if (isSelected) InventraBrand else InventraSurface, toggleShape)
                         .clickable(onClick = { onSelect(mode) })
                         .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center,

@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import com.inventraoficial.inventra.ui.theme.InventraBrand
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -31,7 +32,7 @@ fun InventraFilterChip(
         modifier = modifier,
         colors =
             FilterChipDefaults.filterChipColors(
-                selectedContainerColor = InventraPurple,
+                selectedContainerColor = InventraBrand,
                 selectedLabelColor = Color.White,
                 labelColor = InventraPurple,
             ),

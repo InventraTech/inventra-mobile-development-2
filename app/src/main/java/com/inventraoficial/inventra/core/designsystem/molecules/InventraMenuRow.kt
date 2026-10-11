@@ -19,12 +19,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -63,7 +63,7 @@ fun InventraMenuRow(
             modifier = Modifier.weight(1f),
         )
         trailingText?.let { value ->
-            Text(text = value, fontFamily = Montserrat, fontSize = 13.sp, color = Color.Gray)
+            Text(text = value, fontFamily = Montserrat, fontSize = 13.sp, color = InventraMuted)
         }
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,

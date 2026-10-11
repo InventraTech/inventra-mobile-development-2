@@ -30,7 +30,11 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraCloseButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSwitchRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.theme.InventraBackground
+import com.inventraoficial.inventra.ui.theme.InventraBrand
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraSurface
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 private const val THEME_TOGGLE_CORNER_PERCENT = 50
@@ -54,7 +58,7 @@ fun AccountPreferencesScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(InventraBackground),
     ) {
         InventraTopBar(
             navigationIcon = {
@@ -117,7 +121,7 @@ fun AccountPreferencesScreen(
                     color = InventraPurple,
                     modifier = Modifier.weight(1f),
                 )
-                Text(text = language, fontFamily = Montserrat, fontSize = 14.sp, color = Color.Gray)
+                Text(text = language, fontFamily = Montserrat, fontSize = 14.sp, color = InventraMuted)
                 Text(
                     text = "›",
                     fontFamily = Montserrat,
@@ -162,7 +166,7 @@ private fun ThemeSelector(
                 modifier =
                     Modifier
                         .weight(1f)
-                        .background(if (isSelected) InventraPurple else Color.White, shape)
+                        .background(if (isSelected) InventraBrand else InventraSurface, shape)
                         .clickable(onClick = { onSelect(option) })
                         .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center,

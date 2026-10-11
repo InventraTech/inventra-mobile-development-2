@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.inventraoficial.inventra.ui.theme.InventraNavInk
-import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraBrand
+import com.inventraoficial.inventra.ui.theme.InventraNavBar
 
 enum class InventraBottomDestination(
     val icon: ImageVector,
@@ -108,7 +108,7 @@ fun InventraBottomBar(
                 Modifier
                     .fillMaxWidth()
                     .background(
-                        InventraNavInk,
+                        InventraNavBar,
                         InventraNotchedBarShape(
                             cornerRadius = 22.dp,
                             notchRadius = 24.dp,
@@ -143,7 +143,7 @@ fun InventraBottomBar(
                     .offset(x = circleX, y = (-24).dp)
                     .size(circleSize)
                     .clip(CircleShape)
-                    .background(InventraPurple)
+                    .background(InventraBrand)
                     .clickable(onClick = { onSelect(selected) }),
             contentAlignment = Alignment.Center,
         ) {

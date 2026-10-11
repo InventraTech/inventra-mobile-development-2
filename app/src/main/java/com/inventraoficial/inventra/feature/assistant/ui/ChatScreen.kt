@@ -24,6 +24,7 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraSuggesti
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraChatEmptyHeader
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -42,7 +43,7 @@ fun ChatScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(InventraBackground),
     ) {
         InventraTopBar(
             navigationIcon = {

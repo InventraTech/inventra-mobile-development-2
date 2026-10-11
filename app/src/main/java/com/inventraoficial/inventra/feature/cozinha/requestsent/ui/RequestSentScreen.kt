@@ -18,7 +18,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,7 +26,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraGold
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -40,7 +41,7 @@ fun RequestSentScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(InventraBackground)
                 .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -72,7 +73,7 @@ fun RequestSentScreen(
                     "Você receberá uma notificação assim que o sistema aprovar.",
             fontFamily = Montserrat,
             fontSize = 14.sp,
-            color = Color.Gray,
+            color = InventraMuted,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 12.dp),
         )
