@@ -36,7 +36,6 @@ class ProfileDetailsViewModel(
         }
     }
 
-    /** Toque em "Sair da conta": so abre o modal de confirmacao. */
     fun onLogoutClick() {
         _uiState.update { it.copy(isLogoutDialogVisible = true) }
     }
