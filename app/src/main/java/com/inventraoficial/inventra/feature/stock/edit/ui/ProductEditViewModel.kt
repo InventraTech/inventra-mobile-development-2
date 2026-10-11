@@ -14,7 +14,6 @@ class ProductEditViewModel : ViewModel() {
     }
 
     private fun loadProduct() {
-        // simula o produto ja carregado da tela de detalhe, vindo da API no futuro
         _uiState.value =
             _uiState.value.copy(
                 productName = "Leite Integral",
@@ -45,7 +44,5 @@ class ProductEditViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(quantity = value)
     }
 
-    fun onSaveClick() {
-        // sem persistencia real configurada ainda
-    }
+    fun onSaveClick() = Unit
 }

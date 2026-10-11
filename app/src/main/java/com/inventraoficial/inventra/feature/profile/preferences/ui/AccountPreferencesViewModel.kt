@@ -25,7 +25,5 @@ class AccountPreferencesViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(theme = theme)
     }
 
-    fun onLanguageClick() {
-        // sem tela de selecao de idioma ainda
-    }
+    fun onLanguageClick() = Unit
 }

@@ -19,16 +19,11 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
-/**
- * Sobe um servidor HTTP falso local, faz a requisicao passar pelo
- * [AuthInterceptor] e confere quais headers chegaram no servidor.
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AuthInterceptorTest {
     private val server = MockWebServer()
     private val sessionManager = SessionManager()
 
-    /** Comeca a ouvir os avisos de sessao expirada e devolve a lista que vai sendo preenchida. */
     private fun TestScope.ouvirAvisos(): List<Unit> {
         val avisos = mutableListOf<Unit>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {

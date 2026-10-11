@@ -11,7 +11,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.R
 
-// Fonte variável Montserrat: um único arquivo cobre todos os pesos via eixo "wght"
 @OptIn(ExperimentalTextApi::class)
 val Montserrat =
     FontFamily(
@@ -38,7 +37,6 @@ val Montserrat =
         ),
     )
 
-// Set of Material typography styles to start with
 val Typography =
     Typography(
         bodyLarge =
@@ -49,20 +47,4 @@ val Typography =
                 lineHeight = 24.sp,
                 letterSpacing = 0.5.sp,
             ),
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-     */
     )

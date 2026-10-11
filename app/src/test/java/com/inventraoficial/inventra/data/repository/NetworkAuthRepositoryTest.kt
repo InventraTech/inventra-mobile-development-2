@@ -39,16 +39,16 @@ class NetworkAuthRepositoryTest {
             user = FakeAuthRepository.fakeUser,
         )
 
-    /** UserApi falsa: executa [respond] no lugar do GET /users/me. */
     private class FakeUserApi(
         private val respond: () -> UserResponse,
     ) : UserApi {
         override suspend fun me(): UserResponse = respond()
+
+        override suspend fun listMembers(): List<UserResponse> = emptyList()
     }
 
     private val userApi: UserApi = FakeUserApi { FakeAuthRepository.fakeUser }
 
-    /** AuthApi falsa: executa [respond] no lugar da chamada HTTP, tanto no login quanto no cadastro. */
     private class FakeAuthApi(
         private val respond: () -> LoginResponse,
     ) : AuthApi {
@@ -72,7 +72,6 @@ class NetworkAuthRepositoryTest {
         var lastLogoutRequest: RefreshTokenRequest? = null
             private set
 
-        /** Se preenchido, o logout lanca este erro (simula servidor fora ou sem conexao). */
         var logoutError: Exception? = null
 
         override suspend fun logout(refreshRequest: RefreshTokenRequest) {
@@ -245,7 +244,6 @@ class NetworkAuthRepositoryTest {
             assertNull(repository.currentUser.first())
         }
 
-    /** Repositorio ja logado (token "jwt" e o fakeUser salvos), usando a [api] de usuario informada. */
     private suspend fun loggedRepository(api: UserApi): NetworkAuthRepository {
         val repository = NetworkAuthRepository(FakeAuthApi { successResponse }, api, json, sessionStorage)
         repository.login("teste@inventra.com", "senha123")

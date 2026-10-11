@@ -12,6 +12,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -60,6 +62,20 @@ class ProfileViewModelTest {
             val state = viewModel.uiState.value
             assertEquals("", state.fullName)
             assertEquals("", state.roleLabel)
+        }
+
+    @Test
+    fun `so supervisor com cozinha pode gerenciar membros`() =
+        runTest(testDispatcher) {
+            val supervisor = estoquista.copy(accessType = AccessType.SUPERVISOR)
+            val comCozinha = ProfileViewModel(FakeAuthRepository(initialUser = supervisor))
+            val semCozinha = ProfileViewModel(FakeAuthRepository(initialUser = supervisor.copy(kitchenId = null)))
+            val doEstoquista = ProfileViewModel(FakeAuthRepository(initialUser = estoquista))
+            advanceUntilIdle()
+
+            assertTrue(comCozinha.uiState.value.canManageMembers)
+            assertFalse(semCozinha.uiState.value.canManageMembers)
+            assertFalse(doEstoquista.uiState.value.canManageMembers)
         }
 
     private companion object {

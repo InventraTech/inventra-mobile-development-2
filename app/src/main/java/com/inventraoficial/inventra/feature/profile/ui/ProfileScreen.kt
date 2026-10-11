@@ -45,6 +45,7 @@ fun ProfileScreen(
     fullName: String,
     roleLabel: String,
     cozinhaName: String,
+    canManageMembers: Boolean,
     onProfileDetailsClick: () -> Unit,
     onManageMembersClick: () -> Unit,
     onAccountPreferencesClick: () -> Unit,
@@ -122,11 +123,13 @@ fun ProfileScreen(
                 label = "Dados do perfil",
                 onClick = onProfileDetailsClick,
             )
-            InventraMenuRow(
-                icon = Icons.Default.Groups,
-                label = "Gerenciar membros",
-                onClick = onManageMembersClick,
-            )
+            if (canManageMembers) {
+                InventraMenuRow(
+                    icon = Icons.Default.Groups,
+                    label = "Gerenciar membros",
+                    onClick = onManageMembersClick,
+                )
+            }
             InventraMenuRow(
                 icon = Icons.Default.Tune,
                 label = "Preferências da conta",
@@ -153,6 +156,7 @@ fun ProfileRoute(
         fullName = uiState.fullName,
         roleLabel = uiState.roleLabel,
         cozinhaName = uiState.cozinhaName,
+        canManageMembers = uiState.canManageMembers,
         onProfileDetailsClick = { navigator.navigate(Screen.ProfileDetails) },
         onManageMembersClick = { navigator.navigate(Screen.ManageMembers) },
         onAccountPreferencesClick = { navigator.navigate(Screen.AccountPreferences) },
@@ -169,6 +173,7 @@ private fun ProfileScreenPreview() {
         fullName = "Jones Arakaki Kogake Passos Maldo",
         roleLabel = "Gerente",
         cozinhaName = "Sabor Filial Sul",
+        canManageMembers = true,
         onProfileDetailsClick = {},
         onManageMembersClick = {},
         onAccountPreferencesClick = {},

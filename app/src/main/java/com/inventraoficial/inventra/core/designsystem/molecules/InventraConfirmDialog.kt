@@ -1,5 +1,7 @@
 package com.inventraoficial.inventra.core.designsystem.molecules
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -8,15 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
-/**
- * Modal de confirmacao. Com [isDestructive], o botao de confirmar fica vermelho,
- * para acoes que nao podem ser desfeitas.
- */
 @Composable
 fun InventraConfirmDialog(
     title: String,
@@ -27,6 +26,7 @@ fun InventraConfirmDialog(
     modifier: Modifier = Modifier,
     dismissText: String = "Cancelar",
     isDestructive: Boolean = false,
+    content: (@Composable () -> Unit)? = null,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -42,11 +42,14 @@ fun InventraConfirmDialog(
             )
         },
         text = {
-            Text(
-                text = message,
-                fontFamily = Montserrat,
-                fontSize = 15.sp,
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(
+                    text = message,
+                    fontFamily = Montserrat,
+                    fontSize = 15.sp,
+                )
+                content?.invoke()
+            }
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {

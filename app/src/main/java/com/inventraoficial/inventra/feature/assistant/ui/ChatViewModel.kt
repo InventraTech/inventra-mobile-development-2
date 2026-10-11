@@ -18,11 +18,8 @@ class ChatViewModel : ViewModel() {
     }
 
     fun onSend() {
-        // sem backend de IA integrado ainda; por enquanto so limpa o campo
         _uiState.value = _uiState.value.copy(inputValue = "")
     }
 
-    fun onMenuClick() {
-        // sem comportamento definido ainda
-    }
+    fun onMenuClick() = Unit
 }

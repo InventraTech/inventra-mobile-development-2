@@ -28,7 +28,7 @@ fun InventraMemberRow(
     name: String,
     roleLabel: String,
     isOwner: Boolean,
-    onRemoveClick: () -> Unit,
+    onRemoveClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -52,7 +52,9 @@ fun InventraMemberRow(
             InventraBadge(text = roleLabel, variant = InventraBadgeVariant.Brand)
         } else {
             InventraBadge(text = roleLabel, variant = InventraBadgeVariant.Brand, outlined = true)
-            InventraTextLink(text = "Remover", onClick = onRemoveClick, color = InventraDanger)
+            if (onRemoveClick != null) {
+                InventraTextLink(text = "Remover", onClick = onRemoveClick, color = InventraDanger)
+            }
         }
     }
 }

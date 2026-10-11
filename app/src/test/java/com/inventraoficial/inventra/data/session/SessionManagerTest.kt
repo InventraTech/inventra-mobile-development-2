@@ -48,7 +48,6 @@ class SessionManagerTest {
         runTest {
             val sessionManager = SessionManager()
 
-            // Ninguem ouvindo: o aviso se perde (por isso o token e apagado antes, no interceptor).
             sessionManager.notifySessionExpired()
 
             val avisos = mutableListOf<Unit>()
@@ -57,7 +56,6 @@ class SessionManagerTest {
             }
             advanceUntilIdle()
 
-            // SharedFlow nao guarda "valor atual": quem chega depois nao recebe aviso antigo.
             assertTrue(avisos.isEmpty())
         }
 }

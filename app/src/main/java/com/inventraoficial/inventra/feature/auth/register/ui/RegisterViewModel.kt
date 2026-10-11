@@ -50,7 +50,6 @@ class RegisterViewModel(
             return
         }
 
-        // Nunca e nulo aqui (validate ja garantiu), mas o compilador nao sabe disso.
         val role = state.role ?: return
         val accessType =
             when (role) {
@@ -67,7 +66,6 @@ class RegisterViewModel(
         }
     }
 
-    /** Devolve a mensagem do primeiro erro encontrado, ou null se o formulario estiver valido. */
     private fun validate(state: RegisterUiState): String? =
         when {
             state.role == null -> "Escolha um cargo"

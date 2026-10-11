@@ -35,7 +35,7 @@ import com.inventraoficial.inventra.ui.theme.Montserrat
 fun InventraPendingMemberRow(
     initials: String,
     name: String,
-    roleLabel: String,
+    subtitle: String,
     onAcceptClick: () -> Unit,
     onRejectClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -53,7 +53,7 @@ fun InventraPendingMemberRow(
         Column(modifier = Modifier.weight(1f)) {
             Text(name, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Text(
-                text = "Solicitou entrada como $roleLabel",
+                text = subtitle,
                 fontFamily = Montserrat,
                 fontSize = 12.sp,
                 color = Color.Gray,
@@ -89,7 +89,7 @@ private fun InventraPendingMemberRowPreview() {
     InventraPendingMemberRow(
         initials = "MR",
         name = "Mauro Rosa",
-        roleLabel = "Estoquista",
+        subtitle = "mauro.rosa@email.com",
         onAcceptClick = {},
         onRejectClick = {},
     )

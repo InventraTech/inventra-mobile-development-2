@@ -10,7 +10,6 @@ class StockListViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(StockListUiState())
     val uiState: StateFlow<StockListUiState> = _uiState.asStateFlow()
 
-    // simula o formato que a API deve devolver no futuro
     private val allProducts: List<Product> = buildFakeProducts()
 
     init {
@@ -51,7 +50,5 @@ class StockListViewModel : ViewModel() {
         refreshVisibleProducts()
     }
 
-    fun onFilterIconClick() {
-        // sem comportamento definido ainda
-    }
+    fun onFilterIconClick() = Unit
 }

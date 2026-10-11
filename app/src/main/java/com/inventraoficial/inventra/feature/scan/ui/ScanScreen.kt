@@ -50,7 +50,6 @@ fun ScanScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val previewView = remember { PreviewView(context) }
 
-    // 1. launcher de permissão
     val permissionLauncher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission(),
@@ -58,7 +57,6 @@ fun ScanScreen(
             onPermissionResult(granted)
         }
 
-    // dispara o pedido uma vez, quando a tela entra em composição (só se ainda não tiver permissão)
     LaunchedEffect(Unit) {
         val alreadyGranted =
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
@@ -70,7 +68,6 @@ fun ScanScreen(
         }
     }
 
-    // liga a câmera assim que (e sempre que) a permissão estiver concedida
     LaunchedEffect(hasCameraPermission) {
         if (hasCameraPermission) {
             val cameraProvider = ProcessCameraProvider.getInstance(context).get()

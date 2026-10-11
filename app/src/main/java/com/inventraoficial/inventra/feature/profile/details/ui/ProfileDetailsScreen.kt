@@ -133,7 +133,6 @@ fun ProfileDetailsRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(uiState.isLoggedOut) {
-        // replaceStack apaga a pilha inteira: depois de sair, o "voltar" nao retorna ao app.
         if (uiState.isLoggedOut) navigator.replaceStack(Screen.Login)
     }
 

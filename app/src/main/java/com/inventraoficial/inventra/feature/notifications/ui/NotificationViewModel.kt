@@ -14,9 +14,6 @@ class NotificationViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(NotificationUiState())
     val uiState: StateFlow<NotificationUiState> = _uiState.asStateFlow()
 
-    // simula o formato que a API deve devolver no futuro: uma lista PLANA,
-    // cada notificação com sua própria data. Já inclui dias mais antigos —
-    // "Ver todas" só decide quanto disso aparece, não busca nada novo (ainda).
     private val allNotifications: List<InventraNotification> = buildFakeNotifications()
 
     init {
@@ -67,7 +64,6 @@ class NotificationViewModel : ViewModel() {
 
     private fun refreshGroupedNotifications() {
         val isExpanded = _uiState.value.isHistoryExpanded
-        // sem expandir, mostra só hoje e ontem
         val cutoff = LocalDate.now().minusDays(1)
         val visibleNotifications =
             if (isExpanded) {

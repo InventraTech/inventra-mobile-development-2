@@ -3,7 +3,6 @@ package com.inventraoficial.inventra.data.local
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-/** SessionStorage em memoria para testes: nada e gravado em disco. */
 class FakeSessionStorage(
     initialToken: String? = null,
     initialUser: SessionUser? = null,
@@ -17,7 +16,6 @@ class FakeSessionStorage(
     override val user: Flow<SessionUser?> = _user
     override val refreshToken: Flow<String?> = _refreshToken
 
-    /** Valores atuais, para o teste conferir sem precisar coletar os Flows. */
     val currentToken: String?
         get() = _token.value
     val currentUser: SessionUser?

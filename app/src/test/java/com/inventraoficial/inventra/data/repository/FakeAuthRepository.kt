@@ -7,10 +7,6 @@ import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-/**
- * Repositorio falso para testes: devolve [result] sem tocar na rede e
- * registra os argumentos recebidos para que o teste possa conferi-los.
- */
 class FakeAuthRepository(
     var result: Result<UserResponse> = Result.success(fakeUser),
     var hasSession: Boolean = false,
@@ -19,7 +15,6 @@ class FakeAuthRepository(
     private val _currentUser = MutableStateFlow(initialUser)
     override val currentUser: Flow<SessionUser?> = _currentUser
 
-    /** Simula o usuario salvo mudando (ex.: aprovado numa cozinha). */
     fun emitUser(user: SessionUser?) {
         _currentUser.value = user
     }
