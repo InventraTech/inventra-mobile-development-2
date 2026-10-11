@@ -12,10 +12,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -41,6 +44,8 @@ import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
+private const val MAX_BADGE = 9
+
 @Composable
 fun HomeScreen(
     userName: String,
@@ -49,6 +54,7 @@ fun HomeScreen(
     stats: List<InventraStat>,
     isLoading: Boolean,
     errorMessage: String?,
+    unreadNotifications: Int,
     onBellClick: () -> Unit,
     onPriorityItemClick: (InventraPriorityItem) -> Unit,
     onRetryClick: () -> Unit,
@@ -79,12 +85,21 @@ fun HomeScreen(
                 }
             },
             actions = {
-                Icon(
-                    Icons.Default.Notifications,
-                    contentDescription = "Notifications",
-                    tint = Color.White,
+                BadgedBox(
+                    badge = {
+                        if (unreadNotifications > 0) {
+                            val label = if (unreadNotifications > MAX_BADGE) "$MAX_BADGE+" else "$unreadNotifications"
+                            Badge { Text(label) }
+                        }
+                    },
                     modifier = Modifier.clickable(onClick = onBellClick),
-                )
+                ) {
+                    Icon(
+                        Icons.Default.Notifications,
+                        contentDescription = "Notificações",
+                        tint = Color.White,
+                    )
+                }
             },
         )
         when {
@@ -160,6 +175,10 @@ fun HomeRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.onScreenVisible()
+    }
+
     HomeScreen(
         userName = uiState.userName,
         dateText = uiState.dateText,
@@ -167,6 +186,7 @@ fun HomeRoute(
         stats = uiState.stats,
         isLoading = uiState.isLoading,
         errorMessage = uiState.errorMessage,
+        unreadNotifications = uiState.unreadNotifications,
         onBellClick = { navigator.navigate(Screen.Notifications) },
         onPriorityItemClick = { navigator.navigate(Screen.StockDetail) },
         onRetryClick = viewModel::onRetryClick,
@@ -206,6 +226,7 @@ private fun HomeScreenPreview() {
             ),
         isLoading = false,
         errorMessage = null,
+        unreadNotifications = 3,
         onBellClick = {},
         onPriorityItemClick = {},
         onRetryClick = {},

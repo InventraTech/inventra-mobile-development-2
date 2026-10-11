@@ -10,4 +10,5 @@ data class HomeUiState(
     val stats: List<InventraStat> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val unreadNotifications: Int = 0,
 )

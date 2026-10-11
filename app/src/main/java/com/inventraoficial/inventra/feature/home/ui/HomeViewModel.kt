@@ -14,6 +14,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraPriority
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraStat
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
+import com.inventraoficial.inventra.data.repository.AlertRepository
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.StockRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,7 @@ import java.util.Locale
 class HomeViewModel(
     private val authRepository: AuthRepository,
     private val stockRepository: StockRepository,
+    private val alertRepository: AlertRepository,
     private val today: () -> LocalDate = { LocalDate.now() },
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -41,6 +43,15 @@ class HomeViewModel(
 
     fun onRetryClick() {
         load()
+    }
+
+    fun onScreenVisible() {
+        viewModelScope.launch {
+            val kitchenId = authRepository.currentUser.first()?.kitchenId ?: return@launch
+            alertRepository
+                .unreadCount(kitchenId)
+                .onSuccess { count -> _uiState.update { it.copy(unreadNotifications = count) } }
+        }
     }
 
     private fun load() {
@@ -85,6 +96,7 @@ class HomeViewModel(
                     HomeViewModel(
                         authRepository = application.container.authRepository,
                         stockRepository = application.container.stockRepository,
+                        alertRepository = application.container.alertRepository,
                     )
                 }
             }

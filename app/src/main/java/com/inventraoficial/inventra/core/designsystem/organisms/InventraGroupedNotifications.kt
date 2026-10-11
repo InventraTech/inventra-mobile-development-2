@@ -21,12 +21,15 @@ data class InventraNotification(
     val subtitle: String,
     val timestamp: String,
     val date: LocalDate,
+    val id: Int = 0,
+    val isUnread: Boolean = false,
 )
 
 @Composable
 fun InventraGroupedNotifications(
     groups: Map<String, List<InventraNotification>>,
     modifier: Modifier = Modifier,
+    onNotificationClick: ((InventraNotification) -> Unit)? = null,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(24.dp)) {
         groups.forEach { (dateHeader, notifications) ->
@@ -37,6 +40,8 @@ fun InventraGroupedNotifications(
                     title = notification.title,
                     subtitle = notification.subtitle,
                     timestamp = notification.timestamp,
+                    isUnread = notification.isUnread,
+                    onClick = onNotificationClick?.let { { it(notification) } },
                 )
             }
         }

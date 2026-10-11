@@ -4,6 +4,8 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraStatTone
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUrgency
 import com.inventraoficial.inventra.data.local.SessionUser
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
+import com.inventraoficial.inventra.data.repository.FakeAlertRepository
+import com.inventraoficial.inventra.data.repository.FakeAlertRepository.Companion.alert
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.FakeStockRepository
 import com.inventraoficial.inventra.data.repository.FakeStockRepository.Companion.batch
@@ -60,8 +62,23 @@ class HomeViewModelTest {
         Dispatchers.resetMain()
     }
 
+    private val alertRepository =
+        FakeAlertRepository(
+            alerts =
+                listOf(
+                    alert(1, "EXPIRATION", "2026-10-10T08:00:00", "Leite Integral"),
+                    alert(2, "STOCK", "2026-10-10T09:00:00", "Óleo de Soja"),
+                    alert(3, "STOCK", "2026-10-09T09:00:00", "Arroz", read = true),
+                ),
+        )
+
     private fun createViewModel(sessionUser: SessionUser? = user) =
-        HomeViewModel(FakeAuthRepository(initialUser = sessionUser), stockRepository, today = { today })
+        HomeViewModel(
+            authRepository = FakeAuthRepository(initialUser = sessionUser),
+            stockRepository = stockRepository,
+            alertRepository = alertRepository,
+            today = { today },
+        )
 
     @Test
     fun `mostra o primeiro nome e a data de hoje`() =
@@ -162,5 +179,25 @@ class HomeViewModelTest {
             val state = viewModel.uiState.value
             assertNull(state.errorMessage)
             assertEquals(3, state.priorityItems.size)
+        }
+
+    @Test
+    fun `ao aparecer conta as notificacoes nao lidas`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            viewModel.onScreenVisible()
+            advanceUntilIdle()
+
+            assertEquals(2, viewModel.uiState.value.unreadNotifications)
+        }
+
+    @Test
+    fun `sem cozinha o contador fica zerado`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel(user.copy(kitchenId = null, kitchenName = null))
+            viewModel.onScreenVisible()
+            advanceUntilIdle()
+
+            assertEquals(0, viewModel.uiState.value.unreadNotifications)
         }
 }
