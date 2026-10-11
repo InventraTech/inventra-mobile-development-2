@@ -44,6 +44,8 @@ class NetworkAuthRepositoryTest {
         private val respond: () -> UserResponse,
     ) : UserApi {
         override suspend fun me(): UserResponse = respond()
+
+        override suspend fun listMembers(): List<UserResponse> = emptyList()
     }
 
     private val userApi: UserApi = FakeUserApi { FakeAuthRepository.fakeUser }
