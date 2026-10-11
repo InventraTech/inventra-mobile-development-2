@@ -48,10 +48,6 @@ sealed interface Screen : NavKey {
     data object RequirementsHistory : Screen
 }
 
-/**
- * Telas que ocupam a tela inteira, sem InventraTopBar e sem o padding
- * da barra de navegacao do sistema (formas decorativas encostam nas bordas).
- */
 fun Screen.isFullBleed(): Boolean =
     when (this) {
         Screen.Login, Screen.Register, Screen.RequestSent -> true

@@ -196,10 +196,6 @@ private fun AppNavigation(
     }
 }
 
-/**
- * Ajusta a cor dos icones da barra de status e da barra de navegacao do sistema.
- * "Dark" quer dizer icones escuros, para fundos claros.
- */
 @Composable
 private fun SystemBarsIcons(
     darkStatusBarIcons: Boolean,
