@@ -8,4 +8,6 @@ data class HomeUiState(
     val dateText: String = "",
     val priorityItems: List<InventraPriorityItem> = emptyList(),
     val stats: List<InventraStat> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )
