@@ -30,7 +30,7 @@ class ScanViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
 
         viewModelScope.launch {
-            delay(1000) // placeholder até a leitura de OCR real existir
+            delay(1000)
             _uiState.value =
                 _uiState.value.copy(
                     isProcessing = false,
