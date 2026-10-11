@@ -10,7 +10,6 @@ class SelectCozinhaViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SelectCozinhaUiState())
     val uiState: StateFlow<SelectCozinhaUiState> = _uiState.asStateFlow()
 
-    // simula o formato que a API deve devolver no futuro
     private val allCozinhas: List<CozinhaListItem> = buildFakeCozinhas()
 
     init {
@@ -52,9 +51,7 @@ class SelectCozinhaViewModel : ViewModel() {
         refreshVisibleCozinhas()
     }
 
-    fun onFilterIconClick() {
-        // sem comportamento definido ainda
-    }
+    fun onFilterIconClick() = Unit
 
     fun onViewModeSelect(viewMode: CozinhaViewMode) {
         _uiState.value = _uiState.value.copy(viewMode = viewMode)

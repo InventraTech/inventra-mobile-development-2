@@ -10,7 +10,6 @@ class CozinhaInfoViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CozinhaInfoUiState())
     val uiState: StateFlow<CozinhaInfoUiState> = _uiState.asStateFlow()
 
-    // guarda o ultimo estado salvo, para descartar em Cancelar
     private var savedState = CozinhaInfoUiState()
 
     init {
@@ -18,7 +17,6 @@ class CozinhaInfoViewModel : ViewModel() {
     }
 
     private fun loadCozinhaInfo() {
-        // simula o formato que a API deve devolver no futuro
         val loaded =
             CozinhaInfoUiState(
                 name = "Sabor Filial Sul",
@@ -50,7 +48,6 @@ class CozinhaInfoViewModel : ViewModel() {
     }
 
     fun onSaveClick() {
-        // sem persistencia real ainda; so guarda como o novo estado salvo
         savedState = _uiState.value.copy(isEditing = false)
         _uiState.value = savedState
     }
