@@ -2,6 +2,8 @@ package com.inventraoficial.inventra.di
 
 import android.content.Context
 import com.inventraoficial.inventra.BuildConfig
+import com.inventraoficial.inventra.data.local.AppPreferences
+import com.inventraoficial.inventra.data.local.DataStoreAppPreferences
 import com.inventraoficial.inventra.data.local.DataStoreSessionStorage
 import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.remote.api.AlertApi
@@ -38,6 +40,7 @@ interface AppContainer {
     val stockRepository: StockRepository
     val alertRepository: AlertRepository
     val sessionManager: SessionManager
+    val appPreferences: AppPreferences
 }
 
 class DefaultAppContainer(
@@ -50,6 +53,7 @@ class DefaultAppContainer(
         }
     private val sessionStorage: SessionStorage by lazy { DataStoreSessionStorage(context, json) }
     override val sessionManager = SessionManager()
+    override val appPreferences: AppPreferences by lazy { DataStoreAppPreferences(context) }
     private val authInterceptor: AuthInterceptor by lazy { AuthInterceptor(sessionStorage, sessionManager) }
 
     private val logging =
