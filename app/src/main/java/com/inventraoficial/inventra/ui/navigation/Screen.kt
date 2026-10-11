@@ -46,6 +46,10 @@ sealed interface Screen : NavKey {
     data object RequirementsList : Screen
 
     data object RequirementsHistory : Screen
+
+    data class RequisitionDetail(
+        val requisitionId: Int,
+    ) : Screen
 }
 
 fun Screen.isFullBleed(): Boolean =

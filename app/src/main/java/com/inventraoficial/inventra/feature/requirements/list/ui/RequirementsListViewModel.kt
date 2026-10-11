@@ -1,78 +1,106 @@
 package com.inventraoficial.inventra.feature.requirements.list.ui
 
 import androidx.lifecycle.ViewModel
-import com.inventraoficial.inventra.R
-import com.inventraoficial.inventra.feature.requirements.RequirementsSharedData
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.inventraoficial.inventra.InventraApplication
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
+import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionResponse
+import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
+import com.inventraoficial.inventra.data.repository.AuthRepository
+import com.inventraoficial.inventra.data.repository.RequisitionRepository
+import com.inventraoficial.inventra.feature.requirements.RequisitionSummary
+import com.inventraoficial.inventra.feature.requirements.isVisibleTo
+import com.inventraoficial.inventra.feature.requirements.itemsSummary
+import com.inventraoficial.inventra.feature.requirements.newestFirst
+import com.inventraoficial.inventra.feature.requirements.subtitleText
+import com.inventraoficial.inventra.feature.requirements.titleText
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.time.ZoneId
 
-class RequirementsListViewModel : ViewModel() {
+class RequirementsListViewModel(
+    private val authRepository: AuthRepository,
+    private val requisitionRepository: RequisitionRepository,
+    private val zone: ZoneId = ZoneId.systemDefault(),
+) : ViewModel() {
     private val _uiState = MutableStateFlow(RequirementsListUiState())
     val uiState: StateFlow<RequirementsListUiState> = _uiState.asStateFlow()
 
-    private val allRequirements: List<Requirement> = buildFakeRequirements()
-
-    init {
-        loadRequirements()
+    fun onScreenVisible() {
+        load()
     }
 
-    private fun buildFakeRequirements(): List<Requirement> =
-        listOf(
-            Requirement(
-                id = "1",
-                imageRes = R.drawable.ic_inventra_logo,
-                productName = "Baião - Arroz Camil",
-                description = "Solicitação entrada como Estoquista",
-                status = RequirementStatus.PENDING,
-            ),
-            Requirement(
-                id = "2",
-                imageRes = R.drawable.ic_inventra_logo,
-                productName = "Eduardo Passos",
-                description = "Solicitação entrada como Estoquista",
-                status = RequirementStatus.PENDING,
-            ),
-            Requirement(
-                id = "3",
-                imageRes = R.drawable.ic_inventra_logo,
-                productName = "Compra - Leite Integral",
-                description = "Solicitação de compra para reposição",
-                status = RequirementStatus.PENDING,
-            ),
-            Requirement(
-                id = "4",
-                imageRes = R.drawable.ic_inventra_logo,
-                productName = "Maria Souza",
-                description = "Entrada como Estoquista",
-                status = RequirementStatus.PENDING,
-            ),
-            Requirement(
-                id = "5",
-                imageRes = R.drawable.ic_inventra_logo,
-                productName = "João Silva",
-                description = "Entrada como Gerente",
-                status = RequirementStatus.PENDING,
-            ),
-        )
-
-    private fun loadRequirements() {
-        _uiState.value = _uiState.value.copy(requirements = allRequirements)
+    fun onRetryClick() {
+        load()
     }
 
-    fun onAcceptRequirement(requirement: Requirement) {
-        val acceptedRequirement = requirement.copy(status = RequirementStatus.ACCEPTED)
-        RequirementsSharedData.addProcessedItem(acceptedRequirement)
+    private fun load() {
+        _uiState.update { it.copy(isLoading = it.requisitions.isEmpty(), errorMessage = null) }
+        viewModelScope.launch {
+            val user = authRepository.currentUser.first()
+            val kitchenId = user?.kitchenId
+            if (user == null || kitchenId == null) {
+                _uiState.update { it.copy(isLoading = false, requisitions = emptyList()) }
+                return@launch
+            }
+            _uiState.update { it.copy(isSupervisor = user.accessType == AccessType.SUPERVISOR) }
 
-        val updatedRequirements = _uiState.value.requirements.filter { it.id != requirement.id }
-        _uiState.value = _uiState.value.copy(requirements = updatedRequirements)
+            requisitionRepository
+                .requisitions(kitchenId)
+                .onSuccess { all ->
+                    val pending =
+                        all
+                            .filter { it.status == RequisitionStatus.UNDER_REVIEW && it.isVisibleTo(user) }
+                            .newestFirst()
+                    val summaries = pending.withItemsSummary()
+                    _uiState.update { it.copy(isLoading = false, requisitions = summaries) }
+                }.onFailure { error ->
+                    _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
+                }
+        }
     }
 
-    fun onRejectRequirement(requirement: Requirement) {
-        val rejectedRequirement = requirement.copy(status = RequirementStatus.REJECTED)
-        RequirementsSharedData.addProcessedItem(rejectedRequirement)
+    private suspend fun List<RequisitionResponse>.withItemsSummary(): List<RequisitionSummary> =
+        coroutineScope {
+            map { requisition ->
+                async {
+                    val names =
+                        requisitionRepository
+                            .items(requisition.id)
+                            .getOrDefault(emptyList())
+                            .map { it.product.name }
+                    RequisitionSummary(
+                        id = requisition.id,
+                        title = requisition.titleText(),
+                        subtitle = requisition.subtitleText(zone),
+                        details = names.itemsSummary(),
+                        status = requisition.status,
+                    )
+                }
+            }.awaitAll()
+        }
 
-        val updatedRequirements = _uiState.value.requirements.filter { it.id != requirement.id }
-        _uiState.value = _uiState.value.copy(requirements = updatedRequirements)
+    companion object {
+        val Factory: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    val application = this[APPLICATION_KEY] as InventraApplication
+                    RequirementsListViewModel(
+                        authRepository = application.container.authRepository,
+                        requisitionRepository = application.container.requisitionRepository,
+                    )
+                }
+            }
     }
 }

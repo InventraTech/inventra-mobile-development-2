@@ -39,6 +39,7 @@ import com.inventraoficial.inventra.feature.profile.details.ui.ProfileDetailsRou
 import com.inventraoficial.inventra.feature.profile.members.ui.ManageMembersRoute
 import com.inventraoficial.inventra.feature.profile.preferences.ui.AccountPreferencesRoute
 import com.inventraoficial.inventra.feature.profile.ui.ProfileRoute
+import com.inventraoficial.inventra.feature.requirements.detail.ui.RequisitionDetailRoute
 import com.inventraoficial.inventra.feature.requirements.history.ui.RequirementsHistoryRoute
 import com.inventraoficial.inventra.feature.requirements.list.ui.RequirementsListRoute
 import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
@@ -55,6 +56,7 @@ import kotlinx.coroutines.flow.SharedFlow
 @Composable
 fun SetupNavigation(startViewModel: StartViewModel = viewModel(factory = StartViewModel.Factory)) {
     val startScreen by startViewModel.startScreen.collectAsState()
+    val bottomDestinations by startViewModel.bottomDestinations.collectAsState()
 
     val screen = startScreen
     if (screen == null) {
@@ -68,6 +70,7 @@ fun SetupNavigation(startViewModel: StartViewModel = viewModel(factory = StartVi
         AppNavigation(
             startScreen = screen,
             sessionExpired = startViewModel.sessionExpired,
+            bottomDestinations = bottomDestinations,
         )
     }
 }
@@ -76,6 +79,7 @@ fun SetupNavigation(startViewModel: StartViewModel = viewModel(factory = StartVi
 private fun AppNavigation(
     startScreen: Screen,
     sessionExpired: SharedFlow<Unit>,
+    bottomDestinations: List<InventraBottomDestination>,
 ) {
     val navigator =
         remember {
@@ -105,6 +109,7 @@ private fun AppNavigation(
         bottomBar = {
             if (selectedTab != null) {
                 InventraBottomBar(
+                    destinations = bottomDestinations,
                     selected = selectedTab,
                     onSelect = { destination ->
                         navigator.navigateTopLevel(destination.toScreen())
@@ -192,6 +197,9 @@ private fun AppNavigation(
                     }
                     entry<Screen.RequirementsHistory> {
                         RequirementsHistoryRoute(navigator = navigator)
+                    }
+                    entry<Screen.RequisitionDetail> { key ->
+                        RequisitionDetailRoute(requisitionId = key.requisitionId, navigator = navigator)
                     }
                 },
         )

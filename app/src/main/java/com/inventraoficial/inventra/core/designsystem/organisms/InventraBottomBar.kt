@@ -93,8 +93,8 @@ fun InventraBottomBar(
     selected: InventraBottomDestination,
     onSelect: (InventraBottomDestination) -> Unit,
     modifier: Modifier = Modifier,
+    destinations: List<InventraBottomDestination> = InventraBottomDestination.entries,
 ) {
-    val destinations = InventraBottomDestination.entries
     val selectedIndex = destinations.indexOf(selected)
     val notchCenterFraction = (selectedIndex + 0.5f) / destinations.size
 
