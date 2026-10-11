@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.feature.auth.login.ui
 
+import com.inventraoficial.inventra.data.remote.dto.auth.KitchenSummary
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -154,5 +155,30 @@ class LoginViewModelTest {
             assertNull(viewModel.uiState.value.errorMessage)
             advanceUntilIdle()
             assertTrue(viewModel.uiState.value.isLoggedIn)
+        }
+
+    @Test
+    fun `supervisor sem cozinha precisa criar a cozinha depois do login`() =
+        runTest(testDispatcher) {
+            preencherCampos()
+
+            viewModel.onLoginClick()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.mustCreateKitchen)
+        }
+
+    @Test
+    fun `usuario com cozinha vai direto para a Home depois do login`() =
+        runTest(testDispatcher) {
+            val cozinha = KitchenSummary(id = 7, name = "Sabor Filial Sul")
+            val comCozinha = FakeAuthRepository.fakeUser.copy(kitchen = cozinha)
+            repository.result = Result.success(comCozinha)
+            preencherCampos()
+
+            viewModel.onLoginClick()
+            advanceUntilIdle()
+
+            assertFalse(viewModel.uiState.value.mustCreateKitchen)
         }
 }

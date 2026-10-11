@@ -162,10 +162,13 @@ fun RegisterRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(uiState.isRegistered) {
-        // Provisorio: enquanto o fluxo de vincular/solicitar cozinha nao existe na API,
-        // o cadastro leva direto para a Home. Depois, Supervisor -> CreateCozinha e
-        // Estoquista -> SelectCozinha.
-        if (uiState.isRegistered) navigator.navigateTopLevel(Screen.Home)
+        if (uiState.isRegistered) {
+            if (uiState.role == InventraUserRole.Supervisor) {
+                navigator.replaceStack(Screen.CreateCozinha)
+            } else {
+                navigator.navigateTopLevel(Screen.Home)
+            }
+        }
     }
 
     RegisterScreen(

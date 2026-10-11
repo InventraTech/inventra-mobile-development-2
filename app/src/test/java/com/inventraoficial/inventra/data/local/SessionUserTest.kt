@@ -6,7 +6,9 @@ import com.inventraoficial.inventra.data.remote.dto.auth.ProfileSummary
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SessionUserTest {
@@ -56,5 +58,15 @@ class SessionUserTest {
         val lido = Json.decodeFromString(SessionUser.serializer(), texto)
 
         assertEquals(original, lido)
+    }
+
+    @Test
+    fun `so supervisor sem cozinha precisa criar cozinha`() {
+        val supervisor = userSemCozinha.copy(profile = ProfileSummary(id = 1, accessType = AccessType.SUPERVISOR))
+        val cozinha = KitchenSummary(id = 7, name = "Sabor Filial Sul")
+
+        assertTrue(supervisor.toSessionUser().mustCreateKitchen)
+        assertFalse(supervisor.copy(kitchen = cozinha).toSessionUser().mustCreateKitchen)
+        assertFalse(userSemCozinha.toSessionUser().mustCreateKitchen)
     }
 }

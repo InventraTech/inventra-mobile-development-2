@@ -142,7 +142,13 @@ fun LoginRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(uiState.isLoggedIn) {
-        if (uiState.isLoggedIn) navigator.navigateTopLevel(Screen.Home)
+        if (uiState.isLoggedIn) {
+            if (uiState.mustCreateKitchen) {
+                navigator.replaceStack(Screen.CreateCozinha)
+            } else {
+                navigator.navigateTopLevel(Screen.Home)
+            }
+        }
     }
 
     LoginScreen(

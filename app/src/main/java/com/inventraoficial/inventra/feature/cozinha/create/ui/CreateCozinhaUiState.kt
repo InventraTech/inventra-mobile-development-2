@@ -13,6 +13,8 @@ enum class EstablishmentType(
 data class CreateCozinhaUiState(
     val name: String = "",
     val address: String = "",
-    val establishmentType: EstablishmentType? = null,
+    val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val isCreated: Boolean = false,
+    val isLoggedOut: Boolean = false,
 )
