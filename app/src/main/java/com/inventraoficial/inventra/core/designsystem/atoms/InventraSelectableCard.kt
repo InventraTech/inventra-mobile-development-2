@@ -15,13 +15,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraSurface
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -33,8 +34,8 @@ fun InventraSelectableCard(
     modifier: Modifier = Modifier,
 ) {
     val borderColor = if (selected) InventraPurple else InventraPurple.copy(alpha = 0.15f)
-    val contentColor = if (selected) InventraPurple else Color.Gray
-    val backgroundColor = if (selected) InventraPurple.copy(alpha = 0.06f) else Color.White
+    val contentColor = if (selected) InventraPurple else InventraMuted
+    val backgroundColor = if (selected) InventraPurple.copy(alpha = 0.06f) else InventraSurface
 
     Column(
         modifier =

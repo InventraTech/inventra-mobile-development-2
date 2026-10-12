@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
+import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -57,19 +58,20 @@ fun InventraScanOverlay(
                     blendMode = BlendMode.Clear,
                 )
             }
+            val frameColor = InventraPurple
             Canvas(modifier = Modifier.size(width = 280.dp, height = 140.dp)) {
                 val corner = 28.dp.toPx()
                 val stroke = 4.dp.toPx()
                 val w = size.width
                 val h = size.height
-                drawLine(InventraPurple, Offset(0f, corner), Offset(0f, 0f), stroke)
-                drawLine(InventraPurple, Offset(0f, 0f), Offset(corner, 0f), stroke)
-                drawLine(InventraPurple, Offset(w - corner, 0f), Offset(w, 0f), stroke)
-                drawLine(InventraPurple, Offset(w, 0f), Offset(w, corner), stroke)
-                drawLine(InventraPurple, Offset(0f, h - corner), Offset(0f, h), stroke)
-                drawLine(InventraPurple, Offset(0f, h), Offset(corner, h), stroke)
-                drawLine(InventraPurple, Offset(w - corner, h), Offset(w, h), stroke)
-                drawLine(InventraPurple, Offset(w, h - corner), Offset(w, h), stroke)
+                drawLine(frameColor, Offset(0f, corner), Offset(0f, 0f), stroke)
+                drawLine(frameColor, Offset(0f, 0f), Offset(corner, 0f), stroke)
+                drawLine(frameColor, Offset(w - corner, 0f), Offset(w, 0f), stroke)
+                drawLine(frameColor, Offset(w, 0f), Offset(w, corner), stroke)
+                drawLine(frameColor, Offset(0f, h - corner), Offset(0f, h), stroke)
+                drawLine(frameColor, Offset(0f, h), Offset(corner, h), stroke)
+                drawLine(frameColor, Offset(w - corner, h), Offset(w, h), stroke)
+                drawLine(frameColor, Offset(w, h - corner), Offset(w, h), stroke)
             }
         }
         Column(
@@ -77,7 +79,7 @@ fun InventraScanOverlay(
                 Modifier
                     .fillMaxWidth()
                     .height(250.dp)
-                    .background(Color.White)
+                    .background(InventraBackground)
                     .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,

@@ -14,9 +14,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.inventraoficial.inventra.ui.theme.InventraBrand
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraGold
 import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraSurface
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 enum class InventraBadgeVariant { Brand, DateAlert, Gold }
@@ -30,12 +32,13 @@ fun InventraBadge(
 ) {
     val (baseColor, defaultContentColor) =
         when (variant) {
-            InventraBadgeVariant.Brand -> InventraPurple to Color.White
+            InventraBadgeVariant.Brand -> InventraBrand to Color.White
             InventraBadgeVariant.DateAlert -> InventraDanger.copy(alpha = 0.14f) to InventraDanger
             InventraBadgeVariant.Gold -> InventraGold to Color.White
         }
-    val containerColor = if (outlined) Color.White else baseColor
-    val contentColor = if (outlined) baseColor else defaultContentColor
+    val outlinedContentColor = if (variant == InventraBadgeVariant.Brand) InventraPurple else baseColor
+    val containerColor = if (outlined) InventraSurface else baseColor
+    val contentColor = if (outlined) outlinedContentColor else defaultContentColor
 
     Box(
         modifier =

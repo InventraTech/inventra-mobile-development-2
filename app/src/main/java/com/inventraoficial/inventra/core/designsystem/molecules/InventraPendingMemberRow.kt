@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraInitialsAvatar
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraGold
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -56,7 +57,7 @@ fun InventraPendingMemberRow(
                 text = subtitle,
                 fontFamily = Montserrat,
                 fontSize = 12.sp,
-                color = Color.Gray,
+                color = InventraMuted,
             )
         }
         RoundIconButton(icon = Icons.Default.Check, background = InventraSuccess, onClick = onAcceptClick)

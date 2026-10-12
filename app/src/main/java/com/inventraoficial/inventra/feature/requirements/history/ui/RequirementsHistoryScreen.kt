@@ -30,6 +30,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
+import com.inventraoficial.inventra.ui.theme.InventraBackground
+import com.inventraoficial.inventra.ui.theme.InventraBrand
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -51,7 +53,7 @@ fun RequirementsHistoryScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(InventraBackground),
     ) {
         InventraTopBar(
             title = {
@@ -89,7 +91,7 @@ fun RequirementsHistoryScreen(
                     },
                     colors =
                         FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = InventraPurple,
+                            selectedContainerColor = InventraBrand,
                             selectedLabelColor = Color.White,
                             labelColor = InventraPurple,
                         ),

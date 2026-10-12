@@ -28,6 +28,8 @@ import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraThumbnail
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraGold
+import com.inventraoficial.inventra.ui.theme.InventraInk
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -66,13 +68,13 @@ fun RequirementAcceptanceCard(
                 fontFamily = Montserrat,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
-                color = Color.Black,
+                color = InventraInk,
             )
             Text(
                 text = description,
                 fontFamily = Montserrat,
                 fontSize = 12.sp,
-                color = Color.Gray,
+                color = InventraMuted,
             )
         }
 

@@ -14,8 +14,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.inventraoficial.inventra.ui.theme.InventraBrand
 import com.inventraoficial.inventra.ui.theme.InventraGold
-import com.inventraoficial.inventra.ui.theme.InventraPurple
 
 private val InventraHexagonShape =
     GenericShape { size, _ ->
@@ -41,7 +41,7 @@ fun InventraBrandIcon(
                 Modifier
                     .matchParentSize()
                     .clip(InventraHexagonShape)
-                    .background(InventraPurple),
+                    .background(InventraBrand),
             contentAlignment = Alignment.Center,
         ) {
             Box(
@@ -58,7 +58,7 @@ fun InventraBrandIcon(
                     .align(Alignment.BottomEnd)
                     .size(22.dp)
                     .clip(CircleShape)
-                    .background(InventraPurple)
+                    .background(InventraBrand)
                     .border(2.dp, Color.White, CircleShape),
             contentAlignment = Alignment.Center,
         ) {

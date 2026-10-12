@@ -13,9 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.inventraoficial.inventra.ui.theme.InventraBrand
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraGold
-import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -31,7 +31,7 @@ fun InventraStatusIcon(
             InventraStatusIconVariant.Success -> InventraSuccess to "✓"
             InventraStatusIconVariant.Danger -> InventraDanger to "!"
             InventraStatusIconVariant.Info -> InventraGold to "i"
-            InventraStatusIconVariant.Action -> InventraPurple to "🛒"
+            InventraStatusIconVariant.Action -> InventraBrand to "🛒"
         }
     Box(
         modifier = modifier.size(34.dp).clip(CircleShape).background(background),

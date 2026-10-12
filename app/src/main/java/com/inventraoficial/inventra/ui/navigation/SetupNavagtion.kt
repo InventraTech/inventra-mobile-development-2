@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.core.view.WindowCompat
@@ -49,6 +48,8 @@ import com.inventraoficial.inventra.feature.stock.list.ui.StockListRoute
 import com.inventraoficial.inventra.feature.stock.stockout.ui.StockOutRoute
 import com.inventraoficial.inventra.feature.suppliers.detail.ui.SupplierDetailRoute
 import com.inventraoficial.inventra.feature.suppliers.list.ui.SupplierRoute
+import com.inventraoficial.inventra.ui.theme.InventraBackground
+import com.inventraoficial.inventra.ui.theme.LocalInventraPalette
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
@@ -61,7 +62,7 @@ fun SetupNavigation(startViewModel: StartViewModel = viewModel(factory = StartVi
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .background(Color.White),
+                    .background(InventraBackground),
         )
     } else {
         AppNavigation(
@@ -93,9 +94,10 @@ private fun AppNavigation(
     val insetsModifier =
         if (selectedTab == null && !isFullBleed) Modifier.navigationBarsPadding() else Modifier
 
+    val isLightTheme = !LocalInventraPalette.current.isDark
     SystemBarsIcons(
-        darkStatusBarIcons = isFullBleed,
-        darkNavigationBarIcons = selectedTab == null,
+        darkStatusBarIcons = isFullBleed && isLightTheme,
+        darkNavigationBarIcons = selectedTab == null && isLightTheme,
     )
 
     Scaffold(

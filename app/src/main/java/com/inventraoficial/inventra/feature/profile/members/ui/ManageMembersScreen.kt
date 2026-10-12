@@ -31,7 +31,9 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraMemberRo
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraPendingMemberRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraDanger
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -70,7 +72,7 @@ fun ManageMembersScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(InventraBackground),
     ) {
         InventraTopBar(
             navigationIcon = {
@@ -186,7 +188,7 @@ private fun SectionTitle(text: String) {
 
 @Composable
 private fun EmptyText(text: String) {
-    Text(text = text, fontFamily = Montserrat, fontSize = 14.sp, color = Color.Gray)
+    Text(text = text, fontFamily = Montserrat, fontSize = 14.sp, color = InventraMuted)
 }
 
 @Composable
