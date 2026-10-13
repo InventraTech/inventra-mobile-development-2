@@ -57,6 +57,7 @@ fun StockListScreen(
     onScanClick: () -> Unit,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
+    activeFilterCount: Int = 0,
 ) {
     Column(
         modifier =
@@ -93,6 +94,7 @@ fun StockListScreen(
                 onQueryChange = onSearchQueryChange,
                 onFilterClick = onFilterIconClick,
                 placeholder = "Buscar produto...",
+                activeFilterCount = activeFilterCount,
                 modifier = Modifier.padding(bottom = 16.dp),
             )
             InventraFilterChipRow(
@@ -191,8 +193,25 @@ fun StockListRoute(
         onProductClick = { product -> navigator.navigate(Screen.StockDetail(product.id)) },
         onScanClick = { navigator.navigate(Screen.Scan) },
         onRetryClick = viewModel::onRetryClick,
+        activeFilterCount = uiState.filters.activeCount,
         modifier = modifier,
     )
+
+    uiState.draftFilters?.let { draft ->
+        StockFiltersSheet(
+            filters = draft,
+            categoryOptions = uiState.categoryOptions,
+            actions =
+                StockFiltersActions(
+                    onSortSelect = viewModel::onSortSelect,
+                    onCategoryToggle = viewModel::onCategoryToggle,
+                    onStatusToggle = viewModel::onStatusToggle,
+                    onClear = viewModel::onClearFilters,
+                    onApply = viewModel::onApplyFilters,
+                ),
+            onDismiss = viewModel::onFiltersDismiss,
+        )
+    }
 }
 
 @Suppress("UnusedPrivateMember")
