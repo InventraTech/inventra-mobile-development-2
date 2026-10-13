@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
 import com.inventraoficial.inventra.feature.requirements.RequisitionCard
@@ -41,6 +43,7 @@ fun RequirementsListScreen(
     onHistoryClick: () -> Unit,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onNewClick: () -> Unit = {},
 ) {
     Column(
         modifier =
@@ -64,7 +67,7 @@ fun RequirementsListScreen(
                         if (isSupervisor) {
                             "Nenhuma requisição aguardando sua análise."
                         } else {
-                            "Você não tem requisições em análise."
+                            "Você não tem requisições abertas."
                         },
                     modifier = Modifier.weight(1f),
                 )
@@ -78,6 +81,14 @@ fun RequirementsListScreen(
                     }
                 }
         }
+        InventraPrimaryButton(
+            text = "Nova requisição",
+            onClick = onNewClick,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+        )
     }
 }
 
@@ -98,7 +109,14 @@ fun RequirementsListRoute(
         isSupervisor = uiState.isSupervisor,
         isLoading = uiState.isLoading,
         errorMessage = uiState.errorMessage,
-        onRequisitionClick = { requisition -> navigator.navigate(Screen.RequisitionDetail(requisition.id)) },
+        onRequisitionClick = { requisition ->
+            if (requisition.status == RequisitionStatus.DRAFT) {
+                navigator.navigate(Screen.RequisitionEditor(requisition.id))
+            } else {
+                navigator.navigate(Screen.RequisitionDetail(requisition.id))
+            }
+        },
+        onNewClick = { navigator.navigate(Screen.RequisitionEditor()) },
         onHistoryClick = { navigator.navigate(Screen.RequirementsHistory) },
         onRetryClick = viewModel::onRetryClick,
         modifier = modifier,

@@ -40,6 +40,7 @@ import com.inventraoficial.inventra.feature.profile.members.ui.ManageMembersRout
 import com.inventraoficial.inventra.feature.profile.preferences.ui.AccountPreferencesRoute
 import com.inventraoficial.inventra.feature.profile.ui.ProfileRoute
 import com.inventraoficial.inventra.feature.requirements.detail.ui.RequisitionDetailRoute
+import com.inventraoficial.inventra.feature.requirements.editor.ui.RequisitionEditorRoute
 import com.inventraoficial.inventra.feature.requirements.history.ui.RequirementsHistoryRoute
 import com.inventraoficial.inventra.feature.requirements.list.ui.RequirementsListRoute
 import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
@@ -200,6 +201,9 @@ private fun AppNavigation(
                     }
                     entry<Screen.RequisitionDetail> { key ->
                         RequisitionDetailRoute(requisitionId = key.requisitionId, navigator = navigator)
+                    }
+                    entry<Screen.RequisitionEditor> { key ->
+                        RequisitionEditorRoute(requisitionId = key.requisitionId, navigator = navigator)
                     }
                 },
         )
