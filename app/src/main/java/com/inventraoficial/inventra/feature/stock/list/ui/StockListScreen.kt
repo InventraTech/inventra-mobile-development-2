@@ -188,7 +188,7 @@ fun StockListRoute(
         products = uiState.products,
         isLoading = uiState.isLoading,
         errorMessage = uiState.errorMessage,
-        onProductClick = { navigator.navigate(Screen.StockDetail) },
+        onProductClick = { product -> navigator.navigate(Screen.StockDetail(product.id)) },
         onScanClick = { navigator.navigate(Screen.Scan) },
         onRetryClick = viewModel::onRetryClick,
         modifier = modifier,

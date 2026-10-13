@@ -5,10 +5,15 @@ import com.inventraoficial.inventra.data.remote.apiCall
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
 import kotlinx.serialization.json.Json
 
 interface StockRepository {
-    suspend fun batches(kitchenId: Int): Result<List<StockBatchResponse>>
+    suspend fun batches(
+        kitchenId: Int,
+        productId: Int? = null,
+    ): Result<List<StockBatchResponse>>
 
     suspend fun expiringSoon(
         kitchenId: Int,
@@ -18,13 +23,22 @@ interface StockRepository {
     suspend fun lowStock(): Result<List<LowStockAlertResponse>>
 
     suspend fun kitchenStock(kitchenId: Int): Result<List<KitchenStockItemResponse>>
+
+    suspend fun movements(
+        kitchenId: Int,
+        productId: Int,
+        type: StockMovementType,
+    ): Result<List<StockMovementResponse>>
 }
 
 class NetworkStockRepository(
     private val stockApi: StockApi,
     private val json: Json,
 ) : StockRepository {
-    override suspend fun batches(kitchenId: Int) = apiCall(json) { stockApi.list(kitchenId) }
+    override suspend fun batches(
+        kitchenId: Int,
+        productId: Int?,
+    ) = apiCall(json) { stockApi.list(kitchenId, productId) }
 
     override suspend fun expiringSoon(
         kitchenId: Int,
@@ -35,4 +49,14 @@ class NetworkStockRepository(
 
     override suspend fun kitchenStock(kitchenId: Int): Result<List<KitchenStockItemResponse>> =
         apiCall(json) { stockApi.kitchenStock(kitchenId) }
+
+    override suspend fun movements(
+        kitchenId: Int,
+        productId: Int,
+        type: StockMovementType,
+    ) = apiCall(json) { stockApi.movements(kitchenId, productId, type, MOVEMENTS_LIMIT) }
+
+    private companion object {
+        const val MOVEMENTS_LIMIT = 30
+    }
 }

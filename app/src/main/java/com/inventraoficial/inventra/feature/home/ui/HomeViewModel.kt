@@ -125,6 +125,7 @@ private fun StockBatchResponse.toPriorityItem(today: LocalDate): InventraPriorit
             },
         urgency = if (days <= 1) InventraUrgency.Tomorrow else InventraUrgency.Normal,
         batch = "Lote $batchNumber",
+        productId = product.id,
     )
 }
 
