@@ -42,9 +42,9 @@ class SupplierViewModelTest {
             FakeSupplierRepository(
                 suppliers =
                     listOf(
-                        supplier(3, "camil alimentos"),
-                        supplier(2, "Friboi", rating = 4),
-                        supplier(1, "Seara Alimentos", rating = 5),
+                        supplier(3, "camil alimentos", email = "vendas@camil.com.br"),
+                        supplier(2, "Friboi", rating = 4, whatsapp = "11999990000"),
+                        supplier(1, "Seara Alimentos", rating = 5, email = "contato@seara.com.br", whatsapp = " "),
                     ),
             )
     }
@@ -59,8 +59,14 @@ class SupplierViewModelTest {
 
     private fun SupplierViewModel.names() = uiState.value.suppliers.map { it.name }
 
+    private fun SupplierViewModel.applyFilters(change: SupplierViewModel.() -> Unit) {
+        onFilterIconClick()
+        change()
+        onApplyFilters()
+    }
+
     @Test
-    fun `busca os fornecedores da cozinha do usuario na ordem da api`() =
+    fun `busca os fornecedores da cozinha do usuario em ordem alfabetica`() =
         runTest(testDispatcher) {
             val viewModel = createViewModel()
             advanceUntilIdle()
@@ -129,6 +135,94 @@ class SupplierViewModelTest {
             advanceUntilIdle()
 
             assertNull(viewModel.uiState.value.errorMessage)
+            assertEquals(3, viewModel.names().size)
+        }
+
+    @Test
+    fun `ordena pela melhor avaliacao com os sem nota no fim`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.applyFilters { onSortSelect(SupplierSort.Rating) }
+
+            assertEquals(listOf("Seara Alimentos", "Friboi", "camil alimentos"), viewModel.names())
+            assertEquals(1, viewModel.uiState.value.filters.activeCount)
+        }
+
+    @Test
+    fun `avaliacao minima esconde quem tem menos estrelas ou nenhuma`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.applyFilters { onMinRatingSelect(MinRating.Four) }
+            assertEquals(listOf("Friboi", "Seara Alimentos"), viewModel.names())
+
+            viewModel.applyFilters { onMinRatingSelect(MinRating.Five) }
+            assertEquals(listOf("Seara Alimentos"), viewModel.names())
+        }
+
+    @Test
+    fun `contato exige todos os meios marcados e ignora valores em branco`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.applyFilters { onContactToggle(SupplierContact.WhatsApp) }
+            assertEquals(listOf("Friboi"), viewModel.names())
+
+            viewModel.applyFilters {
+                onContactToggle(SupplierContact.WhatsApp)
+                onContactToggle(SupplierContact.Email)
+            }
+            assertEquals(listOf("camil alimentos", "Seara Alimentos"), viewModel.names())
+        }
+
+    @Test
+    fun `filtros combinam com a busca`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.applyFilters { onContactToggle(SupplierContact.Email) }
+            viewModel.onSearchQueryChange("seara")
+
+            assertEquals(listOf("Seara Alimentos"), viewModel.names())
+        }
+
+    @Test
+    fun `rascunho so vale depois de aplicar e fechar descarta`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onFilterIconClick()
+            viewModel.onMinRatingSelect(MinRating.Five)
+            assertEquals(3, viewModel.names().size)
+
+            viewModel.onFiltersDismiss()
+
+            assertNull(viewModel.uiState.value.draftFilters)
+            assertEquals(SupplierFilters(), viewModel.uiState.value.filters)
+            assertEquals(3, viewModel.names().size)
+        }
+
+    @Test
+    fun `limpar volta tudo ao padrao`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            viewModel.applyFilters {
+                onSortSelect(SupplierSort.Rating)
+                onMinRatingSelect(MinRating.Three)
+                onContactToggle(SupplierContact.Email)
+            }
+            assertEquals(3, viewModel.uiState.value.filters.activeCount)
+
+            viewModel.applyFilters { onClearFilters() }
+
+            assertEquals(SupplierFilters(), viewModel.uiState.value.filters)
             assertEquals(3, viewModel.names().size)
         }
 }
