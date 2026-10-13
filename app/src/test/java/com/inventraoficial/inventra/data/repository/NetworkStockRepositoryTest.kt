@@ -23,6 +23,14 @@ class NetworkStockRepositoryTest {
     ) : StockApi {
         var lastQuery: Pair<Int, Int>? = null
             private set
+        var lastKitchenId: Int? = null
+            private set
+
+        override suspend fun list(kitchenId: Int): List<StockBatchResponse> {
+            error?.let { throw it }
+            lastKitchenId = kitchenId
+            return batches
+        }
 
         override suspend fun expiringSoon(
             kitchenId: Int,
@@ -58,6 +66,18 @@ class NetworkStockRepositoryTest {
 
             assertEquals(listOf(batch), result.getOrNull())
             assertEquals(7 to 7, api.lastQuery)
+        }
+
+    @Test
+    fun `batches lista os lotes da cozinha`() =
+        runTest {
+            val api = FakeStockApi(listOf(batch), listOf(alert))
+            val repository = NetworkStockRepository(api, json)
+
+            val result = repository.batches(kitchenId = 7)
+
+            assertEquals(listOf(batch), result.getOrNull())
+            assertEquals(7, api.lastKitchenId)
         }
 
     @Test

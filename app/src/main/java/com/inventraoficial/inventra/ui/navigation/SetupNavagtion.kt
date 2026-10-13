@@ -139,8 +139,8 @@ private fun AppNavigation(
                     entry<Screen.Suppliers> {
                         SupplierRoute(navigator = navigator)
                     }
-                    entry<Screen.SupplierDetail> {
-                        SupplierDetailRoute(navigator = navigator)
+                    entry<Screen.SupplierDetail> { key ->
+                        SupplierDetailRoute(supplierId = key.supplierId, navigator = navigator)
                     }
                     entry<Screen.Scan> {
                         ScanRoute(navigator = navigator)

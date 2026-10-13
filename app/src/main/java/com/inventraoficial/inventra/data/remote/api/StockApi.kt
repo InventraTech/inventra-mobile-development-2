@@ -8,6 +8,11 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface StockApi {
+    @GET(PATH)
+    suspend fun list(
+        @Query("kitchenId") kitchenId: Int,
+    ): List<StockBatchResponse>
+
     @GET("$PATH/expiring-soon")
     suspend fun expiringSoon(
         @Query("kitchenId") kitchenId: Int,
