@@ -32,6 +32,14 @@ class NetworkAlertRepositoryTest {
             return if (unread == true) alerts.filter { !it.read } else alerts
         }
 
+        var lastReadAll: Int? = null
+            private set
+
+        override suspend fun markAllAsRead(kitchenId: Int) {
+            error?.let { throw it }
+            lastReadAll = kitchenId
+        }
+
         override suspend fun markAsRead(id: Int): AlertResponse {
             lastReadId = id
             return alerts.first { it.id == id }.copy(read = true)
@@ -83,5 +91,17 @@ class NetworkAlertRepositoryTest {
             val result = repository.alerts(kitchenId = 7)
 
             assertTrue(result.isFailure)
+        }
+
+    @Test
+    fun `markAllAsRead envia a cozinha`() =
+        runTest {
+            val api = FakeAlertApi(listOf(unread, read))
+            val repository = NetworkAlertRepository(api, json)
+
+            val result = repository.markAllAsRead(kitchenId = 7)
+
+            assertTrue(result.isSuccess)
+            assertEquals(7, api.lastReadAll)
         }
 }
