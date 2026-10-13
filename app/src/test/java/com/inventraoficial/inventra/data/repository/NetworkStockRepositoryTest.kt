@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.StockApi
+import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import kotlinx.coroutines.test.runTest
@@ -36,6 +37,15 @@ class NetworkStockRepositoryTest {
             error?.let { throw it }
             return alerts
         }
+
+        var lastKitchenStock: Int? = null
+            private set
+
+        override suspend fun kitchenStock(kitchenId: Int): List<KitchenStockItemResponse> {
+            error?.let { throw it }
+            lastKitchenStock = kitchenId
+            return listOf(FakeStockRepository.stockItem(1, "Arroz Camil", "Grãos", 24.0, 2))
+        }
     }
 
     @Test
@@ -69,5 +79,17 @@ class NetworkStockRepositoryTest {
             val result = repository.expiringSoon(kitchenId = 7, days = 7)
 
             assertTrue(result.isFailure)
+        }
+
+    @Test
+    fun `kitchenStock busca o resumo da cozinha`() =
+        runTest {
+            val api = FakeStockApi(listOf(batch), listOf(alert))
+            val repository = NetworkStockRepository(api, json)
+
+            val result = repository.kitchenStock(kitchenId = 7)
+
+            assertEquals(listOf("Arroz Camil"), result.getOrNull()?.map { it.product.name })
+            assertEquals(7, api.lastKitchenStock)
         }
 }
