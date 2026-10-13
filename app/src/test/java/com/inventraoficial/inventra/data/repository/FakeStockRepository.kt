@@ -1,10 +1,13 @@
 package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.dto.auth.KitchenSummary
+import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.ProductSummary
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchStatus
+import com.inventraoficial.inventra.data.remote.dto.stock.StockCategory
+import com.inventraoficial.inventra.data.remote.dto.stock.StockUnit
 
 class FakeStockRepository(
     var expiring: List<StockBatchResponse> = emptyList(),
@@ -26,6 +29,16 @@ class FakeStockRepository(
     override suspend fun lowStock(): Result<List<LowStockAlertResponse>> =
         lowStockError?.let { Result.failure(it) } ?: Result.success(lowStock)
 
+    var kitchenStock: List<KitchenStockItemResponse> = emptyList()
+    var kitchenStockError: Exception? = null
+    var kitchenStockCalls = mutableListOf<Int>()
+        private set
+
+    override suspend fun kitchenStock(kitchenId: Int): Result<List<KitchenStockItemResponse>> {
+        kitchenStockCalls += kitchenId
+        return kitchenStockError?.let { Result.failure(it) } ?: Result.success(kitchenStock)
+    }
+
     companion object {
         fun batch(
             id: Int,
@@ -44,6 +57,20 @@ class FakeStockRepository(
             expirationDate = expirationDate,
             unitPrice = unitPrice,
             status = StockBatchStatus.ACTIVE,
+        )
+
+        fun stockItem(
+            id: Int,
+            productName: String,
+            categoryName: String?,
+            totalQuantity: Double,
+            activeBatches: Int,
+        ) = KitchenStockItemResponse(
+            product = ProductSummary(id = id, name = productName),
+            category = categoryName?.let { StockCategory(id = it.length, name = it) },
+            unit = StockUnit(id = 1, symbol = "kg"),
+            totalQuantity = totalQuantity,
+            activeBatches = activeBatches,
         )
 
         fun lowStockAlert(productName: String) =
