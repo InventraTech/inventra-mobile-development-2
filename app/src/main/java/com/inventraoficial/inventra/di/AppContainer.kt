@@ -11,6 +11,7 @@ import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.api.KitchenAccessApi
 import com.inventraoficial.inventra.data.remote.api.KitchenApi
 import com.inventraoficial.inventra.data.remote.api.ProductApi
+import com.inventraoficial.inventra.data.remote.api.RequisitionApi
 import com.inventraoficial.inventra.data.remote.api.StockApi
 import com.inventraoficial.inventra.data.remote.api.SupplierApi
 import com.inventraoficial.inventra.data.remote.api.UserApi
@@ -25,9 +26,11 @@ import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenRepository
 import com.inventraoficial.inventra.data.repository.NetworkMembersRepository
 import com.inventraoficial.inventra.data.repository.NetworkProductRepository
+import com.inventraoficial.inventra.data.repository.NetworkRequisitionRepository
 import com.inventraoficial.inventra.data.repository.NetworkStockRepository
 import com.inventraoficial.inventra.data.repository.NetworkSupplierRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
+import com.inventraoficial.inventra.data.repository.RequisitionRepository
 import com.inventraoficial.inventra.data.repository.StockRepository
 import com.inventraoficial.inventra.data.repository.SupplierRepository
 import com.inventraoficial.inventra.data.session.SessionManager
@@ -47,6 +50,7 @@ interface AppContainer {
     val alertRepository: AlertRepository
     val supplierRepository: SupplierRepository
     val productRepository: ProductRepository
+    val requisitionRepository: RequisitionRepository
     val sessionManager: SessionManager
     val appPreferences: AppPreferences
 }
@@ -115,6 +119,7 @@ class DefaultAppContainer(
     private val alertApi: AlertApi by lazy { retrofit.create(AlertApi::class.java) }
     private val supplierApi: SupplierApi by lazy { retrofit.create(SupplierApi::class.java) }
     private val productApi: ProductApi by lazy { retrofit.create(ProductApi::class.java) }
+    private val requisitionApi: RequisitionApi by lazy { retrofit.create(RequisitionApi::class.java) }
 
     override val authRepository: AuthRepository by lazy {
         NetworkAuthRepository(
@@ -134,9 +139,14 @@ class DefaultAppContainer(
     override val stockRepository: StockRepository by lazy { NetworkStockRepository(stockApi, json) }
 
     override val alertRepository: AlertRepository by lazy { NetworkAlertRepository(alertApi, json) }
+
     override val supplierRepository: SupplierRepository by lazy { NetworkSupplierRepository(supplierApi, json) }
 
     override val productRepository: ProductRepository by lazy { NetworkProductRepository(productApi, json) }
+
+    override val requisitionRepository: RequisitionRepository by lazy {
+        NetworkRequisitionRepository(requisitionApi, json)
+    }
 
     companion object {
         private const val BASE_URL = "https://ms-inventra-api.onrender.com/api/"
