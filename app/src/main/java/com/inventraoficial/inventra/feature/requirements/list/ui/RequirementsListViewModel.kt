@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
+import com.inventraoficial.inventra.data.local.SessionUser
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionResponse
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
@@ -14,13 +15,10 @@ import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.RequisitionRepository
 import com.inventraoficial.inventra.feature.requirements.RequisitionSummary
 import com.inventraoficial.inventra.feature.requirements.isVisibleTo
-import com.inventraoficial.inventra.feature.requirements.itemsSummary
+import com.inventraoficial.inventra.feature.requirements.itemsDetails
 import com.inventraoficial.inventra.feature.requirements.newestFirst
 import com.inventraoficial.inventra.feature.requirements.subtitleText
 import com.inventraoficial.inventra.feature.requirements.titleText
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,42 +52,32 @@ class RequirementsListViewModel(
                 _uiState.update { it.copy(isLoading = false, requisitions = emptyList()) }
                 return@launch
             }
-            _uiState.update { it.copy(isSupervisor = user.accessType == AccessType.SUPERVISOR) }
+            val isSupervisor = user.accessType == AccessType.SUPERVISOR
+            _uiState.update { it.copy(isSupervisor = isSupervisor) }
 
             requisitionRepository
-                .requisitions(kitchenId)
+                .requisitions(kitchenId, requesterId = if (isSupervisor) null else user.id)
                 .onSuccess { all ->
-                    val pending =
+                    val open =
                         all
-                            .filter { it.status == RequisitionStatus.UNDER_REVIEW && it.isVisibleTo(user) }
+                            .filter { it.isOpenFor(user) }
                             .newestFirst()
-                    val summaries = pending.withItemsSummary()
-                    _uiState.update { it.copy(isLoading = false, requisitions = summaries) }
+                            .sortedBy { it.status != RequisitionStatus.DRAFT }
+                            .map { requisition ->
+                                RequisitionSummary(
+                                    id = requisition.id,
+                                    title = requisition.titleText(),
+                                    subtitle = requisition.subtitleText(zone),
+                                    details = requisition.itemsDetails(),
+                                    status = requisition.status,
+                                )
+                            }
+                    _uiState.update { it.copy(isLoading = false, requisitions = open) }
                 }.onFailure { error ->
                     _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
                 }
         }
     }
-
-    private suspend fun List<RequisitionResponse>.withItemsSummary(): List<RequisitionSummary> =
-        coroutineScope {
-            map { requisition ->
-                async {
-                    val names =
-                        requisitionRepository
-                            .items(requisition.id)
-                            .getOrDefault(emptyList())
-                            .map { it.product.name }
-                    RequisitionSummary(
-                        id = requisition.id,
-                        title = requisition.titleText(),
-                        subtitle = requisition.subtitleText(zone),
-                        details = names.itemsSummary(),
-                        status = requisition.status,
-                    )
-                }
-            }.awaitAll()
-        }
 
     companion object {
         val Factory: ViewModelProvider.Factory =
@@ -104,3 +92,10 @@ class RequirementsListViewModel(
             }
     }
 }
+
+private fun RequisitionResponse.isOpenFor(user: SessionUser): Boolean =
+    when (status) {
+        RequisitionStatus.DRAFT -> requester?.id == user.id
+        RequisitionStatus.UNDER_REVIEW -> isVisibleTo(user)
+        else -> false
+    }

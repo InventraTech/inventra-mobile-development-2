@@ -17,6 +17,9 @@ data class RequisitionResponse(
     val approver: UserSummary? = null,
     val createdAt: String,
     val approvedAt: String? = null,
+    val itemCount: Int = 0,
+    val estimatedTotal: Double = 0.0,
+    val itemNames: List<String> = emptyList(),
 )
 
 @Serializable
@@ -49,8 +52,25 @@ enum class RequisitionType {
 
 @Serializable
 enum class RequisitionStatus {
+    DRAFT,
     UNDER_REVIEW,
     APPROVED,
     REJECTED,
     CANCELLED,
 }
+
+@Serializable
+data class CreateRequisitionRequest(
+    val type: RequisitionType,
+    val origin: String,
+    val kitchenId: Int,
+)
+
+@Serializable
+data class AddRequisitionItemRequest(
+    val productId: Int,
+    val quantity: Double,
+    val suggestedSupplierId: Int? = null,
+    val estimatedPrice: Double? = null,
+    val note: String? = null,
+)

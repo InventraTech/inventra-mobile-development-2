@@ -97,6 +97,7 @@ fun RequisitionDetailScreen(
         ActionDialog(
             action = action,
             type = uiState.type,
+            restoresStock = uiState.restoresStockOnCancel,
             reasonText = uiState.reasonText,
             errorMessage = uiState.actionErrorMessage,
             onReasonChange = onReasonChange,
@@ -232,6 +233,7 @@ private fun ItemCard(item: RequisitionItemUi) {
 private fun ActionDialog(
     action: PendingAction,
     type: RequisitionType?,
+    restoresStock: Boolean,
     reasonText: String,
     errorMessage: String?,
     onReasonChange: (String) -> Unit,
@@ -252,7 +254,15 @@ private fun ActionDialog(
                 )
             PendingAction.Reject -> Triple("Recusar requisição?", "Quem pediu vai ver o motivo.", "Recusar")
             PendingAction.Cancel ->
-                Triple("Cancelar requisição?", "Ela sai da análise do supervisor.", "Cancelar requisição")
+                Triple(
+                    "Cancelar requisição?",
+                    if (restoresStock) {
+                        "O que a aprovação baixou volta para o estoque."
+                    } else {
+                        "Ela sai da análise do supervisor."
+                    },
+                    "Cancelar requisição",
+                )
         }
     InventraConfirmDialog(
         title = title,

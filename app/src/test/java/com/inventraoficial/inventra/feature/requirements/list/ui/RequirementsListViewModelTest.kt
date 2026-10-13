@@ -4,7 +4,6 @@ import com.inventraoficial.inventra.data.local.SessionUser
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.FakeRequisitionRepository
-import com.inventraoficial.inventra.data.repository.FakeRequisitionRepository.Companion.item
 import com.inventraoficial.inventra.data.repository.FakeRequisitionRepository.Companion.otherBuyer
 import com.inventraoficial.inventra.data.repository.FakeRequisitionRepository.Companion.requisition
 import com.inventraoficial.inventra.feature.requirements.RequisitionTestUsers
@@ -37,20 +36,15 @@ class RequirementsListViewModelTest {
             FakeRequisitionRepository(
                 requisitions =
                     listOf(
-                        requisition(1, createdAt = "2026-10-10T12:00:00"),
-                        requisition(2, requester = otherBuyer, createdAt = "2026-10-11T02:00:00"),
+                        requisition(1, createdAt = "2026-10-10T12:00:00").copy(
+                            itemCount = 4,
+                            estimatedTotal = 131.76,
+                            itemNames = listOf("Leite Integral", "Arroz Camil", "Feijão Carioca"),
+                        ),
+                        requisition(2, requester = otherBuyer, createdAt = "2026-10-11T02:00:00")
+                            .copy(itemCount = 1, itemNames = listOf("Tomate")),
                         requisition(3, status = RequisitionStatus.APPROVED),
-                    ),
-                itemsById =
-                    mapOf(
-                        1 to
-                            listOf(
-                                item(1, "Leite Integral", 24.0),
-                                item(2, "Arroz Camil", 10.0),
-                                item(3, "Feijão Carioca", 5.0),
-                                item(4, "Óleo de Soja", 6.0),
-                            ),
-                        2 to listOf(item(5, "Tomate", 8.0)),
+                        requisition(4, status = RequisitionStatus.DRAFT, createdAt = "2026-10-09T12:00:00"),
                     ),
             )
     }
@@ -81,17 +75,20 @@ class RequirementsListViewModelTest {
             assertFalse(state.isLoading)
             assertTrue(state.isSupervisor)
             assertEquals(listOf(2, 1), state.requisitions.map { it.id })
+            assertEquals(listOf(Triple(7, null, null)), repository.listCalls)
         }
 
     @Test
-    fun `comprador ve so as proprias requisicoes`() =
+    fun `comprador ve os proprios rascunhos primeiro e depois as em analise`() =
         runTest(testDispatcher) {
             val viewModel = visibleViewModel(RequisitionTestUsers.buyer)
             advanceUntilIdle()
 
             val state = viewModel.uiState.value
             assertFalse(state.isSupervisor)
-            assertEquals(listOf(1), state.requisitions.map { it.id })
+            assertEquals(listOf(4, 1), state.requisitions.map { it.id })
+            assertEquals(RequisitionStatus.DRAFT, state.requisitions.first().status)
+            assertEquals(listOf(Triple(7, null, "buy-1")), repository.listCalls)
         }
 
     @Test
@@ -104,7 +101,7 @@ class RequirementsListViewModelTest {
             assertEquals("Compra #2", newest.title)
             assertEquals("Paulo Lima · 10/10/2026", newest.subtitle)
             assertEquals("Tomate", newest.details)
-            assertEquals("Leite Integral, Arroz Camil e mais 2", oldest.details)
+            assertEquals("Leite Integral, Arroz Camil e mais 2 · R$ 131,76", oldest.details)
         }
 
     @Test

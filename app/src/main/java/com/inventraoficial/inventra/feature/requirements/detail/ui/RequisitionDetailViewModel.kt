@@ -18,6 +18,7 @@ import com.inventraoficial.inventra.feature.requirements.createdDateText
 import com.inventraoficial.inventra.feature.requirements.currencyText
 import com.inventraoficial.inventra.feature.requirements.quantityText
 import com.inventraoficial.inventra.feature.requirements.titleText
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -98,28 +99,20 @@ class RequisitionDetailViewModel(
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             val user = authRepository.currentUser.first()
-            val kitchenId = user?.kitchenId
-            if (user == null || kitchenId == null) {
+            if (user == null) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = NOT_FOUND) }
                 return@launch
             }
-            val requisition =
-                requisitionRepository
-                    .requisitions(kitchenId)
-                    .getOrElse { error ->
-                        _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
-                        return@launch
-                    }.firstOrNull { it.id == requisitionId }
-            if (requisition == null) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = NOT_FOUND) }
+            val requisition = async { requisitionRepository.requisition(requisitionId) }
+            val items = async { requisitionRepository.items(requisitionId) }
+            val requisitionResult = requisition.await()
+            val itemsResult = items.await()
+            val error = requisitionResult.exceptionOrNull() ?: itemsResult.exceptionOrNull()
+            if (error != null) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
                 return@launch
             }
-            val items =
-                requisitionRepository.items(requisitionId).getOrElse { error ->
-                    _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
-                    return@launch
-                }
-            _uiState.update { it.withRequisition(requisition, items, user) }
+            _uiState.update { it.withRequisition(requisitionResult.getOrThrow(), itemsResult.getOrThrow(), user) }
         }
     }
 
@@ -129,6 +122,8 @@ class RequisitionDetailViewModel(
         user: SessionUser,
     ): RequisitionDetailUiState {
         val isUnderReview = requisition.status == RequisitionStatus.UNDER_REVIEW
+        val isSupervisor = user.accessType == AccessType.SUPERVISOR
+        val isMine = requisition.requester?.id == user.id
         val pricedItems = items.filter { it.estimatedPrice != null }
         return copy(
             title = requisition.titleText(),
@@ -144,8 +139,11 @@ class RequisitionDetailViewModel(
                     .takeIf { it.isNotEmpty() }
                     ?.sumOf { it.quantity * (it.estimatedPrice ?: 0.0) }
                     ?.currencyText(),
-            canReview = isUnderReview && user.accessType == AccessType.SUPERVISOR,
-            canCancel = isUnderReview && requisition.requester?.id == user.id,
+            canReview = isUnderReview && isSupervisor,
+            canCancel =
+                (isUnderReview && isMine) ||
+                    (requisition.status == RequisitionStatus.APPROVED && isSupervisor),
+            restoresStockOnCancel = requisition.status == RequisitionStatus.APPROVED,
             isLoading = false,
         )
     }

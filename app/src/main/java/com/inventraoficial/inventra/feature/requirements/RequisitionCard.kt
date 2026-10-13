@@ -75,6 +75,7 @@ fun RequisitionStatusChip(
 ) {
     val color =
         when (status) {
+            RequisitionStatus.DRAFT -> InventraPurple
             RequisitionStatus.UNDER_REVIEW -> InventraGold
             RequisitionStatus.APPROVED -> InventraSuccess
             RequisitionStatus.REJECTED -> InventraDanger

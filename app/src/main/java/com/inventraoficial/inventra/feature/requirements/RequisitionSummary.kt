@@ -5,6 +5,8 @@ import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionResponse
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionType
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -30,6 +32,7 @@ val RequisitionType.label: String
 val RequisitionStatus.label: String
     get() =
         when (this) {
+            RequisitionStatus.DRAFT -> "Rascunho"
             RequisitionStatus.UNDER_REVIEW -> "Em análise"
             RequisitionStatus.APPROVED -> "Aprovada"
             RequisitionStatus.REJECTED -> "Recusada"
@@ -58,13 +61,16 @@ internal fun RequisitionResponse.isVisibleTo(user: SessionUser): Boolean =
 
 internal fun List<RequisitionResponse>.newestFirst() = sortedByDescending { LocalDateTime.parse(it.createdAt) }
 
-internal fun List<String>.itemsSummary(): String =
-    when (size) {
-        0 -> "Sem itens"
-        1, 2 -> joinToString(", ")
-        else -> "${take(2).joinToString(", ")} e mais ${size - 2}"
-    }
+internal fun RequisitionResponse.itemsDetails(): String {
+    if (itemCount == 0) return "Sem itens"
+    val shown = itemNames.take(NAMES_IN_CARD)
+    val rest = itemCount - shown.size
+    val names = if (rest > 0) "${shown.joinToString(", ")} e mais $rest" else shown.joinToString(", ")
+    return if (estimatedTotal > 0) "$names · ${estimatedTotal.currencyText()}" else names
+}
 
-internal fun Double.quantityText(): String = if (this % 1.0 == 0.0) toLong().toString() else toString()
+private const val NAMES_IN_CARD = 2
+
+internal fun Double.quantityText(): String = DecimalFormat("#,##0.###", DecimalFormatSymbols(ptBr)).format(this)
 
 internal fun Double.currencyText(): String = String.format(ptBr, "R$ %,.2f", this)

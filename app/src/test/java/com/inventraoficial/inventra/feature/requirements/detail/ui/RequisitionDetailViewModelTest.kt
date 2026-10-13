@@ -38,6 +38,7 @@ class RequisitionDetailViewModelTest {
                     listOf(
                         requisition(12),
                         requisition(13, status = RequisitionStatus.APPROVED),
+                        requisition(14, status = RequisitionStatus.REJECTED, reason = "Fora do orçamento"),
                     ),
                 itemsById =
                     mapOf(
@@ -97,13 +98,26 @@ class RequisitionDetailViewModelTest {
         }
 
     @Test
-    fun `requisicao ja decidida nao tem acoes`() =
+    fun `requisicao recusada nao tem acoes`() =
         runTest(testDispatcher) {
-            val viewModel = createViewModel(id = 13)
+            val viewModel = createViewModel(id = 14)
             advanceUntilIdle()
 
             assertFalse(viewModel.uiState.value.canReview)
             assertFalse(viewModel.uiState.value.canCancel)
+        }
+
+    @Test
+    fun `so o supervisor cancela uma aprovada e o estoque volta`() =
+        runTest(testDispatcher) {
+            val supervisorView = createViewModel(id = 13)
+            val buyerView = createViewModel(user = RequisitionTestUsers.buyer, id = 13)
+            advanceUntilIdle()
+
+            assertFalse(supervisorView.uiState.value.canReview)
+            assertTrue(supervisorView.uiState.value.canCancel)
+            assertTrue(supervisorView.uiState.value.restoresStockOnCancel)
+            assertFalse(buyerView.uiState.value.canCancel)
         }
 
     @Test

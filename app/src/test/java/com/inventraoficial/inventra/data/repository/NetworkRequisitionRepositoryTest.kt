@@ -1,10 +1,13 @@
 package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.RequisitionApi
+import com.inventraoficial.inventra.data.remote.dto.requisition.AddRequisitionItemRequest
+import com.inventraoficial.inventra.data.remote.dto.requisition.CreateRequisitionRequest
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionItemResponse
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionReasonRequest
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionResponse
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
+import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionType
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
@@ -22,18 +25,53 @@ class NetworkRequisitionRepositoryTest {
         private val items: List<RequisitionItemResponse>,
         private val error: Exception? = null,
     ) : RequisitionApi {
-        var lastKitchenId: Int? = null
+        var lastList: Triple<Int, RequisitionStatus?, String?>? = null
             private set
-        var calls = mutableListOf<Pair<String, RequisitionReasonRequest?>>()
+        var calls = mutableListOf<Pair<String, Any?>>()
             private set
 
-        override suspend fun list(kitchenId: Int): List<RequisitionResponse> {
+        override suspend fun list(
+            kitchenId: Int,
+            status: RequisitionStatus?,
+            requesterId: String?,
+        ): List<RequisitionResponse> {
             error?.let { throw it }
-            lastKitchenId = kitchenId
+            lastList = Triple(kitchenId, status, requesterId)
             return listOf(requisition)
         }
 
+        override suspend fun find(id: Int): RequisitionResponse {
+            calls += "find" to id
+            return requisition
+        }
+
         override suspend fun items(id: Int): List<RequisitionItemResponse> = items
+
+        override suspend fun create(request: CreateRequisitionRequest): RequisitionResponse {
+            calls += "create" to request
+            return requisition.copy(status = RequisitionStatus.DRAFT)
+        }
+
+        override suspend fun addItem(
+            id: Int,
+            request: AddRequisitionItemRequest,
+        ): RequisitionResponse {
+            calls += "addItem" to request
+            return requisition
+        }
+
+        override suspend fun removeItem(
+            id: Int,
+            itemId: Int,
+        ): RequisitionResponse {
+            calls += "removeItem" to itemId
+            return requisition
+        }
+
+        override suspend fun submit(id: Int): RequisitionResponse {
+            calls += "submit" to id
+            return requisition.copy(status = RequisitionStatus.UNDER_REVIEW)
+        }
 
         override suspend fun approve(id: Int): RequisitionResponse {
             calls += "approve" to null
@@ -58,15 +96,26 @@ class NetworkRequisitionRepositoryTest {
     }
 
     @Test
-    fun `requisitions busca a cozinha inteira`() =
+    fun `requisitions envia os filtros combinados`() =
         runTest {
             val api = FakeRequisitionApi(requisition, listOf(item))
             val repository = NetworkRequisitionRepository(api, json)
 
-            val result = repository.requisitions(kitchenId = 7)
+            val result =
+                repository.requisitions(kitchenId = 7, status = RequisitionStatus.UNDER_REVIEW, requesterId = "buy-1")
 
             assertEquals(listOf(requisition), result.getOrNull())
-            assertEquals(7, api.lastKitchenId)
+            assertEquals(Triple(7, RequisitionStatus.UNDER_REVIEW, "buy-1"), api.lastList)
+        }
+
+    @Test
+    fun `requisition busca pelo id`() =
+        runTest {
+            val api = FakeRequisitionApi(requisition, emptyList())
+            val repository = NetworkRequisitionRepository(api, json)
+
+            assertEquals(requisition, repository.requisition(12).getOrNull())
+            assertEquals(listOf("find" to 12), api.calls)
         }
 
     @Test
@@ -75,6 +124,25 @@ class NetworkRequisitionRepositoryTest {
             val repository = NetworkRequisitionRepository(FakeRequisitionApi(requisition, listOf(item)), json)
 
             assertEquals(listOf(item), repository.items(12).getOrNull())
+        }
+
+    @Test
+    fun `rascunho cria adiciona remove e envia`() =
+        runTest {
+            val api = FakeRequisitionApi(requisition, emptyList())
+            val repository = NetworkRequisitionRepository(api, json)
+            val create = CreateRequisitionRequest(RequisitionType.PURCHASE, "Reposição", 7)
+            val add = AddRequisitionItemRequest(productId = 5013, quantity = 20.0, estimatedPrice = 4.5)
+
+            assertEquals(RequisitionStatus.DRAFT, repository.create(create).getOrNull()?.status)
+            repository.addItem(12, add)
+            repository.removeItem(12, 3)
+            assertEquals(RequisitionStatus.UNDER_REVIEW, repository.submit(12).getOrNull()?.status)
+
+            assertEquals(
+                listOf("create" to create, "addItem" to add, "removeItem" to 3, "submit" to 12),
+                api.calls,
+            )
         }
 
     @Test

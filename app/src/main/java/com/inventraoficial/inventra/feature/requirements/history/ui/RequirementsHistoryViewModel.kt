@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionResponse
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
 import com.inventraoficial.inventra.data.repository.AuthRepository
@@ -58,12 +59,13 @@ class RequirementsHistoryViewModel(
                 refreshVisible()
                 return@launch
             }
+            val requesterId = if (user.accessType == AccessType.SUPERVISOR) null else user.id
             requisitionRepository
-                .requisitions(kitchenId)
+                .requisitions(kitchenId, requesterId = requesterId)
                 .onSuccess { all ->
                     processed =
                         all
-                            .filter { it.status != RequisitionStatus.UNDER_REVIEW && it.isVisibleTo(user) }
+                            .filter { it.status !in OPEN_STATUSES && it.isVisibleTo(user) }
                             .newestFirst()
                     _uiState.update { it.copy(isLoading = false) }
                     refreshVisible()
@@ -91,6 +93,8 @@ class RequirementsHistoryViewModel(
     }
 
     companion object {
+        private val OPEN_STATUSES = setOf(RequisitionStatus.DRAFT, RequisitionStatus.UNDER_REVIEW)
+
         val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {

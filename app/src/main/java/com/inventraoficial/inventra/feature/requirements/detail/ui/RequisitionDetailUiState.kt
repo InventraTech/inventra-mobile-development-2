@@ -29,6 +29,7 @@ data class RequisitionDetailUiState(
     val totalText: String? = null,
     val canReview: Boolean = false,
     val canCancel: Boolean = false,
+    val restoresStockOnCancel: Boolean = false,
     val pendingAction: PendingAction? = null,
     val reasonText: String = "",
     val isProcessing: Boolean = false,
