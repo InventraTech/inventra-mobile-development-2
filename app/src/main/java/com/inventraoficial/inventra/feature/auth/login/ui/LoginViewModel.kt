@@ -54,6 +54,10 @@ class LoginViewModel(
         }
     }
 
+    fun onLoggedInHandled() {
+        _uiState.value = LoginUiState()
+    }
+
     fun onForgotPasswordClick() {
     }
 

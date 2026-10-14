@@ -206,4 +206,16 @@ class GoogleSignInViewModelTest {
 
             assertEquals(1, repository.googleCalls)
         }
+
+    @Test
+    fun `onLoggedInHandled impede que o Login entre sozinho depois do logout`() =
+        runTest {
+            clicarNoGoogle()
+            advanceUntilIdle()
+
+            viewModel.onLoggedInHandled()
+
+            assertFalse(viewModel.uiState.value.isLoggedIn)
+            assertFalse(viewModel.uiState.value.isLoading)
+        }
 }

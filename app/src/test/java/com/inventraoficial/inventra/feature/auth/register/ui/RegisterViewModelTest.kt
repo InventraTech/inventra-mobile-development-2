@@ -166,4 +166,18 @@ class RegisterViewModelTest {
             assertFalse(state.isRegistered)
             assertFalse(state.isLoading)
         }
+
+    @Test
+    fun `onRegisteredHandled limpa o estado para a proxima vez que o Cadastro abrir`() =
+        runTest(testDispatcher) {
+            preencherFormulario()
+            viewModel.onRegisterClick()
+            advanceUntilIdle()
+
+            viewModel.onRegisteredHandled()
+
+            val state = viewModel.uiState.value
+            assertFalse(state.isRegistered)
+            assertEquals("", state.password)
+        }
 }

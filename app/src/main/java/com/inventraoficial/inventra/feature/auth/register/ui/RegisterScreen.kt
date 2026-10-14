@@ -180,6 +180,7 @@ fun RegisterRoute(
             } else {
                 navigator.navigateTopLevel(Screen.Home)
             }
+            viewModel.onRegisteredHandled()
         }
     }
 

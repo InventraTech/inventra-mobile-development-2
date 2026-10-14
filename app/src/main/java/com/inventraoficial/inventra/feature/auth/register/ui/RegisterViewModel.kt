@@ -66,6 +66,10 @@ class RegisterViewModel(
         }
     }
 
+    fun onRegisteredHandled() {
+        _uiState.value = RegisterUiState()
+    }
+
     private fun validate(state: RegisterUiState): String? =
         when {
             state.role == null -> "Escolha um cargo"

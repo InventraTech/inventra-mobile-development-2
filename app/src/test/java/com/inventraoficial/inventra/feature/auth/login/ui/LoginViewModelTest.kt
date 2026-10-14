@@ -181,4 +181,18 @@ class LoginViewModelTest {
 
             assertFalse(viewModel.uiState.value.mustCreateKitchen)
         }
+
+    @Test
+    fun `onLoggedInHandled limpa o estado para a proxima vez que o Login abrir`() =
+        runTest(testDispatcher) {
+            preencherCampos()
+            viewModel.onLoginClick()
+            advanceUntilIdle()
+
+            viewModel.onLoggedInHandled()
+
+            val state = viewModel.uiState.value
+            assertFalse(state.isLoggedIn)
+            assertEquals("", state.password)
+        }
 }
