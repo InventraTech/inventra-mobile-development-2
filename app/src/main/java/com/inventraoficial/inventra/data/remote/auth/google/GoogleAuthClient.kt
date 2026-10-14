@@ -1,9 +1,11 @@
 package com.inventraoficial.inventra.data.remote.auth.google
 
 import android.content.Context
+import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.ClearCredentialException
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
@@ -16,6 +18,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.tasks.await
 
 class GoogleAuthClient(
+    private val appContext: Context,
     private val webClientId: String,
     private val firebaseAuth: FirebaseAuth,
 ) {
@@ -35,6 +38,14 @@ class GoogleAuthClient(
         } catch (e: IllegalStateException) {
             Result.failure(Exception(GENERIC_ERROR, e))
         }
+
+    suspend fun signOut() {
+        firebaseAuth.signOut()
+        try {
+            CredentialManager.create(appContext).clearCredentialState(ClearCredentialStateRequest())
+        } catch (ignored: ClearCredentialException) {
+        }
+    }
 
     private suspend fun firebaseIdToken(activityContext: Context): String {
         val googleIdToken = getGoogleIdToken(activityContext)

@@ -375,6 +375,40 @@ class NetworkAuthRepositoryTest {
         }
 
     @Test
+    fun `logout limpa a sessao do Google depois de apagar a sessao local`() =
+        runTest {
+            var tokenNaHoraDeLimpar: String? = "nao chamado"
+            val repository =
+                NetworkAuthRepository(
+                    FakeAuthApi { successResponse },
+                    userApi,
+                    json,
+                    sessionStorage,
+                    clearExternalSession = { tokenNaHoraDeLimpar = sessionStorage.currentToken },
+                )
+            repository.login("teste@inventra.com", "senha123")
+
+            repository.logout()
+
+            assertNull(tokenNaHoraDeLimpar)
+        }
+
+    @Test
+    fun `logout sem conexao limpa a sessao do Google mesmo assim`() =
+        runTest {
+            var limpezas = 0
+            val api = FakeAuthApi { successResponse }
+            val repository =
+                NetworkAuthRepository(api, userApi, json, sessionStorage, clearExternalSession = { limpezas++ })
+            repository.login("teste@inventra.com", "senha123")
+            api.logoutError = IOException("sem sinal")
+
+            repository.logout()
+
+            assertEquals(1, limpezas)
+        }
+
+    @Test
     fun `logout sem refresh token salvo nao chama o servidor`() =
         runTest {
             val api = FakeAuthApi { successResponse }

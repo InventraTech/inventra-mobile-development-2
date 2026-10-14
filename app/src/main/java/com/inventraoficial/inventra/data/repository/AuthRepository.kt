@@ -50,6 +50,7 @@ class NetworkAuthRepository(
     private val userApi: UserApi,
     private val json: Json,
     private val sessionStorage: SessionStorage,
+    private val clearExternalSession: suspend () -> Unit = {},
 ) : AuthRepository {
     override val currentUser: Flow<SessionUser?> = sessionStorage.user
 
@@ -99,6 +100,7 @@ class NetworkAuthRepository(
             apiCall(json) { authApi.logout(RefreshTokenRequest(refreshToken)) }
         }
         sessionStorage.clear()
+        clearExternalSession()
     }
 
     override suspend fun refreshCurrentUser(): Result<Unit> =

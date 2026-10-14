@@ -131,11 +131,12 @@ class DefaultAppContainer(
             userApi,
             json,
             sessionStorage,
+            clearExternalSession = { googleAuthClient.signOut() },
         )
     }
 
     override val googleAuthClient: GoogleAuthClient by lazy {
-        GoogleAuthClient(context.getString(R.string.default_web_client_id), FirebaseAuth.getInstance())
+        GoogleAuthClient(context, context.getString(R.string.default_web_client_id), FirebaseAuth.getInstance())
     }
 
     override val kitchenRepository: KitchenRepository by lazy { NetworkKitchenRepository(kitchenApi, json) }
