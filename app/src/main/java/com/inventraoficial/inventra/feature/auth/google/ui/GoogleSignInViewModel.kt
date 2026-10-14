@@ -61,10 +61,6 @@ class GoogleSignInViewModel(
         }
     }
 
-    fun onLoggedInHandled() {
-        _uiState.value = GoogleSignInUiState()
-    }
-
     fun onDismissSignUp() {
         _uiState.update { it.copy(pendingSignUp = null, isLoading = false, errorMessage = null) }
     }

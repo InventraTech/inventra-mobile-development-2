@@ -163,7 +163,6 @@ fun LoginRoute(
             } else {
                 navigator.navigateTopLevel(Screen.Home)
             }
-            viewModel.onLoggedInHandled()
         }
     }
 
