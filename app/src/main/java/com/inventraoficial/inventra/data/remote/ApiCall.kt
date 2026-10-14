@@ -10,6 +10,12 @@ private const val GENERIC_ERROR = "Erro inesperado. Tente novamente."
 private const val NETWORK_ERROR = "Não foi possível conectar ao servidor. Verifique sua conexão."
 private const val PARSE_ERROR = "Resposta inesperada do servidor. Tente novamente."
 
+class ApiException(
+    message: String,
+    val error: ErrorResponse?,
+    cause: Throwable,
+) : Exception(message, cause)
+
 suspend fun <T> apiCall(
     json: Json,
     call: suspend () -> T,
@@ -19,7 +25,7 @@ suspend fun <T> apiCall(
     } catch (e: HttpException) {
         val body = e.response()?.errorBody()?.string()
         val error = body?.let { runCatching { json.decodeFromString<ErrorResponse>(it) }.getOrNull() }
-        Result.failure(Exception(error?.detail ?: GENERIC_ERROR, e))
+        Result.failure(ApiException(error?.detail ?: GENERIC_ERROR, error, e))
     } catch (e: IOException) {
         Result.failure(Exception(NETWORK_ERROR, e))
     } catch (e: SerializationException) {

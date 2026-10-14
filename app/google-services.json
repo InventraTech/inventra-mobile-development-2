@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "154703782856",
+    "project_id": "inventra-1b5ef",
+    "storage_bucket": "inventra-1b5ef.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:154703782856:android:c025df5d60092f1c5556fd",
+        "android_client_info": {
+          "package_name": "com.inventraoficial.inventra"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "154703782856-6o1qspcs7ao7evojjj95v51cdftmrobd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.inventraoficial.inventra",
+            "certificate_hash": "c5b7a7c622eba4309701a305d40f7d18369f2606"
+          }
+        },
+        {
+          "client_id": "154703782856-l88ga4laea8u4s50k9kc2im56u42oca4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3KxDMQAT0w2uvnA_0zeEpAB7cJLsRG88"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "154703782856-l88ga4laea8u4s50k9kc2im56u42oca4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

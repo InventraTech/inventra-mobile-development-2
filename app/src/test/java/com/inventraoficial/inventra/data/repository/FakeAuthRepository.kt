@@ -56,6 +56,21 @@ class FakeAuthRepository(
         return result
     }
 
+    var googleCalls = 0
+        private set
+    var lastIdToken: String? = null
+        private set
+
+    override suspend fun loginWithGoogle(
+        idToken: String,
+        accessType: AccessType?,
+    ): Result<UserResponse> {
+        googleCalls++
+        lastIdToken = idToken
+        lastAccessType = accessType
+        return result
+    }
+
     override suspend fun hasSession(): Boolean = hasSession
 
     var refreshCalls = 0

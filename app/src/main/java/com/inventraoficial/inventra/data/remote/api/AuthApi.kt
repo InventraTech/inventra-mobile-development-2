@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.data.remote.api
 
+import com.inventraoficial.inventra.data.remote.dto.auth.GoogleLoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.RefreshTokenRequest
@@ -16,6 +17,11 @@ interface AuthApi {
     @POST("$PATH/register")
     suspend fun register(
         @Body registerRequest: RegisterRequest,
+    ): LoginResponse
+
+    @POST("$PATH/google")
+    suspend fun loginWithGoogle(
+        @Body googleLoginRequest: GoogleLoginRequest,
     ): LoginResponse
 
     @POST("$PATH/refresh")

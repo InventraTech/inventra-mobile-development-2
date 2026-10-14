@@ -5,6 +5,7 @@ import com.inventraoficial.inventra.data.local.toSessionUser
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
+import com.inventraoficial.inventra.data.remote.dto.auth.GoogleLoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.KitchenSummary
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
@@ -64,6 +65,14 @@ class NetworkAuthRepositoryTest {
 
         override suspend fun register(registerRequest: RegisterRequest): LoginResponse {
             lastRegisterRequest = registerRequest
+            return respond()
+        }
+
+        var lastGoogleRequest: GoogleLoginRequest? = null
+            private set
+
+        override suspend fun loginWithGoogle(googleLoginRequest: GoogleLoginRequest): LoginResponse {
+            lastGoogleRequest = googleLoginRequest
             return respond()
         }
 
@@ -202,6 +211,68 @@ class NetworkAuthRepositoryTest {
         val encoded = json.encodeToString(RegisterRequest.serializer(), request)
 
         assertTrue(encoded.contains("\"accessType\":\"SUPERVISOR\""))
+    }
+
+    @Test
+    fun `login com Google envia o idToken sem cargo e salva a sessao`() =
+        runTest {
+            val api = FakeAuthApi { successResponse }
+            val repository = NetworkAuthRepository(api, userApi, json, sessionStorage)
+
+            val result = repository.loginWithGoogle("firebase-id-token")
+
+            assertEquals(FakeAuthRepository.fakeUser, result.getOrNull())
+            assertEquals(GoogleLoginRequest("firebase-id-token"), api.lastGoogleRequest)
+            assertEquals("jwt", sessionStorage.currentToken)
+            assertEquals("refresh-jwt", sessionStorage.currentRefreshToken)
+        }
+
+    @Test
+    fun `login com Google no primeiro acesso envia o cargo escolhido`() =
+        runTest {
+            val api = FakeAuthApi { successResponse }
+            val repository = NetworkAuthRepository(api, userApi, json, sessionStorage)
+
+            repository.loginWithGoogle("firebase-id-token", AccessType.ESTOQUISTA)
+
+            assertEquals(GoogleLoginRequest("firebase-id-token", AccessType.ESTOQUISTA), api.lastGoogleRequest)
+        }
+
+    @Test
+    fun `login com Google sem cadastro devolve o nome e o email do token`() =
+        runTest {
+            val body =
+                """
+                {"title":"Conflict","status":409,"detail":"Conta ainda não cadastrada.",
+                "code":"REGISTRATION_REQUIRED","email":"felipe@gmail.com","name":"Felipe Kogake"}
+                """.trimIndent()
+            val repository = repositoryThatThrows(httpError(409, body))
+
+            val error = repository.loginWithGoogle("firebase-id-token").exceptionOrNull()
+
+            assertTrue(error is GoogleRegistrationRequiredException)
+            assertEquals("Felipe Kogake", (error as GoogleRegistrationRequiredException).name)
+            assertEquals("felipe@gmail.com", error.email)
+            assertNull(sessionStorage.currentToken)
+        }
+
+    @Test
+    fun `login com Google com outro 409 mantem o detail do backend`() =
+        runTest {
+            val body = """{"title":"Conflict","status":409,"detail":"Conflito qualquer."}"""
+            val repository = repositoryThatThrows(httpError(409, body))
+
+            val error = repository.loginWithGoogle("firebase-id-token").exceptionOrNull()
+
+            assertTrue(error !is GoogleRegistrationRequiredException)
+            assertEquals("Conflito qualquer.", error?.message)
+        }
+
+    @Test
+    fun `GoogleLoginRequest sem cargo nao envia o campo accessType`() {
+        val encoded = json.encodeToString(GoogleLoginRequest.serializer(), GoogleLoginRequest("token"))
+
+        assertEquals("""{"idToken":"token"}""", encoded)
     }
 
     @Test

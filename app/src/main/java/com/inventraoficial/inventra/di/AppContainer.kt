@@ -1,7 +1,9 @@
 package com.inventraoficial.inventra.di
 
 import android.content.Context
+import com.google.firebase.auth.FirebaseAuth
 import com.inventraoficial.inventra.BuildConfig
+import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.data.local.AppPreferences
 import com.inventraoficial.inventra.data.local.DataStoreAppPreferences
 import com.inventraoficial.inventra.data.local.DataStoreSessionStorage
@@ -15,6 +17,7 @@ import com.inventraoficial.inventra.data.remote.api.RequisitionApi
 import com.inventraoficial.inventra.data.remote.api.StockApi
 import com.inventraoficial.inventra.data.remote.api.SupplierApi
 import com.inventraoficial.inventra.data.remote.api.UserApi
+import com.inventraoficial.inventra.data.remote.auth.google.GoogleAuthClient
 import com.inventraoficial.inventra.data.remote.interceptor.AuthInterceptor
 import com.inventraoficial.inventra.data.remote.interceptor.TokenAuthenticator
 import com.inventraoficial.inventra.data.repository.AlertRepository
@@ -53,6 +56,7 @@ interface AppContainer {
     val requisitionRepository: RequisitionRepository
     val sessionManager: SessionManager
     val appPreferences: AppPreferences
+    val googleAuthClient: GoogleAuthClient
 }
 
 class DefaultAppContainer(
@@ -128,6 +132,10 @@ class DefaultAppContainer(
             json,
             sessionStorage,
         )
+    }
+
+    override val googleAuthClient: GoogleAuthClient by lazy {
+        GoogleAuthClient(context.getString(R.string.default_web_client_id), FirebaseAuth.getInstance())
     }
 
     override val kitchenRepository: KitchenRepository by lazy { NetworkKitchenRepository(kitchenApi, json) }
