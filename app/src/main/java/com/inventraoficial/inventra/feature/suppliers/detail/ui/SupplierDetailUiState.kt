@@ -18,9 +18,10 @@ data class SupplierDetailUiState(
     val name: String = "",
     val rating: Int = 0,
     val badgeText: String = "",
-    val phone: String = "",
-    val email: String = "",
-    val address: String = "",
+    val phone: String? = null,
+    val email: String? = null,
     val products: List<SupplierProduct> = emptyList(),
     val deliveryHistory: List<DeliveryHistoryEntry> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )

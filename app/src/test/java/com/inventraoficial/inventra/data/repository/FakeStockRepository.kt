@@ -12,11 +12,20 @@ import com.inventraoficial.inventra.data.remote.dto.stock.StockUnit
 class FakeStockRepository(
     var expiring: List<StockBatchResponse> = emptyList(),
     var lowStock: List<LowStockAlertResponse> = emptyList(),
+    var batches: List<StockBatchResponse> = emptyList(),
 ) : StockRepository {
     var expiringError: Exception? = null
     var lowStockError: Exception? = null
+    var batchesError: Exception? = null
     var expiringCalls = mutableListOf<Pair<Int, Int>>()
         private set
+    var batchesCalls = mutableListOf<Int>()
+        private set
+
+    override suspend fun batches(kitchenId: Int): Result<List<StockBatchResponse>> {
+        batchesCalls += kitchenId
+        return batchesError?.let { Result.failure(it) } ?: Result.success(batches)
+    }
 
     override suspend fun expiringSoon(
         kitchenId: Int,
@@ -40,15 +49,17 @@ class FakeStockRepository(
     }
 
     companion object {
+        @Suppress("LongParameterList")
         fun batch(
             id: Int,
             productName: String,
             expirationDate: String,
             currentQuantity: Double = 1.0,
             unitPrice: Double? = null,
+            productId: Int = id,
         ) = StockBatchResponse(
             id = id,
-            product = ProductSummary(id = id, name = productName),
+            product = ProductSummary(id = productId, name = productName),
             kitchen = KitchenSummary(id = 7, name = "Sabor Filial Sul"),
             batchNumber = "000$id",
             initialQuantity = currentQuantity,

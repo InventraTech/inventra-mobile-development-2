@@ -8,6 +8,8 @@ import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import kotlinx.serialization.json.Json
 
 interface StockRepository {
+    suspend fun batches(kitchenId: Int): Result<List<StockBatchResponse>>
+
     suspend fun expiringSoon(
         kitchenId: Int,
         days: Int,
@@ -22,6 +24,8 @@ class NetworkStockRepository(
     private val stockApi: StockApi,
     private val json: Json,
 ) : StockRepository {
+    override suspend fun batches(kitchenId: Int) = apiCall(json) { stockApi.list(kitchenId) }
+
     override suspend fun expiringSoon(
         kitchenId: Int,
         days: Int,
