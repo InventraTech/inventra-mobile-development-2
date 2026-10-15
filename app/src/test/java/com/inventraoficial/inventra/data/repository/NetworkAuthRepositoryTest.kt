@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -46,6 +47,25 @@ class NetworkAuthRepositoryTest {
         override suspend fun me(): UserResponse = respond()
 
         override suspend fun listMembers(): List<UserResponse> = emptyList()
+
+        var lastPhotoPart: MultipartBody.Part? = null
+            private set
+        var removePhotoCalls = 0
+            private set
+
+        override suspend fun updatePhoto(file: MultipartBody.Part): UserResponse {
+            lastPhotoPart = file
+            return respond().copy(photoUrl = PHOTO_URL)
+        }
+
+        override suspend fun removePhoto(): UserResponse {
+            removePhotoCalls++
+            return respond().copy(photoUrl = null)
+        }
+
+        companion object {
+            const val PHOTO_URL = "https://res.cloudinary.com/inventra/image/upload/v2/inventra/users/1.jpg"
+        }
     }
 
     private val userApi: UserApi = FakeUserApi { FakeAuthRepository.fakeUser }
@@ -417,5 +437,52 @@ class NetworkAuthRepositoryTest {
             repository.logout()
 
             assertNull(api.lastLogoutRequest)
+        }
+
+    @Test
+    fun `updatePhoto envia o campo file em JPEG e salva a nova foto na sessao`() =
+        runTest {
+            val api = FakeUserApi { FakeAuthRepository.fakeUser }
+            val repository = loggedRepository(api)
+
+            val result = repository.updatePhoto(byteArrayOf(1, 2, 3))
+
+            assertTrue(result.isSuccess)
+            val part = api.lastPhotoPart
+            assertTrue(
+                part
+                    ?.headers
+                    ?.get("Content-Disposition")
+                    .orEmpty()
+                    .contains("name=\"file\""),
+            )
+            assertEquals("image/jpeg", part?.body?.contentType().toString())
+            assertEquals(3L, part?.body?.contentLength())
+            assertEquals(FakeUserApi.PHOTO_URL, sessionStorage.currentUser?.photoUrl)
+        }
+
+    @Test
+    fun `removePhoto limpa a foto da sessao`() =
+        runTest {
+            val api = FakeUserApi { FakeAuthRepository.fakeUser.copy(photoUrl = FakeUserApi.PHOTO_URL) }
+            val repository = loggedRepository(api)
+            repository.updatePhoto(byteArrayOf(1))
+
+            repository.removePhoto()
+
+            assertEquals(1, api.removePhotoCalls)
+            assertNull(sessionStorage.currentUser?.photoUrl)
+        }
+
+    @Test
+    fun `updatePhoto sem o endpoint no backend devolve falha e mantem a sessao`() =
+        runTest {
+            val repository = loggedRepository(FakeUserApi { throw httpError(404, "") })
+
+            val result = repository.updatePhoto(byteArrayOf(1))
+
+            assertTrue(result.isFailure)
+            assertNull(sessionStorage.currentUser?.photoUrl)
+            assertEquals("jwt", sessionStorage.currentToken)
         }
 }

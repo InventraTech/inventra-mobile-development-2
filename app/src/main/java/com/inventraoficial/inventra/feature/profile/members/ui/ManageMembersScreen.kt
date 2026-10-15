@@ -131,6 +131,7 @@ private fun MembersContent(
                     subtitle = if (isProcessing) "Processando..." else request.email,
                     onAcceptClick = { onAcceptClick(request) },
                     onRejectClick = { onRejectClick(request) },
+                    photoUrl = request.photoUrl,
                 )
             }
         }
@@ -144,6 +145,7 @@ private fun MembersContent(
                     isOwner = member.isCurrentUser,
                     onRemoveClick = null,
                     modifier = Modifier.fillMaxWidth(),
+                    photoUrl = member.photoUrl,
                 )
             }
         }

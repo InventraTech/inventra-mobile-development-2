@@ -33,4 +33,5 @@ data class MovementBatch(
 data class MovementUser(
     val id: String,
     val name: String,
+    val photoUrl: String? = null,
 )

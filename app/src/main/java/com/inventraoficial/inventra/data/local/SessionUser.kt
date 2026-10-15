@@ -12,6 +12,7 @@ data class SessionUser(
     val accessType: AccessType,
     val kitchenId: Int? = null,
     val kitchenName: String? = null,
+    val photoUrl: String? = null,
 )
 
 fun UserResponse.toSessionUser() =
@@ -22,6 +23,7 @@ fun UserResponse.toSessionUser() =
         accessType = profile.accessType,
         kitchenId = kitchen?.id,
         kitchenName = kitchen?.name,
+        photoUrl = photoUrl,
     )
 
 val SessionUser.mustCreateKitchen: Boolean

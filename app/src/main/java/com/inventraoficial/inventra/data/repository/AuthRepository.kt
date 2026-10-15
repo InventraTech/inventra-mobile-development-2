@@ -17,6 +17,9 @@ import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 interface AuthRepository {
     val currentUser: Flow<SessionUser?>
@@ -43,6 +46,10 @@ interface AuthRepository {
     suspend fun logout()
 
     suspend fun refreshCurrentUser(): Result<Unit>
+
+    suspend fun updatePhoto(image: ByteArray): Result<Unit>
+
+    suspend fun removePhoto(): Result<Unit>
 }
 
 class NetworkAuthRepository(
@@ -108,8 +115,23 @@ class NetworkAuthRepository(
             sessionStorage.updateUser(userApi.me().toSessionUser())
         }
 
+    override suspend fun updatePhoto(image: ByteArray): Result<Unit> =
+        apiCall(json) {
+            val body = image.toRequestBody(JPEG.toMediaType())
+            val part = MultipartBody.Part.createFormData(PHOTO_FIELD, PHOTO_FILE_NAME, body)
+            sessionStorage.updateUser(userApi.updatePhoto(part).toSessionUser())
+        }
+
+    override suspend fun removePhoto(): Result<Unit> =
+        apiCall(json) {
+            sessionStorage.updateUser(userApi.removePhoto().toSessionUser())
+        }
+
     private companion object {
         const val REGISTRATION_REQUIRED = "REGISTRATION_REQUIRED"
+        const val JPEG = "image/jpeg"
+        const val PHOTO_FIELD = "file"
+        const val PHOTO_FILE_NAME = "perfil.jpg"
     }
 }
 
