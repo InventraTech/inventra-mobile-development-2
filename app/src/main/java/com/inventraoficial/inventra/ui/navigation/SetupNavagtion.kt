@@ -145,8 +145,8 @@ private fun AppNavigation(
                     entry<Screen.Scan> {
                         ScanRoute(navigator = navigator)
                     }
-                    entry<Screen.StockDetail> {
-                        StockDetailRoute(navigator = navigator)
+                    entry<Screen.StockDetail> { key ->
+                        StockDetailRoute(productId = key.productId, navigator = navigator)
                     }
                     entry<Screen.ProductEdit> {
                         ProductEditRoute(navigator = navigator)

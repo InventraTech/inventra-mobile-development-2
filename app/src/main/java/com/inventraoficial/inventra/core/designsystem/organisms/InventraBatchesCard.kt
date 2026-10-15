@@ -30,6 +30,7 @@ fun InventraBatchesCard(
     batches: List<InventraBatch>,
     onSeeAll: () -> Unit,
     modifier: Modifier = Modifier,
+    seeAllText: String? = "Ver todos os lotes",
 ) {
     Column(
         modifier =
@@ -49,12 +50,14 @@ fun InventraBatchesCard(
                 isUrgent = batch.isUrgent,
             )
         }
-        InventraTextLink(
-            text = "Ver todos os lotes",
-            onClick = onSeeAll,
-            showArrow = true,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        )
+        seeAllText?.let {
+            InventraTextLink(
+                text = it,
+                onClick = onSeeAll,
+                showArrow = true,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+        }
     }
 }
 

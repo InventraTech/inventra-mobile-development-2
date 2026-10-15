@@ -3,6 +3,8 @@ package com.inventraoficial.inventra.data.remote.api
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -11,6 +13,7 @@ interface StockApi {
     @GET(PATH)
     suspend fun list(
         @Query("kitchenId") kitchenId: Int,
+        @Query("productId") productId: Int? = null,
     ): List<StockBatchResponse>
 
     @GET("$PATH/expiring-soon")
@@ -26,6 +29,14 @@ interface StockApi {
     suspend fun kitchenStock(
         @Path("kitchenId") kitchenId: Int,
     ): List<KitchenStockItemResponse>
+
+    @GET("stock-movements")
+    suspend fun movements(
+        @Query("kitchenId") kitchenId: Int,
+        @Query("productId") productId: Int,
+        @Query("type") type: StockMovementType,
+        @Query("limit") limit: Int,
+    ): List<StockMovementResponse>
 
     companion object {
         private const val PATH = "stock-batches"

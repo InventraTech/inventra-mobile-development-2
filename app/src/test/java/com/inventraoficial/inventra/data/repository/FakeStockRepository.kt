@@ -7,6 +7,8 @@ import com.inventraoficial.inventra.data.remote.dto.stock.ProductSummary
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchStatus
 import com.inventraoficial.inventra.data.remote.dto.stock.StockCategory
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
 import com.inventraoficial.inventra.data.remote.dto.stock.StockUnit
 
 class FakeStockRepository(
@@ -22,9 +24,32 @@ class FakeStockRepository(
     var batchesCalls = mutableListOf<Int>()
         private set
 
-    override suspend fun batches(kitchenId: Int): Result<List<StockBatchResponse>> {
+    var batchesProductIds = mutableListOf<Int?>()
+        private set
+
+    override suspend fun batches(
+        kitchenId: Int,
+        productId: Int?,
+    ): Result<List<StockBatchResponse>> {
         batchesCalls += kitchenId
-        return batchesError?.let { Result.failure(it) } ?: Result.success(batches)
+        batchesProductIds += productId
+        batchesError?.let { return Result.failure(it) }
+        return Result.success(if (productId == null) batches else batches.filter { it.product.id == productId })
+    }
+
+    var movements: Map<StockMovementType, List<StockMovementResponse>> = emptyMap()
+    var movementsError: Exception? = null
+    var movementsCalls = mutableListOf<StockMovementType>()
+        private set
+
+    override suspend fun movements(
+        kitchenId: Int,
+        productId: Int,
+        type: StockMovementType,
+    ): Result<List<StockMovementResponse>> {
+        movementsCalls += type
+        movementsError?.let { return Result.failure(it) }
+        return Result.success(movements[type].orEmpty())
     }
 
     override suspend fun expiringSoon(

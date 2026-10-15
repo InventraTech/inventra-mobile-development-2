@@ -4,6 +4,8 @@ import com.inventraoficial.inventra.data.remote.api.StockApi
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
@@ -26,7 +28,27 @@ class NetworkStockRepositoryTest {
         var lastKitchenId: Int? = null
             private set
 
-        override suspend fun list(kitchenId: Int): List<StockBatchResponse> {
+        var lastListProductId: Int? = null
+            private set
+        var lastMovements: Triple<Int, StockMovementType, Int>? = null
+            private set
+
+        override suspend fun movements(
+            kitchenId: Int,
+            productId: Int,
+            type: StockMovementType,
+            limit: Int,
+        ): List<StockMovementResponse> {
+            error?.let { throw it }
+            lastMovements = Triple(productId, type, limit)
+            return emptyList()
+        }
+
+        override suspend fun list(
+            kitchenId: Int,
+            productId: Int?,
+        ): List<StockBatchResponse> {
+            lastListProductId = productId
             error?.let { throw it }
             lastKitchenId = kitchenId
             return batches
@@ -111,5 +133,28 @@ class NetworkStockRepositoryTest {
 
             assertEquals(listOf("Arroz Camil"), result.getOrNull()?.map { it.product.name })
             assertEquals(7, api.lastKitchenStock)
+        }
+
+    @Test
+    fun `batches envia o produto quando informado`() =
+        runTest {
+            val api = FakeStockApi(listOf(batch), listOf(alert))
+            val repository = NetworkStockRepository(api, json)
+
+            repository.batches(kitchenId = 7, productId = 5013)
+
+            assertEquals(5013, api.lastListProductId)
+        }
+
+    @Test
+    fun `movements busca o tipo pedido com limite`() =
+        runTest {
+            val api = FakeStockApi(listOf(batch), listOf(alert))
+            val repository = NetworkStockRepository(api, json)
+
+            val result = repository.movements(kitchenId = 7, productId = 5013, type = StockMovementType.WRITE_OFF)
+
+            assertTrue(result.isSuccess)
+            assertEquals(Triple(5013, StockMovementType.WRITE_OFF, 30), api.lastMovements)
         }
 }

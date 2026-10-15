@@ -21,6 +21,7 @@ data class InventraPriorityItem(
     val statusText: String,
     val urgency: InventraUrgency,
     val batch: String,
+    val productId: Int? = null,
 )
 
 @Composable

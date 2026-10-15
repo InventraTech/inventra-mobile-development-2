@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,20 +47,25 @@ fun InventraSupplierRow(
         InventraThumbnail(
             painter = painter,
             shape = RoundedCornerShape(10.dp),
-            size = 72.dp,
+            size = 56.dp,
             contentScale = ContentScale.Fit,
         )
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
             Text(
                 name,
                 fontFamily = Montserrat,
                 fontWeight = FontWeight.Bold,
                 color = InventraPurple,
-                fontSize = 17.sp,
+                fontSize = 16.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
             InventraStarRating(rating = rating)
+            InventraBadge(text = badgeText)
         }
-        InventraBadge(text = badgeText)
     }
 }
 
@@ -68,9 +74,9 @@ fun InventraSupplierRow(
 private fun InventraSupplierRowPreview() {
     InventraSupplierRow(
         painter = painterResource(R.drawable.ic_inventra_logo),
-        name = "Seara Alimentos",
-        rating = 5,
-        badgeText = "VPQ 50",
+        name = "Distribuidora QA Alimentos Ltda",
+        rating = 4,
+        badgeText = "11.222.333/0001-81",
         onClick = {},
     )
 }

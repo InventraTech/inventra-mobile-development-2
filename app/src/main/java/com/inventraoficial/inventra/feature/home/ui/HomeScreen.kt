@@ -189,7 +189,7 @@ fun HomeRoute(
         errorMessage = uiState.errorMessage,
         unreadNotifications = uiState.unreadNotifications,
         onBellClick = { navigator.navigate(Screen.Notifications) },
-        onPriorityItemClick = { navigator.navigate(Screen.StockDetail) },
+        onPriorityItemClick = { item -> item.productId?.let { navigator.navigate(Screen.StockDetail(it)) } },
         onRetryClick = viewModel::onRetryClick,
         modifier = modifier,
     )

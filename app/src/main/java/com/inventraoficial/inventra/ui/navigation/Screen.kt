@@ -27,7 +27,9 @@ sealed interface Screen : NavKey {
 
     data object StockList : Screen
 
-    data object StockDetail : Screen
+    data class StockDetail(
+        val productId: Int,
+    ) : Screen
 
     data object ProductEdit : Screen
 

@@ -19,16 +19,20 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit.DAYS
 import java.util.Locale
 
+@Suppress("TooManyFunctions")
 class StockListViewModel(
     private val authRepository: AuthRepository,
     private val stockRepository: StockRepository,
+    private val today: () -> LocalDate = { LocalDate.now() },
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StockListUiState())
     val uiState: StateFlow<StockListUiState> = _uiState.asStateFlow()
 
-    private var allProducts: List<Product> = emptyList()
+    private var items: List<KitchenStockItemResponse> = emptyList()
 
     fun onScreenVisible() {
         load()
@@ -44,52 +48,99 @@ class StockListViewModel(
     }
 
     fun onFilterSelect(filter: String) {
-        _uiState.update { it.copy(selectedFilter = filter) }
+        val categories = if (filter == ALL_FILTER) emptySet() else setOf(filter)
+        _uiState.update { it.copy(filters = it.filters.copy(categories = categories)) }
         refreshVisibleProducts()
     }
 
-    fun onFilterIconClick() = Unit
+    fun onFilterIconClick() {
+        _uiState.update { it.copy(draftFilters = it.filters) }
+    }
+
+    fun onFiltersDismiss() {
+        _uiState.update { it.copy(draftFilters = null) }
+    }
+
+    fun onSortSelect(sort: StockSort) {
+        updateDraft { it.copy(sort = sort) }
+    }
+
+    fun onCategoryToggle(category: String) {
+        updateDraft { it.copy(categories = it.categories.toggle(category)) }
+    }
+
+    fun onStatusToggle(status: StockStatus) {
+        updateDraft { it.copy(statuses = it.statuses.toggle(status)) }
+    }
+
+    fun onClearFilters() {
+        updateDraft { StockFilters() }
+    }
+
+    fun onApplyFilters() {
+        val draft = _uiState.value.draftFilters ?: return
+        _uiState.update { it.copy(filters = draft, draftFilters = null) }
+        refreshVisibleProducts()
+    }
+
+    private fun updateDraft(transform: (StockFilters) -> StockFilters) {
+        _uiState.update { state -> state.copy(draftFilters = state.draftFilters?.let(transform)) }
+    }
 
     private fun load() {
-        _uiState.update { it.copy(isLoading = allProducts.isEmpty(), errorMessage = null) }
+        _uiState.update { it.copy(isLoading = items.isEmpty(), errorMessage = null) }
         viewModelScope.launch {
             val kitchenId = authRepository.currentUser.first()?.kitchenId
             if (kitchenId == null) {
-                showProducts(emptyList())
+                showItems(emptyList())
                 return@launch
             }
             stockRepository
                 .kitchenStock(kitchenId)
-                .onSuccess { items -> showProducts(items.map { it.toProduct() }) }
+                .onSuccess { showItems(it) }
                 .onFailure { error ->
                     _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
                 }
         }
     }
 
-    private fun showProducts(products: List<Product>) {
-        allProducts = products
-        val options = listOf(ALL_FILTER) + products.map { it.category }.distinct().sorted()
+    private fun showItems(newItems: List<KitchenStockItemResponse>) {
+        items = newItems
+        val categories = newItems.map { it.categoryName() }.distinct().sorted()
         _uiState.update { state ->
             state.copy(
                 isLoading = false,
-                filterOptions = options,
-                selectedFilter = state.selectedFilter.takeIf { it in options } ?: ALL_FILTER,
+                categoryOptions = categories,
+                filters = state.filters.copy(categories = state.filters.categories.intersect(categories.toSet())),
             )
         }
         refreshVisibleProducts()
     }
 
     private fun refreshVisibleProducts() {
-        val query = _uiState.value.searchQuery.trim()
-        val filter = _uiState.value.selectedFilter
-        val visibleProducts =
-            allProducts.filter { product ->
-                val matchesFilter = filter == ALL_FILTER || product.category == filter
-                val matchesQuery = product.title.contains(query, ignoreCase = true)
-                matchesFilter && matchesQuery
-            }
-        _uiState.update { it.copy(products = visibleProducts) }
+        val state = _uiState.value
+        val query = state.searchQuery.trim()
+        val filters = state.filters
+        val today = today()
+        val visible =
+            items
+                .filter { item ->
+                    item.product.name.contains(query, ignoreCase = true) &&
+                        (filters.categories.isEmpty() || item.categoryName() in filters.categories) &&
+                        (filters.statuses.isEmpty() || filters.statuses.any { item.matches(it, today) })
+                }.sortedWith(filters.sort.comparator())
+        _uiState.update {
+            it.copy(
+                products = visible.map { item -> item.toProduct() },
+                filterOptions = listOf(ALL_FILTER) + it.categoryOptions,
+                selectedFilter =
+                    when (filters.categories.size) {
+                        0 -> ALL_FILTER
+                        1 -> filters.categories.first()
+                        else -> ""
+                    },
+            )
+        }
     }
 
     companion object {
@@ -107,8 +158,34 @@ class StockListViewModel(
 }
 
 private const val NO_CATEGORY = "Sem categoria"
+private const val EXPIRING_SOON_DAYS = 7
 
 private val quantityFormat = DecimalFormat("#,##0.###", DecimalFormatSymbols(Locale.forLanguageTag("pt-BR")))
+
+private fun <T> Set<T>.toggle(value: T): Set<T> = if (value in this) this - value else this + value
+
+private fun KitchenStockItemResponse.categoryName(): String = category?.name ?: NO_CATEGORY
+
+private fun KitchenStockItemResponse.matches(
+    status: StockStatus,
+    today: LocalDate,
+): Boolean =
+    when (status) {
+        StockStatus.ExpiringSoon ->
+            nextExpirationDate?.let { DAYS.between(today, LocalDate.parse(it)) <= EXPIRING_SOON_DAYS } ?: false
+        StockStatus.LowStock -> lowStock
+        StockStatus.OutOfStock -> totalQuantity <= 0.0
+    }
+
+private fun StockSort.comparator(): Comparator<KitchenStockItemResponse> {
+    val byName = compareBy<KitchenStockItemResponse> { it.product.name.lowercase() }
+    val byExpiration = compareBy<KitchenStockItemResponse, String?>(nullsLast()) { it.nextExpirationDate }
+    return when (this) {
+        StockSort.Name -> byName
+        StockSort.Expiration -> byExpiration.then(byName)
+        StockSort.Quantity -> compareBy<KitchenStockItemResponse> { it.totalQuantity }.then(byName)
+    }
+}
 
 private fun KitchenStockItemResponse.toProduct(): Product {
     val batches =
@@ -123,6 +200,6 @@ private fun KitchenStockItemResponse.toProduct(): Product {
         title = product.name,
         quantity = "${quantityFormat.format(totalQuantity)} ${unit.symbol}",
         batchInfo = if (lowStock) "$batches · abaixo do mínimo" else batches,
-        category = category?.name ?: NO_CATEGORY,
+        category = categoryName(),
     )
 }
