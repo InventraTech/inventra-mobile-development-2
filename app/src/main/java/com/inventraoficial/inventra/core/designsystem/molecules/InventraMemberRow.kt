@@ -30,6 +30,7 @@ fun InventraMemberRow(
     isOwner: Boolean,
     onRemoveClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    photoUrl: String? = null,
 ) {
     Row(
         modifier =
@@ -40,7 +41,7 @@ fun InventraMemberRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        InventraInitialsAvatar(initials = initials)
+        InventraInitialsAvatar(initials = initials, photoUrl = photoUrl)
         Text(
             text = name,
             fontFamily = Montserrat,

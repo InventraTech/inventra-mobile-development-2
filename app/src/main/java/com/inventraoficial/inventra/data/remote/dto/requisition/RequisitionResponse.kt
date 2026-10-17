@@ -36,6 +36,7 @@ data class RequisitionItemResponse(
 data class UserSummary(
     val id: String,
     val name: String,
+    val photoUrl: String? = null,
 )
 
 @Serializable

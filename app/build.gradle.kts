@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.firebase.auth)
     implementation(libs.googleid)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.okhttp.mockwebserver)

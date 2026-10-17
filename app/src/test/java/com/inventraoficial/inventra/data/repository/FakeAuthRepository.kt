@@ -81,6 +81,24 @@ class FakeAuthRepository(
         return Result.success(Unit)
     }
 
+    var photoResult: Result<Unit> = Result.success(Unit)
+    var uploadedPhotos = mutableListOf<ByteArray>()
+        private set
+    var removePhotoCalls = 0
+        private set
+
+    override suspend fun updatePhoto(image: ByteArray): Result<Unit> {
+        uploadedPhotos += image
+        if (photoResult.isSuccess) _currentUser.value = _currentUser.value?.copy(photoUrl = UPLOADED_PHOTO_URL)
+        return photoResult
+    }
+
+    override suspend fun removePhoto(): Result<Unit> {
+        removePhotoCalls++
+        if (photoResult.isSuccess) _currentUser.value = _currentUser.value?.copy(photoUrl = null)
+        return photoResult
+    }
+
     var logoutCalls = 0
         private set
 
@@ -91,6 +109,8 @@ class FakeAuthRepository(
     }
 
     companion object {
+        const val UPLOADED_PHOTO_URL = "https://res.cloudinary.com/inventra/image/upload/v2/inventra/users/1.jpg"
+
         val fakeUser =
             UserResponse(
                 id = "00000000-0000-0000-0000-000000000001",

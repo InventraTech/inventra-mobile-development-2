@@ -8,10 +8,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -20,12 +23,14 @@ fun InventraInitialsAvatar(
     initials: String,
     modifier: Modifier = Modifier,
     size: Dp = 48.dp,
+    photoUrl: String? = null,
 ) {
     Box(
         modifier =
             modifier
                 .size(size)
-                .background(InventraPurple.copy(alpha = 0.15f), CircleShape),
+                .clip(CircleShape)
+                .background(InventraPurple.copy(alpha = 0.15f)),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -34,6 +39,14 @@ fun InventraInitialsAvatar(
             fontWeight = FontWeight.Bold,
             color = InventraPurple,
         )
+        if (photoUrl != null) {
+            AsyncImage(
+                model = photoUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.matchParentSize(),
+            )
+        }
     }
 }
 

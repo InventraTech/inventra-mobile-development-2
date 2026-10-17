@@ -40,6 +40,7 @@ fun InventraPendingMemberRow(
     onAcceptClick: () -> Unit,
     onRejectClick: () -> Unit,
     modifier: Modifier = Modifier,
+    photoUrl: String? = null,
 ) {
     Row(
         modifier =
@@ -50,7 +51,7 @@ fun InventraPendingMemberRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        InventraInitialsAvatar(initials = initials)
+        InventraInitialsAvatar(initials = initials, photoUrl = photoUrl)
         Column(modifier = Modifier.weight(1f)) {
             Text(name, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Text(

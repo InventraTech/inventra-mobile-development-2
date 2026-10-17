@@ -116,6 +116,7 @@ private fun KitchenAccessRequestResponse.toPendingMemberRequest() =
         initials = user.name.initials(),
         name = user.name,
         email = user.email,
+        photoUrl = user.photoUrl,
     )
 
 private fun UserResponse.toCozinhaMember(currentUserId: String?): CozinhaMember {
@@ -126,6 +127,7 @@ private fun UserResponse.toCozinhaMember(currentUserId: String?): CozinhaMember 
         name = if (isCurrentUser) "$name (você)" else name,
         roleLabel = profile.accessType.toLabel(),
         isCurrentUser = isCurrentUser,
+        photoUrl = photoUrl,
     )
 }
 
