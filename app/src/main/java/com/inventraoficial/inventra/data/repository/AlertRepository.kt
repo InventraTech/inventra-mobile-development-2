@@ -11,6 +11,8 @@ interface AlertRepository {
 
     suspend fun unreadCount(kitchenId: Int): Result<Int>
 
+    suspend fun unreadAlerts(kitchenId: Int): Result<List<AlertResponse>>
+
     suspend fun markAsRead(id: Int): Result<AlertResponse>
 
     suspend fun markAllAsRead(kitchenId: Int): Result<Unit>
@@ -28,6 +30,8 @@ class NetworkAlertRepository(
     override suspend fun alerts(kitchenId: Int) = apiCall(json) { alertApi.list(kitchenId) }
 
     override suspend fun unreadCount(kitchenId: Int) = apiCall(json) { alertApi.list(kitchenId, unread = true).size }
+
+    override suspend fun unreadAlerts(kitchenId: Int) = apiCall(json) { alertApi.list(kitchenId, unread = true) }
 
     override suspend fun markAsRead(id: Int): Result<AlertResponse> = apiCall(json) { alertApi.markAsRead(id) }
 

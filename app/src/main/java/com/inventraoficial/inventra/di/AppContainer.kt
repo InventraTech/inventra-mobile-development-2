@@ -44,6 +44,9 @@ import com.inventraoficial.inventra.data.repository.RequisitionRepository
 import com.inventraoficial.inventra.data.repository.StockRepository
 import com.inventraoficial.inventra.data.repository.SupplierRepository
 import com.inventraoficial.inventra.data.session.SessionManager
+import com.inventraoficial.inventra.feature.notifications.background.DataStoreLastNotifiedAlertStore
+import com.inventraoficial.inventra.feature.notifications.background.NewAlertsChecker
+import com.inventraoficial.inventra.feature.notifications.background.SystemAlertNotifier
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -68,6 +71,8 @@ interface AppContainer {
     val imageCompressor: ImageCompressor
     val profilePhotoPreview: ProfilePhotoPreview
     val locationProvider: LocationProvider
+    val alertNotifier: SystemAlertNotifier
+    val newAlertsChecker: NewAlertsChecker
 }
 
 class DefaultAppContainer(
@@ -174,6 +179,18 @@ class DefaultAppContainer(
 
     override val requisitionRepository: RequisitionRepository by lazy {
         NetworkRequisitionRepository(requisitionApi, json)
+    }
+
+    override val alertNotifier: SystemAlertNotifier by lazy { SystemAlertNotifier(context) }
+
+    override val newAlertsChecker: NewAlertsChecker by lazy {
+        NewAlertsChecker(
+            authRepository = authRepository,
+            alertRepository = alertRepository,
+            appPreferences = appPreferences,
+            store = DataStoreLastNotifiedAlertStore(context),
+            notifier = alertNotifier,
+        )
     }
 
     companion object {
