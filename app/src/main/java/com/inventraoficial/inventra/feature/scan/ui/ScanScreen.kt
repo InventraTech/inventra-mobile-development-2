@@ -193,12 +193,22 @@ private fun FoundPanel(
         }
     }
     if (canManageStock) {
-        InventraPrimaryButton(
-            text = "Dar baixa",
-            onClick = { actions.onStockOutClick(result.productId) },
-            enabled = result.hasStock,
+        Row(
             modifier = Modifier.fillMaxWidth(),
-        )
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            InventraPrimaryButton(
+                text = "Dar entrada",
+                onClick = { actions.onStockEntryClick(result.productId) },
+                modifier = Modifier.weight(1f),
+            )
+            InventraPrimaryButton(
+                text = "Dar baixa",
+                onClick = { actions.onStockOutClick(result.productId) },
+                enabled = result.hasStock,
+                modifier = Modifier.weight(1f),
+            )
+        }
     }
     InventraSecondaryButton(
         text = "Ver produto",
@@ -316,6 +326,7 @@ fun ScanRoute(
                 onBarcodeDetected = viewModel::onBarcodeDetected,
                 onScanAgainClick = viewModel::onScanAgainClick,
                 onStockOutClick = { productId -> navigator.navigate(Screen.StockOut(productId)) },
+                onStockEntryClick = { productId -> navigator.navigate(Screen.StockEntry(productId)) },
                 onSeeProductClick = { productId -> navigator.navigate(Screen.StockDetail(productId)) },
                 onReportClick = viewModel::onReportClick,
                 onManualEntryClick = viewModel::onManualEntryClick,
@@ -335,6 +346,7 @@ private val previewActions =
         onBarcodeDetected = {},
         onScanAgainClick = {},
         onStockOutClick = {},
+        onStockEntryClick = {},
         onSeeProductClick = {},
         onReportClick = {},
         onManualEntryClick = {},

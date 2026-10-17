@@ -42,6 +42,7 @@ data class StockDetailActions(
     val onSeeAllBatchesClick: () -> Unit = {},
     val onEntriesClick: () -> Unit = {},
     val onExitsClick: () -> Unit = {},
+    val onStockEntryClick: () -> Unit = {},
     val onStockOutClick: () -> Unit = {},
     val onRetryClick: () -> Unit = {},
     val onBackClick: () -> Unit = {},
