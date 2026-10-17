@@ -6,6 +6,7 @@ import com.inventraoficial.inventra.data.remote.dto.stock.BatchConsumptionRespon
 import com.inventraoficial.inventra.data.remote.dto.stock.ConsumeProductRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.RegisterStockEntryRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementReason
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
@@ -40,6 +41,9 @@ interface StockRepository {
         quantity: Double,
         reason: StockMovementReason,
     ): Result<List<BatchConsumptionResponse>>
+
+    // Entrada: cria um lote novo do produto na cozinha.
+    suspend fun registerEntry(request: RegisterStockEntryRequest): Result<StockBatchResponse>
 }
 
 class NetworkStockRepository(
@@ -74,6 +78,9 @@ class NetworkStockRepository(
         reason: StockMovementReason,
     ): Result<List<BatchConsumptionResponse>> =
         apiCall(json) { stockApi.consume(ConsumeProductRequest(kitchenId, productId, quantity, reason)) }
+
+    override suspend fun registerEntry(request: RegisterStockEntryRequest): Result<StockBatchResponse> =
+        apiCall(json) { stockApi.registerEntry(request) }
 
     private companion object {
         const val MOVEMENTS_LIMIT = 30

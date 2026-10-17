@@ -4,6 +4,7 @@ import com.inventraoficial.inventra.data.remote.dto.stock.BatchConsumptionRespon
 import com.inventraoficial.inventra.data.remote.dto.stock.ConsumeProductRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.RegisterStockEntryRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
@@ -14,6 +15,11 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface StockApi {
+    @POST(PATH)
+    suspend fun registerEntry(
+        @Body request: RegisterStockEntryRequest,
+    ): StockBatchResponse
+
     @GET(PATH)
     suspend fun list(
         @Query("kitchenId") kitchenId: Int,
