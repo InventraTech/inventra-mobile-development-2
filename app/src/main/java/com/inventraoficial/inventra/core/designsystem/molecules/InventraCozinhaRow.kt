@@ -62,6 +62,8 @@ fun InventraCozinhaRow(
                 InventraBadge(text = "Disponível", variant = InventraBadgeVariant.Brand, outlined = true)
             InventraCozinhaRequestStatus.Pendente ->
                 InventraBadge(text = "Pendente", variant = InventraBadgeVariant.Gold)
+            InventraCozinhaRequestStatus.Recusada ->
+                InventraBadge(text = "Recusada", variant = InventraBadgeVariant.DateAlert)
         }
     }
 }
