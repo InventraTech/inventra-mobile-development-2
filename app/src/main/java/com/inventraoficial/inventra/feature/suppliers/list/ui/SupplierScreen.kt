@@ -47,6 +47,7 @@ fun SupplierScreen(
     onSupplierClick: (Supplier) -> Unit,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
+    activeFilterCount: Int = 0,
 ) {
     Column(
         modifier =
@@ -75,6 +76,7 @@ fun SupplierScreen(
                 onQueryChange = onSearchQueryChange,
                 onFilterClick = onFilterIconClick,
                 placeholder = "Buscar fornecedor...",
+                activeFilterCount = activeFilterCount,
                 modifier = Modifier.padding(bottom = 16.dp),
             )
             when {
@@ -82,7 +84,7 @@ fun SupplierScreen(
                 errorMessage != null ->
                     ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
                 suppliers.isEmpty() ->
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Text(
                             text = "Nenhum fornecedor encontrado.",
                             fontFamily = Montserrat,
@@ -92,7 +94,7 @@ fun SupplierScreen(
                     }
                 else ->
                     LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        items(suppliers) { supplier ->
+                        items(suppliers, key = { it.id }) { supplier ->
                             InventraSupplierRow(
                                 painter = painterResource(supplier.imageRes),
                                 name = supplier.name,
@@ -156,8 +158,24 @@ fun SupplierRoute(
         errorMessage = uiState.errorMessage,
         onSupplierClick = { supplier -> navigator.navigate(Screen.SupplierDetail(supplier.id)) },
         onRetryClick = viewModel::onRetryClick,
+        activeFilterCount = uiState.filters.activeCount,
         modifier = modifier,
     )
+
+    uiState.draftFilters?.let { draft ->
+        SupplierFiltersSheet(
+            filters = draft,
+            actions =
+                SupplierFiltersActions(
+                    onSortSelect = viewModel::onSortSelect,
+                    onMinRatingSelect = viewModel::onMinRatingSelect,
+                    onContactToggle = viewModel::onContactToggle,
+                    onClear = viewModel::onClearFilters,
+                    onApply = viewModel::onApplyFilters,
+                ),
+            onDismiss = viewModel::onFiltersDismiss,
+        )
+    }
 }
 
 @Suppress("UnusedPrivateMember", "MagicNumber")
