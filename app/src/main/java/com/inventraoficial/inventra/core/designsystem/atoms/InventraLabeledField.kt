@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +31,7 @@ fun InventraLabeledField(
     readOnly: Boolean = false,
     multiline: Boolean = false,
     isPassword: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Unspecified,
     placeholder: String,
 ) {
     Column(
@@ -47,6 +50,7 @@ fun InventraLabeledField(
             placeholder = { Text(text = placeholder, fontSize = 13.sp) },
             readOnly = readOnly,
             singleLine = !multiline,
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
             shape = RoundedCornerShape(8.dp),
             colors =

@@ -18,6 +18,15 @@ class FakeProductRepository(
             ?: Result.failure(NoSuchElementException("Produto não encontrado."))
     }
 
+    var searches = mutableListOf<String>()
+        private set
+
+    override suspend fun search(name: String): Result<List<ProductResponse>> {
+        searches += name
+        error?.let { return Result.failure(it) }
+        return Result.success(products.filter { it.name.contains(name, ignoreCase = true) })
+    }
+
     companion object {
         fun product(
             id: Int,

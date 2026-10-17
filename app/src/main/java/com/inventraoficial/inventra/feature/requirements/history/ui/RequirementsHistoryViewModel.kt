@@ -1,57 +1,109 @@
 package com.inventraoficial.inventra.feature.requirements.history.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import com.inventraoficial.inventra.R
-import com.inventraoficial.inventra.feature.requirements.RequirementsSharedData
-import com.inventraoficial.inventra.feature.requirements.list.ui.RequirementStatus
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.inventraoficial.inventra.InventraApplication
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
+import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionResponse
+import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
+import com.inventraoficial.inventra.data.repository.AuthRepository
+import com.inventraoficial.inventra.data.repository.RequisitionRepository
+import com.inventraoficial.inventra.feature.requirements.RequisitionSummary
+import com.inventraoficial.inventra.feature.requirements.isVisibleTo
+import com.inventraoficial.inventra.feature.requirements.newestFirst
+import com.inventraoficial.inventra.feature.requirements.subtitleText
+import com.inventraoficial.inventra.feature.requirements.titleText
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.time.ZoneId
 
-private const val SUBSCRIPTION_TIMEOUT_MS = 5000L
+class RequirementsHistoryViewModel(
+    private val authRepository: AuthRepository,
+    private val requisitionRepository: RequisitionRepository,
+    private val zone: ZoneId = ZoneId.systemDefault(),
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(RequirementsHistoryUiState())
+    val uiState: StateFlow<RequirementsHistoryUiState> = _uiState.asStateFlow()
 
-class RequirementsHistoryViewModel : ViewModel() {
-    private val initialHistoryItems: List<HistoryItem> = buildFakeHistoryItems()
+    private var processed: List<RequisitionResponse> = emptyList()
 
-    private val _uiState = MutableStateFlow(RequirementsHistoryUiState(historyItems = initialHistoryItems))
-    val uiState: StateFlow<RequirementsHistoryUiState> =
-        combine(
-            _uiState,
-            RequirementsSharedData.processedItems,
-        ) { currentState, newItems ->
-            val allItems = newItems + initialHistoryItems
-            currentState.copy(historyItems = allItems)
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MS),
-            initialValue = _uiState.value,
-        )
+    fun onScreenVisible() {
+        load()
+    }
 
-    private fun buildFakeHistoryItems(): List<HistoryItem> =
-        listOf(
-            HistoryItem(
-                id = "h1",
-                imageRes = R.drawable.ic_inventra_logo,
-                productName = "Baião - Arroz Camil",
-                description = "Solicitação aprovada",
-                status = RequirementStatus.ACCEPTED,
-            ),
-            HistoryItem(
-                id = "h2",
-                imageRes = R.drawable.ic_inventra_logo,
-                productName = "Eduardo Passos",
-                description = "Entrada como Estoquista recusada",
-                status = RequirementStatus.REJECTED,
-            ),
-            HistoryItem(
-                id = "h3",
-                imageRes = R.drawable.ic_inventra_logo,
-                productName = "Compra - Leite Integral",
-                description = "Solicitação aprovada",
-                status = RequirementStatus.ACCEPTED,
-            ),
-        )
+    fun onRetryClick() {
+        load()
+    }
+
+    fun onFilterSelect(filter: HistoryFilter) {
+        _uiState.update { it.copy(selectedFilter = filter) }
+        refreshVisible()
+    }
+
+    private fun load() {
+        _uiState.update { it.copy(isLoading = processed.isEmpty(), errorMessage = null) }
+        viewModelScope.launch {
+            val user = authRepository.currentUser.first()
+            val kitchenId = user?.kitchenId
+            if (user == null || kitchenId == null) {
+                processed = emptyList()
+                _uiState.update { it.copy(isLoading = false) }
+                refreshVisible()
+                return@launch
+            }
+            val requesterId = if (user.accessType == AccessType.SUPERVISOR) null else user.id
+            requisitionRepository
+                .requisitions(kitchenId, requesterId = requesterId)
+                .onSuccess { all ->
+                    processed =
+                        all
+                            .filter { it.status !in OPEN_STATUSES && it.isVisibleTo(user) }
+                            .newestFirst()
+                    _uiState.update { it.copy(isLoading = false) }
+                    refreshVisible()
+                }.onFailure { error ->
+                    _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
+                }
+        }
+    }
+
+    private fun refreshVisible() {
+        val status = _uiState.value.selectedFilter.status
+        val visible =
+            processed
+                .filter { status == null || it.status == status }
+                .map { requisition ->
+                    RequisitionSummary(
+                        id = requisition.id,
+                        title = requisition.titleText(),
+                        subtitle = requisition.subtitleText(zone),
+                        details = requisition.reason?.let { "Motivo: $it" } ?: requisition.origin.orEmpty(),
+                        status = requisition.status,
+                    )
+                }
+        _uiState.update { it.copy(requisitions = visible) }
+    }
+
+    companion object {
+        private val OPEN_STATUSES = setOf(RequisitionStatus.DRAFT, RequisitionStatus.UNDER_REVIEW)
+
+        val Factory: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    val application = this[APPLICATION_KEY] as InventraApplication
+                    RequirementsHistoryViewModel(
+                        authRepository = application.container.authRepository,
+                        requisitionRepository = application.container.requisitionRepository,
+                    )
+                }
+            }
+    }
 }

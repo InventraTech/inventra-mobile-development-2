@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.ui.navigation
 
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 
 fun InventraBottomDestination.toScreen(): Screen =
     when (this) {
@@ -20,4 +21,11 @@ fun Screen.toBottomDestination(): InventraBottomDestination? =
         Screen.RequirementsHistory -> InventraBottomDestination.History
         Screen.Profile -> InventraBottomDestination.Perfil
         else -> null
+    }
+
+fun bottomDestinationsFor(accessType: AccessType?): List<InventraBottomDestination> =
+    if (accessType == AccessType.ESTOQUISTA) {
+        InventraBottomDestination.entries - InventraBottomDestination.History
+    } else {
+        InventraBottomDestination.entries
     }
