@@ -104,4 +104,5 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.androidx.camera.mlkit.vision)
+    implementation(libs.androidx.work.runtime)
 }
