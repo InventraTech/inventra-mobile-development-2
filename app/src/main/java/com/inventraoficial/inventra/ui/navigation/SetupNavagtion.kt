@@ -49,6 +49,7 @@ import com.inventraoficial.inventra.feature.scan.ui.ScanRoute
 import com.inventraoficial.inventra.feature.stock.detail.ui.StockDetailRoute
 import com.inventraoficial.inventra.feature.stock.edit.ui.ProductEditRoute
 import com.inventraoficial.inventra.feature.stock.list.ui.StockListRoute
+import com.inventraoficial.inventra.feature.stock.stockentry.ui.StockEntryRoute
 import com.inventraoficial.inventra.feature.stock.stockout.ui.StockOutRoute
 import com.inventraoficial.inventra.feature.suppliers.detail.ui.SupplierDetailRoute
 import com.inventraoficial.inventra.feature.suppliers.list.ui.SupplierRoute
@@ -166,6 +167,9 @@ private fun AppNavigation(
                     }
                     entry<Screen.StockOut> { key ->
                         StockOutRoute(productId = key.productId, navigator = navigator)
+                    }
+                    entry<Screen.StockEntry> { key ->
+                        StockEntryRoute(productId = key.productId, navigator = navigator)
                     }
                     entry<Screen.Home> {
                         HomeRoute(navigator = navigator)

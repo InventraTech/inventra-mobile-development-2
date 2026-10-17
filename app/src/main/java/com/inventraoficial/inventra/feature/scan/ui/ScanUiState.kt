@@ -48,6 +48,7 @@ data class ScanActions(
     val onBarcodeDetected: (String) -> Unit,
     val onScanAgainClick: () -> Unit,
     val onStockOutClick: (Int) -> Unit,
+    val onStockEntryClick: (Int) -> Unit,
     val onSeeProductClick: (Int) -> Unit,
     val onReportClick: () -> Unit,
     val onManualEntryClick: () -> Unit,

@@ -6,6 +6,7 @@ import com.inventraoficial.inventra.data.remote.dto.stock.ConsumeProductRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.ProductSummary
+import com.inventraoficial.inventra.data.remote.dto.stock.RegisterStockEntryRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchStatus
 import com.inventraoficial.inventra.data.remote.dto.stock.StockCategory
@@ -88,6 +89,19 @@ class FakeStockRepository(
     ): Result<List<BatchConsumptionResponse>> {
         consumeCalls += ConsumeProductRequest(kitchenId, productId, quantity, reason)
         return consumeResult
+    }
+
+    var registerEntryError: Exception? = null
+    var registerEntryCalls = mutableListOf<RegisterStockEntryRequest>()
+        private set
+
+    override suspend fun registerEntry(request: RegisterStockEntryRequest): Result<StockBatchResponse> {
+        registerEntryCalls += request
+        registerEntryError?.let { return Result.failure(it) }
+        val created = batch(id = 99, productName = "Produto ${request.productId}", request.expirationDate.orEmpty())
+        return Result.success(
+            created.copy(batchNumber = request.batchNumber, initialQuantity = request.initialQuantity),
+        )
     }
 
     companion object {
