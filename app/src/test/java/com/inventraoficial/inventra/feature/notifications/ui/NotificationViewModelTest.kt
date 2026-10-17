@@ -253,4 +253,128 @@ class NotificationViewModelTest {
                     .toList(),
             )
         }
+
+    private fun useSystemAlerts() {
+        alertRepository.alerts =
+            listOf(
+                alert(10, "ACCESS_REQUEST", "2026-10-11T14:00:00")
+                    .copy(refKey = "55")
+                    .copy(message = "Mauro Rosa pediu para entrar na cozinha."),
+                alert(11, "REQUISITION_APPROVED", "2026-10-11T13:00:00")
+                    .copy(refKey = "12")
+                    .copy(message = "Sua requisição #12 foi aprovada."),
+                alert(12, "REQUISITION_SUBMITTED", "2026-10-11T12:00:00", read = true).copy(refKey = "13"),
+                alert(13, "EXPIRING", "2026-10-11T11:00:00", "Leite Integral")
+                    .copy(message = "Lote QA-13 vence em 2 dias (13/10)."),
+                alert(14, "UNREGISTERED_PRODUCT", "2026-10-11T10:00:00")
+                    .copy(refKey = "7898080640611")
+                    .copy(message = "Produto não cadastrado: Leite Italac 1L (7898080640611)"),
+            )
+    }
+
+    @Test
+    fun `monta titulo subtitulo e cor dos tipos novos`() =
+        runTest(testDispatcher) {
+            useSystemAlerts()
+            val viewModel = createVisibleViewModel()
+            advanceUntilIdle()
+
+            val today =
+                viewModel.uiState.value.groupedNotifications
+                    .getValue("Hoje")
+            assertEquals(
+                listOf(
+                    "Pedido de entrada na cozinha",
+                    "Requisição aprovada",
+                    "Nova requisição para análise",
+                    "Leite Integral vence em breve",
+                    "Produto não cadastrado",
+                ),
+                today.map { it.title },
+            )
+            assertEquals("Mauro Rosa pediu para entrar na cozinha.", today[0].subtitle)
+            assertEquals("Lote QA-13 vence em 2 dias (13/10).", today[3].subtitle)
+            assertEquals(InventraStatusIconVariant.Action, today[0].variant)
+            assertEquals(InventraStatusIconVariant.Success, today[1].variant)
+        }
+
+    @Test
+    fun `filtro separa alertas de estoque dos eventos do sistema`() =
+        runTest(testDispatcher) {
+            useSystemAlerts()
+            val viewModel = createVisibleViewModel()
+            advanceUntilIdle()
+
+            viewModel.onFilterSelect(NotificationFilter.Alerts)
+            assertEquals(
+                listOf(13, 14),
+                viewModel.uiState.value.groupedNotifications.values
+                    .flatten()
+                    .map { it.id },
+            )
+
+            viewModel.onFilterSelect(NotificationFilter.System)
+            assertEquals(
+                listOf(10, 11, 12),
+                viewModel.uiState.value.groupedNotifications.values
+                    .flatten()
+                    .map { it.id },
+            )
+        }
+
+    @Test
+    fun `cada notificacao sabe para onde levar`() =
+        runTest(testDispatcher) {
+            useSystemAlerts()
+            val viewModel = createVisibleViewModel()
+            advanceUntilIdle()
+
+            assertEquals(
+                mapOf(
+                    10 to NotificationTarget.Members,
+                    11 to NotificationTarget.Requisition(12),
+                    12 to NotificationTarget.Requisition(13),
+                    13 to NotificationTarget.Product(13),
+                ),
+                viewModel.uiState.value.targets,
+            )
+        }
+
+    @Test
+    fun `marcar todas como lidas zera os nao lidos`() =
+        runTest(testDispatcher) {
+            val viewModel = createVisibleViewModel()
+            advanceUntilIdle()
+            assertTrue(viewModel.uiState.value.hasUnread)
+
+            viewModel.onMarkAllReadClick()
+            advanceUntilIdle()
+
+            assertEquals(listOf(7), alertRepository.markedAllKitchens)
+            assertFalse(viewModel.uiState.value.hasUnread)
+            assertTrue(
+                viewModel.uiState.value.groupedNotifications.values
+                    .flatten()
+                    .none { it.isUnread },
+            )
+        }
+
+    @Test
+    fun `se marcar todas falhar os nao lidos voltam`() =
+        runTest(testDispatcher) {
+            alertRepository.markAllError = IOException("Sem conexão")
+            val viewModel = createVisibleViewModel()
+            advanceUntilIdle()
+
+            viewModel.onMarkAllReadClick()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.hasUnread)
+            assertTrue(
+                viewModel.uiState.value.groupedNotifications
+                    .getValue("Hoje")
+                    .single()
+                    .isUnread,
+            )
+        }
 }

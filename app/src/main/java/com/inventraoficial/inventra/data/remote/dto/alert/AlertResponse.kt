@@ -12,6 +12,7 @@ data class AlertResponse(
     val product: ProductSummary? = null,
     val message: String,
     val read: Boolean = false,
+    val refKey: String? = null,
     val createdAt: String,
 )
 

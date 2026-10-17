@@ -34,6 +34,17 @@ class FakeAlertRepository(
         return Result.success(alert)
     }
 
+    var markAllError: Exception? = null
+    var markedAllKitchens = mutableListOf<Int>()
+        private set
+
+    override suspend fun markAllAsRead(kitchenId: Int): Result<Unit> {
+        markedAllKitchens += kitchenId
+        markAllError?.let { return Result.failure(it) }
+        alerts = alerts.map { it.copy(read = true) }
+        return Result.success(Unit)
+    }
+
     companion object {
         fun alert(
             id: Int,

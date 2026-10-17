@@ -27,11 +27,14 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraStatusIconVariant
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraFilterChipRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraGroupedNotifications
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraNotification
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 import java.time.LocalDate
@@ -47,6 +50,10 @@ fun NotificationScreen(
     onRetryClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    selectedFilter: NotificationFilter = NotificationFilter.All,
+    hasUnread: Boolean = false,
+    onFilterSelect: (NotificationFilter) -> Unit = {},
+    onMarkAllReadClick: () -> Unit = {},
 ) {
     Column(
         modifier =
@@ -79,12 +86,27 @@ fun NotificationScreen(
                             .verticalScroll(rememberScrollState())
                             .padding(16.dp),
                 ) {
+                    InventraFilterChipRow(
+                        options = NotificationFilter.entries.map { it.label },
+                        selected = selectedFilter.label,
+                        onSelect = { label -> onFilterSelect(NotificationFilter.entries.first { it.label == label }) },
+                    )
+                    if (hasUnread) {
+                        InventraTextLink(
+                            text = "Marcar todas como lidas",
+                            onClick = onMarkAllReadClick,
+                            modifier =
+                                Modifier
+                                    .padding(top = 12.dp)
+                                    .align(Alignment.End),
+                        )
+                    }
                     if (groupedNotifications.isEmpty()) {
                         Text(
                             text = if (isHistoryExpanded) "Nenhuma notificação." else "Nenhuma notificação recente.",
                             fontFamily = Montserrat,
                             fontSize = 14.sp,
-                            color = InventraPurple.copy(alpha = 0.6f),
+                            color = InventraMuted,
                             modifier = Modifier.padding(vertical = 12.dp),
                         )
                     }
@@ -149,13 +171,27 @@ fun NotificationRoute(
         isHistoryExpanded = uiState.isHistoryExpanded,
         isLoading = uiState.isLoading,
         errorMessage = uiState.errorMessage,
-        onNotificationClick = viewModel::onNotificationClick,
+        onNotificationClick = { notification ->
+            viewModel.onNotificationClick(notification)
+            uiState.targets[notification.id]?.let { target -> navigator.navigate(target.toScreen()) }
+        },
         onSeeAllClick = viewModel::onSeeAllClick,
         onRetryClick = viewModel::onRetryClick,
         onBackClick = { navigator.back() },
         modifier = modifier,
+        selectedFilter = uiState.selectedFilter,
+        hasUnread = uiState.hasUnread,
+        onFilterSelect = viewModel::onFilterSelect,
+        onMarkAllReadClick = viewModel::onMarkAllReadClick,
     )
 }
+
+private fun NotificationTarget.toScreen(): Screen =
+    when (this) {
+        is NotificationTarget.Product -> Screen.StockDetail(productId)
+        is NotificationTarget.Requisition -> Screen.RequisitionDetail(requisitionId)
+        NotificationTarget.Members -> Screen.ManageMembers
+    }
 
 @Suppress("UnusedPrivateMember")
 @Preview
@@ -188,6 +224,7 @@ private fun NotificationScreenPreview() {
         isHistoryExpanded = false,
         isLoading = false,
         errorMessage = null,
+        hasUnread = true,
         onNotificationClick = {},
         onSeeAllClick = {},
         onRetryClick = {},

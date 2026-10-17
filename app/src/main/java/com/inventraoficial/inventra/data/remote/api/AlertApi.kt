@@ -18,6 +18,11 @@ interface AlertApi {
         @Path("id") id: Int,
     ): AlertResponse
 
+    @PATCH("$PATH/read-all")
+    suspend fun markAllAsRead(
+        @Query("kitchenId") kitchenId: Int,
+    )
+
     companion object {
         private const val PATH = "alerts"
     }
