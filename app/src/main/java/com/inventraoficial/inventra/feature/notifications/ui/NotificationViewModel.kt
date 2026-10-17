@@ -13,6 +13,13 @@ import com.inventraoficial.inventra.data.remote.dto.alert.AlertResponse
 import com.inventraoficial.inventra.data.remote.dto.alert.AlertSeverity
 import com.inventraoficial.inventra.data.repository.AlertRepository
 import com.inventraoficial.inventra.data.repository.AuthRepository
+import com.inventraoficial.inventra.feature.notifications.ACCESS_REQUEST_TYPE
+import com.inventraoficial.inventra.feature.notifications.REQUISITION_APPROVED_TYPE
+import com.inventraoficial.inventra.feature.notifications.REQUISITION_PREFIX
+import com.inventraoficial.inventra.feature.notifications.REQUISITION_SUBMITTED_TYPE
+import com.inventraoficial.inventra.feature.notifications.stockTypes
+import com.inventraoficial.inventra.feature.notifications.subtitle
+import com.inventraoficial.inventra.feature.notifications.title
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -148,18 +155,6 @@ class NotificationViewModel(
     }
 }
 
-private const val EXPIRATION_TYPE = "EXPIRATION"
-private const val EXPIRING_TYPE = "EXPIRING"
-private const val STOCK_TYPE = "STOCK"
-private const val UNREGISTERED_PRODUCT_TYPE = "UNREGISTERED_PRODUCT"
-private const val ACCESS_REQUEST_TYPE = "ACCESS_REQUEST"
-private const val REQUISITION_SUBMITTED_TYPE = "REQUISITION_SUBMITTED"
-private const val REQUISITION_APPROVED_TYPE = "REQUISITION_APPROVED"
-private const val REQUISITION_REJECTED_TYPE = "REQUISITION_REJECTED"
-private const val REQUISITION_PREFIX = "REQUISITION_"
-
-private val stockTypes = setOf(EXPIRATION_TYPE, EXPIRING_TYPE, STOCK_TYPE, UNREGISTERED_PRODUCT_TYPE)
-
 private val ptBr: Locale = Locale.forLanguageTag("pt-BR")
 private val dayFormatter = DateTimeFormatter.ofPattern("d 'de' MMMM", ptBr)
 private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -181,30 +176,6 @@ private fun AlertResponse.target(): NotificationTarget? =
 
 private fun AlertResponse.createdAtIn(zone: ZoneId): ZonedDateTime =
     LocalDateTime.parse(createdAt).atZone(ZoneOffset.UTC).withZoneSameInstant(zone)
-
-private fun AlertResponse.title(): String {
-    val productName = product?.name
-    return when (type) {
-        EXPIRATION_TYPE -> productName?.let { "$it venceu" }
-        EXPIRING_TYPE -> productName?.let { "$it vence em breve" }
-        STOCK_TYPE -> productName?.let { "$it abaixo do mínimo" }
-        UNREGISTERED_PRODUCT_TYPE -> "Produto não cadastrado"
-        ACCESS_REQUEST_TYPE -> "Pedido de entrada na cozinha"
-        REQUISITION_SUBMITTED_TYPE -> "Nova requisição para análise"
-        REQUISITION_APPROVED_TYPE -> "Requisição aprovada"
-        REQUISITION_REJECTED_TYPE -> "Requisição recusada"
-        else -> null
-    } ?: message
-}
-
-private fun AlertResponse.subtitle(): String {
-    val usesMessage = title() != message
-    return when (type) {
-        EXPIRATION_TYPE -> batch?.let { "Lote ${it.batchNumber}" } ?: message
-        STOCK_TYPE -> if (product != null) "Reponha o estoque" else ""
-        else -> if (usesMessage) message else ""
-    }
-}
 
 private fun AlertResponse.variant(): InventraStatusIconVariant =
     when {
