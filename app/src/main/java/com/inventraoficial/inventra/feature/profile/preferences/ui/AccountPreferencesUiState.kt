@@ -4,6 +4,7 @@ import com.inventraoficial.inventra.data.local.ThemeMode
 
 data class AccountPreferencesUiState(
     val theme: ThemeMode = ThemeMode.System,
+    val alertNotifications: Boolean = true,
 )
 
 val ThemeMode.label: String

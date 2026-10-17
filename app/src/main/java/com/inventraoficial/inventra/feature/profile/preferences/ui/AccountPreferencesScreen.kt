@@ -26,8 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraCloseButton
+import com.inventraoficial.inventra.core.designsystem.molecules.InventraSwitchRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.data.local.ThemeMode
+import com.inventraoficial.inventra.feature.notifications.rememberNotificationPermissionRequest
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraBrand
@@ -44,6 +46,8 @@ fun AccountPreferencesScreen(
     onThemeSelect: (ThemeMode) -> Unit,
     onCloseClick: () -> Unit,
     modifier: Modifier = Modifier,
+    alertNotifications: Boolean = true,
+    onAlertNotificationsChange: (Boolean) -> Unit = {},
 ) {
     Column(
         modifier =
@@ -81,14 +85,32 @@ fun AccountPreferencesScreen(
                 fontSize = 13.sp,
                 color = InventraMuted,
             )
+            SectionTitle(text = "Notificações", modifier = Modifier.padding(top = 12.dp))
+            InventraSwitchRow(
+                label = "Avisos no celular",
+                checked = alertNotifications,
+                onCheckedChange = onAlertNotificationsChange,
+            )
+            Text(
+                text =
+                    "Estoque crítico, validade, requisições e pedidos da cozinha chegam mesmo com o app " +
+                        "fechado. O celular confere a cada 15 minutos, mais ou menos.",
+                fontFamily = Montserrat,
+                fontSize = 13.sp,
+                color = InventraMuted,
+            )
         }
     }
 }
 
 @Composable
-private fun SectionTitle(text: String) {
+private fun SectionTitle(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
     Text(
         text = text,
+        modifier = modifier,
         fontFamily = Montserrat,
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
@@ -140,12 +162,18 @@ fun AccountPreferencesRoute(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val requestNotificationPermission = rememberNotificationPermissionRequest()
 
     AccountPreferencesScreen(
         theme = uiState.theme,
         onThemeSelect = viewModel::onThemeSelect,
         onCloseClick = { navigator.back() },
         modifier = modifier,
+        alertNotifications = uiState.alertNotifications,
+        onAlertNotificationsChange = { enabled ->
+            viewModel.onAlertNotificationsChange(enabled)
+            if (enabled) requestNotificationPermission()
+        },
     )
 }
 
