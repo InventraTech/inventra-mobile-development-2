@@ -4,6 +4,7 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraUserRole
 import com.inventraoficial.inventra.data.remote.auth.google.GoogleSignInCancelledException
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.KitchenSummary
+import com.inventraoficial.inventra.data.remote.dto.auth.ProfileSummary
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.GoogleRegistrationRequiredException
 import kotlinx.coroutines.Dispatchers
@@ -77,6 +78,20 @@ class GoogleSignInViewModelTest {
             clicarNoGoogle()
             advanceUntilIdle()
 
+            assertFalse(viewModel.uiState.value.mustCreateKitchen)
+            assertFalse(viewModel.uiState.value.mustJoinKitchen)
+        }
+
+    @Test
+    fun `estoquista sem cozinha precisa pedir entrada numa cozinha depois de entrar`() =
+        runTest {
+            val estoquista = ProfileSummary(id = 2, accessType = AccessType.ESTOQUISTA)
+            repository.result = Result.success(FakeAuthRepository.fakeUser.copy(profile = estoquista))
+
+            clicarNoGoogle()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.mustJoinKitchen)
             assertFalse(viewModel.uiState.value.mustCreateKitchen)
         }
 
