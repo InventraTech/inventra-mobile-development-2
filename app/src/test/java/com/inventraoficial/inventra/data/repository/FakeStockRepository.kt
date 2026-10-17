@@ -1,12 +1,15 @@
 package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.dto.auth.KitchenSummary
+import com.inventraoficial.inventra.data.remote.dto.stock.BatchConsumptionResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.ConsumeProductRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.ProductSummary
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchStatus
 import com.inventraoficial.inventra.data.remote.dto.stock.StockCategory
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementReason
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
 import com.inventraoficial.inventra.data.remote.dto.stock.StockUnit
@@ -71,6 +74,20 @@ class FakeStockRepository(
     override suspend fun kitchenStock(kitchenId: Int): Result<List<KitchenStockItemResponse>> {
         kitchenStockCalls += kitchenId
         return kitchenStockError?.let { Result.failure(it) } ?: Result.success(kitchenStock)
+    }
+
+    var consumeResult: Result<List<BatchConsumptionResponse>> = Result.success(emptyList())
+    var consumeCalls = mutableListOf<ConsumeProductRequest>()
+        private set
+
+    override suspend fun consume(
+        kitchenId: Int,
+        productId: Int,
+        quantity: Double,
+        reason: StockMovementReason,
+    ): Result<List<BatchConsumptionResponse>> {
+        consumeCalls += ConsumeProductRequest(kitchenId, productId, quantity, reason)
+        return consumeResult
     }
 
     companion object {

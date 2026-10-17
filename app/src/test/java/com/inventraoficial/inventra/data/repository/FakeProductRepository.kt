@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.data.repository
 
+import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockCategory
 import com.inventraoficial.inventra.data.remote.dto.stock.StockUnit
@@ -25,6 +26,18 @@ class FakeProductRepository(
         searches += name
         error?.let { return Result.failure(it) }
         return Result.success(products.filter { it.name.contains(name, ignoreCase = true) })
+    }
+
+    var barcodeResult: Result<BarcodeLookupResponse?> = Result.success(null)
+    var barcodeCalls = mutableListOf<Pair<String, Int?>>()
+        private set
+
+    override suspend fun findByBarcode(
+        barcode: String,
+        kitchenId: Int?,
+    ): Result<BarcodeLookupResponse?> {
+        barcodeCalls += barcode to kitchenId
+        return barcodeResult
     }
 
     companion object {
