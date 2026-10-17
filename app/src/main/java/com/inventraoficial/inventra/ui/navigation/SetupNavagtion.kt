@@ -164,8 +164,8 @@ private fun AppNavigation(
                     entry<Screen.ProductEdit> {
                         ProductEditRoute(navigator = navigator)
                     }
-                    entry<Screen.StockOut> {
-                        StockOutRoute(navigator = navigator)
+                    entry<Screen.StockOut> { key ->
+                        StockOutRoute(productId = key.productId, navigator = navigator)
                     }
                     entry<Screen.Home> {
                         HomeRoute(navigator = navigator)
