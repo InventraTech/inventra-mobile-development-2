@@ -8,7 +8,9 @@ import com.inventraoficial.inventra.data.local.AndroidImageCompressor
 import com.inventraoficial.inventra.data.local.AppPreferences
 import com.inventraoficial.inventra.data.local.DataStoreAppPreferences
 import com.inventraoficial.inventra.data.local.DataStoreSessionStorage
+import com.inventraoficial.inventra.data.local.FusedLocationProvider
 import com.inventraoficial.inventra.data.local.ImageCompressor
+import com.inventraoficial.inventra.data.local.LocationProvider
 import com.inventraoficial.inventra.data.local.ProfilePhotoPreview
 import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.remote.api.AlertApi
@@ -25,10 +27,12 @@ import com.inventraoficial.inventra.data.remote.interceptor.AuthInterceptor
 import com.inventraoficial.inventra.data.remote.interceptor.TokenAuthenticator
 import com.inventraoficial.inventra.data.repository.AlertRepository
 import com.inventraoficial.inventra.data.repository.AuthRepository
+import com.inventraoficial.inventra.data.repository.KitchenAccessRepository
 import com.inventraoficial.inventra.data.repository.KitchenRepository
 import com.inventraoficial.inventra.data.repository.MembersRepository
 import com.inventraoficial.inventra.data.repository.NetworkAlertRepository
 import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
+import com.inventraoficial.inventra.data.repository.NetworkKitchenAccessRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenRepository
 import com.inventraoficial.inventra.data.repository.NetworkMembersRepository
 import com.inventraoficial.inventra.data.repository.NetworkProductRepository
@@ -51,6 +55,7 @@ import java.util.concurrent.TimeUnit
 interface AppContainer {
     val authRepository: AuthRepository
     val kitchenRepository: KitchenRepository
+    val kitchenAccessRepository: KitchenAccessRepository
     val membersRepository: MembersRepository
     val stockRepository: StockRepository
     val alertRepository: AlertRepository
@@ -62,6 +67,7 @@ interface AppContainer {
     val googleAuthClient: GoogleAuthClient
     val imageCompressor: ImageCompressor
     val profilePhotoPreview: ProfilePhotoPreview
+    val locationProvider: LocationProvider
 }
 
 class DefaultAppContainer(
@@ -146,8 +152,13 @@ class DefaultAppContainer(
 
     override val imageCompressor: ImageCompressor by lazy { AndroidImageCompressor(context) }
     override val profilePhotoPreview = ProfilePhotoPreview()
+    override val locationProvider: LocationProvider by lazy { FusedLocationProvider(context) }
 
     override val kitchenRepository: KitchenRepository by lazy { NetworkKitchenRepository(kitchenApi, json) }
+
+    override val kitchenAccessRepository: KitchenAccessRepository by lazy {
+        NetworkKitchenAccessRepository(kitchenApi, kitchenAccessApi, json)
+    }
 
     override val membersRepository: MembersRepository by lazy {
         NetworkMembersRepository(kitchenAccessApi, userApi, json)

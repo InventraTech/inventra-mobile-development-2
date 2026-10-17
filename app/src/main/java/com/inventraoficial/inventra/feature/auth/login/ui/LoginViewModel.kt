@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
 import com.inventraoficial.inventra.data.local.mustCreateKitchen
+import com.inventraoficial.inventra.data.local.mustJoinKitchen
 import com.inventraoficial.inventra.data.local.toSessionUser
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,12 +43,14 @@ class LoginViewModel(
             authRepository
                 .login(currentState.login.trim(), currentState.password)
                 .onSuccess { user ->
+                    val sessionUser = user.toSessionUser()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             errorMessage = null,
                             isLoggedIn = true,
-                            mustCreateKitchen = user.toSessionUser().mustCreateKitchen,
+                            mustCreateKitchen = sessionUser.mustCreateKitchen,
+                            mustJoinKitchen = sessionUser.mustJoinKitchen,
                         )
                     }
                 }.onFailure { error -> _uiState.update { it.copy(errorMessage = error.message, isLoading = false) } }

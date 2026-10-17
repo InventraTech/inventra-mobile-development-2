@@ -1,6 +1,8 @@
 package com.inventraoficial.inventra.feature.auth.login.ui
 
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.auth.KitchenSummary
+import com.inventraoficial.inventra.data.remote.dto.auth.ProfileSummary
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -179,6 +181,21 @@ class LoginViewModelTest {
             viewModel.onLoginClick()
             advanceUntilIdle()
 
+            assertFalse(viewModel.uiState.value.mustCreateKitchen)
+        }
+
+    @Test
+    fun `estoquista sem cozinha precisa entrar em uma cozinha depois do login`() =
+        runTest(testDispatcher) {
+            val estoquista =
+                FakeAuthRepository.fakeUser.copy(profile = ProfileSummary(id = 2, accessType = AccessType.ESTOQUISTA))
+            repository.result = Result.success(estoquista)
+            preencherCampos()
+
+            viewModel.onLoginClick()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.mustJoinKitchen)
             assertFalse(viewModel.uiState.value.mustCreateKitchen)
         }
 }

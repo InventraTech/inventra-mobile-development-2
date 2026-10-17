@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.data.remote.api
 
+import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.CreateKitchenAccessRequest
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.KitchenAccessRequestResponse
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.KitchenAccessRequestStatus
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.RejectKitchenAccessRequest
@@ -25,6 +26,14 @@ interface KitchenAccessApi {
         @Path("id") id: String,
         @Body request: RejectKitchenAccessRequest,
     ): KitchenAccessRequestResponse
+
+    @POST(PATH)
+    suspend fun create(
+        @Body request: CreateKitchenAccessRequest,
+    ): KitchenAccessRequestResponse
+
+    @GET("$PATH/mine")
+    suspend fun mine(): KitchenAccessRequestResponse
 
     companion object {
         private const val PATH = "kitchen-access-requests"

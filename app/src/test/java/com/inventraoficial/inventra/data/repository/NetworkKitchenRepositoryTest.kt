@@ -2,6 +2,7 @@ package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.KitchenApi
 import com.inventraoficial.inventra.data.remote.dto.kitchen.CreateKitchenRequest
+import com.inventraoficial.inventra.data.remote.dto.kitchen.DiscoverKitchenPage
 import com.inventraoficial.inventra.data.remote.dto.kitchen.KitchenResponse
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -23,6 +24,13 @@ class NetworkKitchenRepositoryTest {
             lastRequest = request
             return respond()
         }
+
+        override suspend fun discover(
+            query: String?,
+            latitude: Double?,
+            longitude: Double?,
+            size: Int,
+        ): DiscoverKitchenPage = error("nao usado")
     }
 
     @Test
