@@ -75,10 +75,11 @@ class FakeAuthRepository(
 
     var refreshCalls = 0
         private set
+    var refreshResult: Result<Unit> = Result.success(Unit)
 
     override suspend fun refreshCurrentUser(): Result<Unit> {
         refreshCalls++
-        return Result.success(Unit)
+        return refreshResult
     }
 
     var photoResult: Result<Unit> = Result.success(Unit)
