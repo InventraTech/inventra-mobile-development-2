@@ -8,6 +8,19 @@ import com.inventraoficial.inventra.data.remote.dto.stock.ProductSummary
 class FakeAlertRepository(
     var alerts: List<AlertResponse> = emptyList(),
 ) : AlertRepository {
+    var reportError: Exception? = null
+    var reported = mutableListOf<Pair<Int, String>>()
+        private set
+
+    override suspend fun reportUnregisteredProduct(
+        kitchenId: Int,
+        barcode: String,
+    ): Result<AlertResponse> {
+        reported += kitchenId to barcode
+        reportError?.let { return Result.failure(it) }
+        return Result.success(alert(id = 99, type = "UNREGISTERED_PRODUCT", createdAt = "2026-10-17T10:00:00"))
+    }
+
     var error: Exception? = null
     var markAsReadError: Exception? = null
     var alertsCalls = mutableListOf<Int>()

@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.data.remote.api
 
+import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
 import com.inventraoficial.inventra.data.remote.dto.product.PageProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import retrofit2.http.GET
@@ -19,6 +20,12 @@ interface ProductApi {
         @Query("active") active: Boolean = true,
         @Query("sort") sort: String = "name",
     ): PageProductResponse
+
+    @GET("$PATH/by-barcode/{barcode}")
+    suspend fun findByBarcode(
+        @Path("barcode") barcode: String,
+        @Query("kitchenId") kitchenId: Int?,
+    ): BarcodeLookupResponse
 
     companion object {
         private const val PATH = "products"

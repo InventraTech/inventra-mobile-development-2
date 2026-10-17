@@ -1,11 +1,15 @@
 package com.inventraoficial.inventra.data.remote.api
 
+import com.inventraoficial.inventra.data.remote.dto.stock.BatchConsumptionResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.ConsumeProductRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -37,6 +41,11 @@ interface StockApi {
         @Query("type") type: StockMovementType,
         @Query("limit") limit: Int,
     ): List<StockMovementResponse>
+
+    @POST("$PATH/consume")
+    suspend fun consume(
+        @Body request: ConsumeProductRequest,
+    ): List<BatchConsumptionResponse>
 
     companion object {
         private const val PATH = "stock-batches"

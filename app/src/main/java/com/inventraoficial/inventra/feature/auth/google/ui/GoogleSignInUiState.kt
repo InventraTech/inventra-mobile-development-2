@@ -8,6 +8,7 @@ data class GoogleSignInUiState(
     val pendingSignUp: GoogleSignUp? = null,
     val isLoggedIn: Boolean = false,
     val mustCreateKitchen: Boolean = false,
+    val mustJoinKitchen: Boolean = false,
 ) {
     val screenErrorMessage: String?
         get() = errorMessage.takeIf { pendingSignUp == null }

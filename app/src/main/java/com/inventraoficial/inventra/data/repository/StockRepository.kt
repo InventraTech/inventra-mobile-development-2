@@ -2,9 +2,12 @@ package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.StockApi
 import com.inventraoficial.inventra.data.remote.apiCall
+import com.inventraoficial.inventra.data.remote.dto.stock.BatchConsumptionResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.ConsumeProductRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementReason
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
 import kotlinx.serialization.json.Json
@@ -29,6 +32,14 @@ interface StockRepository {
         productId: Int,
         type: StockMovementType,
     ): Result<List<StockMovementResponse>>
+
+    // Baixa por produto: o backend tira primeiro dos lotes que vencem antes.
+    suspend fun consume(
+        kitchenId: Int,
+        productId: Int,
+        quantity: Double,
+        reason: StockMovementReason,
+    ): Result<List<BatchConsumptionResponse>>
 }
 
 class NetworkStockRepository(
@@ -55,6 +66,14 @@ class NetworkStockRepository(
         productId: Int,
         type: StockMovementType,
     ) = apiCall(json) { stockApi.movements(kitchenId, productId, type, MOVEMENTS_LIMIT) }
+
+    override suspend fun consume(
+        kitchenId: Int,
+        productId: Int,
+        quantity: Double,
+        reason: StockMovementReason,
+    ): Result<List<BatchConsumptionResponse>> =
+        apiCall(json) { stockApi.consume(ConsumeProductRequest(kitchenId, productId, quantity, reason)) }
 
     private companion object {
         const val MOVEMENTS_LIMIT = 30

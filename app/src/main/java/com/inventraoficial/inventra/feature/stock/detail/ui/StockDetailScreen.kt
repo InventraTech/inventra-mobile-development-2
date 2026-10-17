@@ -230,7 +230,7 @@ fun StockDetailRoute(
                 onSeeAllBatchesClick = viewModel::onSeeAllBatchesClick,
                 onEntriesClick = viewModel::onEntriesClick,
                 onExitsClick = viewModel::onExitsClick,
-                onStockOutClick = { navigator.navigate(Screen.StockOut) },
+                onStockOutClick = { navigator.navigate(Screen.StockOut(productId)) },
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },
             ),
