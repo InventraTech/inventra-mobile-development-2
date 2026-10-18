@@ -3,6 +3,7 @@ package com.inventraoficial.inventra.data.remote.interceptor
 import com.inventraoficial.inventra.data.local.FakeSessionStorage
 import com.inventraoficial.inventra.data.local.toSessionUser
 import com.inventraoficial.inventra.data.remote.api.AuthApi
+import com.inventraoficial.inventra.data.remote.dto.auth.GoogleLoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.RefreshTokenRequest
@@ -48,6 +49,8 @@ class TokenAuthenticatorTest {
         override suspend fun login(loginRequest: LoginRequest): LoginResponse = error("nao usado")
 
         override suspend fun register(registerRequest: RegisterRequest): LoginResponse = error("nao usado")
+
+        override suspend fun loginWithGoogle(googleLoginRequest: GoogleLoginRequest): LoginResponse = error("nao usado")
 
         override suspend fun logout(refreshRequest: RefreshTokenRequest) = Unit
     }

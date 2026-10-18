@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,6 +35,10 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraRoleSelector
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUserRole
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
+import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInButton
+import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInHost
+import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInViewModel
+import com.inventraoficial.inventra.feature.auth.google.ui.rememberGoogleSignInClick
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -53,8 +58,10 @@ fun RegisterScreen(
     onConfirmPasswordChange: (String) -> Unit,
     onRegisterClick: () -> Unit,
     onBackToLoginClick: () -> Unit,
+    onGoogleClick: () -> Unit,
     errorMessage: String?,
     isLoading: Boolean,
+    isGoogleLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -75,19 +82,15 @@ fun RegisterScreen(
                     .size(200.dp)
                     .offset(0.dp, -30.dp),
         )
-        Image(
-            painter = painterResource(id = R.drawable.bg_shape_purple_bottom),
-            contentDescription = "Background shape yellow bottom",
-            modifier = Modifier.align(Alignment.BottomStart),
-        )
         Column(
             modifier =
                 modifier
+                    .navigationBarsPadding()
                     .imePadding()
                     .verticalScroll(rememberScrollState())
-                    .padding(24.dp, 50.dp, 24.dp, 0.dp),
+                    .padding(24.dp, 40.dp, 24.dp, 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             InventraAuthHeader(
                 appName = "Inventra",
@@ -146,6 +149,11 @@ fun RegisterScreen(
                         .width(300.dp)
                         .padding(0.dp, 0.dp, 0.dp, 0.dp),
             )
+            GoogleSignInButton(
+                onClick = onGoogleClick,
+                isLoading = isGoogleLoading,
+                modifier = Modifier.width(300.dp),
+            )
             InventraTextLink(
                 text = "Já tenho uma conta!",
                 onClick = onBackToLoginClick,
@@ -158,9 +166,13 @@ fun RegisterScreen(
 fun RegisterRoute(
     navigator: Navigator,
     viewModel: RegisterViewModel = viewModel(factory = RegisterViewModel.Factory),
+    googleViewModel: GoogleSignInViewModel = viewModel(factory = GoogleSignInViewModel.Factory),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val googleState by googleViewModel.uiState.collectAsState()
+    GoogleSignInHost(uiState = googleState, viewModel = googleViewModel, navigator = navigator)
+
     LaunchedEffect(uiState.isRegistered) {
         if (uiState.isRegistered) {
             if (uiState.role == InventraUserRole.Supervisor) {
@@ -184,8 +196,10 @@ fun RegisterRoute(
         onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
         onRegisterClick = viewModel::onRegisterClick,
         onBackToLoginClick = { navigator.back() },
-        errorMessage = uiState.errorMessage,
+        onGoogleClick = rememberGoogleSignInClick(googleViewModel),
+        errorMessage = uiState.errorMessage ?: googleState.screenErrorMessage,
         isLoading = uiState.isLoading,
+        isGoogleLoading = googleState.isButtonLoading,
         modifier = modifier,
     )
 }
@@ -207,7 +221,9 @@ private fun RegisterScreenPreview() {
         onConfirmPasswordChange = {},
         onRegisterClick = {},
         onBackToLoginClick = {},
+        onGoogleClick = {},
         errorMessage = null,
         isLoading = false,
+        isGoogleLoading = false,
     )
 }

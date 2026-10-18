@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -57,8 +58,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.firebase.auth)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.okhttp.mockwebserver)
@@ -69,6 +74,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.compose.material.icons.extended)
     val cameraxVersion = "1.7.0-alpha02"
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
@@ -80,4 +86,5 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.coroutines.play.services)
 }

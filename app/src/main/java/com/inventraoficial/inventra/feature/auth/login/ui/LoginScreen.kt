@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,6 +33,10 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
+import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInButton
+import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInHost
+import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInViewModel
+import com.inventraoficial.inventra.feature.auth.google.ui.rememberGoogleSignInClick
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -46,8 +51,10 @@ fun LoginScreen(
     onLoginClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
     onCreateAccountClick: () -> Unit,
+    onGoogleClick: () -> Unit,
     errorMessage: String?,
     isLoading: Boolean,
+    isGoogleLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -78,11 +85,12 @@ fun LoginScreen(
         Column(
             modifier =
                 modifier
+                    .navigationBarsPadding()
                     .imePadding()
                     .verticalScroll(rememberScrollState())
-                    .padding(24.dp, 80.dp, 24.dp, 0.dp),
+                    .padding(24.dp, 64.dp, 24.dp, 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             InventraAuthHeader(
                 appName = "Inventra",
@@ -103,6 +111,11 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = "Insira sua Senha",
             )
+            InventraTextLink(
+                text = "Esqueci minha senha",
+                onClick = onForgotPasswordClick,
+                modifier = Modifier.align(Alignment.End),
+            )
             Text(
                 text = errorMessage.orEmpty(),
                 color = InventraDanger,
@@ -117,14 +130,12 @@ fun LoginScreen(
                     onLoginClick()
                 },
                 isLoading = isLoading,
-                modifier =
-                    Modifier
-                        .width(300.dp)
-                        .padding(0.dp, 35.dp, 0.dp, 20.dp),
+                modifier = Modifier.width(300.dp),
             )
-            InventraTextLink(
-                text = "Esqueci minha senha",
-                onClick = onForgotPasswordClick,
+            GoogleSignInButton(
+                onClick = onGoogleClick,
+                isLoading = isGoogleLoading,
+                modifier = Modifier.width(300.dp),
             )
             InventraTextLink(
                 text = "Criar conta",
@@ -138,9 +149,13 @@ fun LoginScreen(
 fun LoginRoute(
     navigator: Navigator,
     viewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory),
+    googleViewModel: GoogleSignInViewModel = viewModel(factory = GoogleSignInViewModel.Factory),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val googleState by googleViewModel.uiState.collectAsState()
+    GoogleSignInHost(uiState = googleState, viewModel = googleViewModel, navigator = navigator)
+
     LaunchedEffect(uiState.isLoggedIn) {
         if (uiState.isLoggedIn) {
             if (uiState.mustCreateKitchen) {
@@ -159,8 +174,10 @@ fun LoginRoute(
         onLoginClick = viewModel::onLoginClick,
         onForgotPasswordClick = viewModel::onForgotPasswordClick,
         onCreateAccountClick = { navigator.navigate(Screen.Register) },
-        errorMessage = uiState.errorMessage,
+        onGoogleClick = rememberGoogleSignInClick(googleViewModel),
+        errorMessage = uiState.errorMessage ?: googleState.screenErrorMessage,
         isLoading = uiState.isLoading,
+        isGoogleLoading = googleState.isButtonLoading,
         modifier = modifier,
     )
 }
@@ -176,7 +193,9 @@ private fun LoginScreenPreview() {
         onLoginClick = {},
         onForgotPasswordClick = {},
         onCreateAccountClick = {},
+        onGoogleClick = {},
         errorMessage = null,
         isLoading = false,
+        isGoogleLoading = false,
     )
 }

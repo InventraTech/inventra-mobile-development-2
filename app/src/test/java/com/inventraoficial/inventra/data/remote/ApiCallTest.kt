@@ -41,6 +41,16 @@ class ApiCallTest {
         }
 
     @Test
+    fun `erro HTTP expoe o code do ProblemDetail`() =
+        runTest {
+            val body = """{"status":409,"detail":"Conta ainda não cadastrada.","code":"REGISTRATION_REQUIRED"}"""
+
+            val result = apiCall<Int>(json) { throw httpError(409, body) }
+
+            assertEquals("REGISTRATION_REQUIRED", (result.exceptionOrNull() as? ApiException)?.error?.code)
+        }
+
+    @Test
     fun `erro HTTP sem JSON usa a mensagem generica`() =
         runTest {
             val result = apiCall<Int>(json) { throw httpError(502, "<html>Bad Gateway</html>") }

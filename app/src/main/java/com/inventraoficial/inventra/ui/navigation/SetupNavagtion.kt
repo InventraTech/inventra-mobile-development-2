@@ -20,7 +20,9 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomBar
@@ -131,6 +133,11 @@ private fun AppNavigation(
             modifier = insetsModifier.padding(innerPadding),
             backStack = navigator.currentBackStack,
             onBack = { navigator.back() },
+            entryDecorators =
+                listOf(
+                    rememberSaveableStateHolderNavEntryDecorator(),
+                    rememberViewModelStoreNavEntryDecorator(),
+                ),
             entryProvider =
                 entryProvider {
                     entry<Screen.Chat> {

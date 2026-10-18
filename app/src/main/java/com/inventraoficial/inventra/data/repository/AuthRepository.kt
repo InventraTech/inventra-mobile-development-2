@@ -3,10 +3,12 @@ package com.inventraoficial.inventra.data.repository
 import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.local.SessionUser
 import com.inventraoficial.inventra.data.local.toSessionUser
+import com.inventraoficial.inventra.data.remote.ApiException
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.apiCall
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
+import com.inventraoficial.inventra.data.remote.dto.auth.GoogleLoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.RefreshTokenRequest
@@ -31,6 +33,11 @@ interface AuthRepository {
         accessType: AccessType,
     ): Result<UserResponse>
 
+    suspend fun loginWithGoogle(
+        idToken: String,
+        accessType: AccessType? = null,
+    ): Result<UserResponse>
+
     suspend fun hasSession(): Boolean
 
     suspend fun logout()
@@ -43,6 +50,7 @@ class NetworkAuthRepository(
     private val userApi: UserApi,
     private val json: Json,
     private val sessionStorage: SessionStorage,
+    private val clearExternalSession: suspend () -> Unit = {},
 ) : AuthRepository {
     override val currentUser: Flow<SessionUser?> = sessionStorage.user
 
@@ -71,6 +79,19 @@ class NetworkAuthRepository(
             authApi.register(RegisterRequest(name, email, password, accessType))
         }
 
+    override suspend fun loginWithGoogle(
+        idToken: String,
+        accessType: AccessType?,
+    ): Result<UserResponse> {
+        val result = authenticate { authApi.loginWithGoogle(GoogleLoginRequest(idToken, accessType)) }
+        val error = (result.exceptionOrNull() as? ApiException)?.error
+        return if (error?.code == REGISTRATION_REQUIRED) {
+            Result.failure(GoogleRegistrationRequiredException(error.name, error.email.orEmpty()))
+        } else {
+            result
+        }
+    }
+
     override suspend fun hasSession(): Boolean = sessionStorage.token.first() != null
 
     override suspend fun logout() {
@@ -79,10 +100,20 @@ class NetworkAuthRepository(
             apiCall(json) { authApi.logout(RefreshTokenRequest(refreshToken)) }
         }
         sessionStorage.clear()
+        clearExternalSession()
     }
 
     override suspend fun refreshCurrentUser(): Result<Unit> =
         apiCall(json) {
             sessionStorage.updateUser(userApi.me().toSessionUser())
         }
+
+    private companion object {
+        const val REGISTRATION_REQUIRED = "REGISTRATION_REQUIRED"
+    }
 }
+
+class GoogleRegistrationRequiredException(
+    val name: String?,
+    val email: String,
+) : Exception("Escolha seu cargo para concluir o cadastro.")
