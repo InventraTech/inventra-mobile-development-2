@@ -8,6 +8,7 @@ import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.RejectKitchenA
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
+import okhttp3.MultipartBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -52,6 +53,10 @@ class NetworkMembersRepositoryTest {
         override suspend fun listMembers(): List<UserResponse> = listOf(FakeMembersRepository.supervisor)
 
         override suspend fun me(): UserResponse = FakeMembersRepository.supervisor
+
+        override suspend fun updatePhoto(file: MultipartBody.Part): UserResponse = error("nao usado")
+
+        override suspend fun removePhoto(): UserResponse = error("nao usado")
     }
 
     @Test

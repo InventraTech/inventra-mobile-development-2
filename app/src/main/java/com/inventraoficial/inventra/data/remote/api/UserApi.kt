@@ -1,7 +1,12 @@
 package com.inventraoficial.inventra.data.remote.api
 
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
+import okhttp3.MultipartBody
+import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.PUT
+import retrofit2.http.Part
 
 interface UserApi {
     @GET(PATH)
@@ -9,6 +14,15 @@ interface UserApi {
 
     @GET("$PATH/me")
     suspend fun me(): UserResponse
+
+    @Multipart
+    @PUT("$PATH/me/photo")
+    suspend fun updatePhoto(
+        @Part file: MultipartBody.Part,
+    ): UserResponse
+
+    @DELETE("$PATH/me/photo")
+    suspend fun removePhoto(): UserResponse
 
     companion object {
         private const val PATH = "users"

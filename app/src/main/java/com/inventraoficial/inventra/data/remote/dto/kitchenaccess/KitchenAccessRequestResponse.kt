@@ -20,6 +20,7 @@ data class AccessRequestUser(
     val id: String,
     val name: String,
     val email: String,
+    val photoUrl: String? = null,
 )
 
 @Serializable

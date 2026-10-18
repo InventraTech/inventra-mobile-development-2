@@ -5,6 +5,7 @@ data class PendingMemberRequest(
     val initials: String,
     val name: String,
     val email: String,
+    val photoUrl: String? = null,
 )
 
 data class CozinhaMember(
@@ -13,6 +14,7 @@ data class CozinhaMember(
     val name: String,
     val roleLabel: String,
     val isCurrentUser: Boolean,
+    val photoUrl: String? = null,
 )
 
 data class ManageMembersUiState(

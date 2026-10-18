@@ -12,6 +12,7 @@ data class UserResponse(
     val kitchen: KitchenSummary? = null,
     val profile: ProfileSummary,
     val active: Boolean,
+    val photoUrl: String? = null,
     val lastLogin: String? = null,
     val createdAt: String,
 )

@@ -4,9 +4,12 @@ import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.inventraoficial.inventra.BuildConfig
 import com.inventraoficial.inventra.R
+import com.inventraoficial.inventra.data.local.AndroidImageCompressor
 import com.inventraoficial.inventra.data.local.AppPreferences
 import com.inventraoficial.inventra.data.local.DataStoreAppPreferences
 import com.inventraoficial.inventra.data.local.DataStoreSessionStorage
+import com.inventraoficial.inventra.data.local.ImageCompressor
+import com.inventraoficial.inventra.data.local.ProfilePhotoPreview
 import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.remote.api.AlertApi
 import com.inventraoficial.inventra.data.remote.api.AuthApi
@@ -57,6 +60,8 @@ interface AppContainer {
     val sessionManager: SessionManager
     val appPreferences: AppPreferences
     val googleAuthClient: GoogleAuthClient
+    val imageCompressor: ImageCompressor
+    val profilePhotoPreview: ProfilePhotoPreview
 }
 
 class DefaultAppContainer(
@@ -138,6 +143,9 @@ class DefaultAppContainer(
     override val googleAuthClient: GoogleAuthClient by lazy {
         GoogleAuthClient(context, context.getString(R.string.default_web_client_id), FirebaseAuth.getInstance())
     }
+
+    override val imageCompressor: ImageCompressor by lazy { AndroidImageCompressor(context) }
+    override val profilePhotoPreview = ProfilePhotoPreview()
 
     override val kitchenRepository: KitchenRepository by lazy { NetworkKitchenRepository(kitchenApi, json) }
 

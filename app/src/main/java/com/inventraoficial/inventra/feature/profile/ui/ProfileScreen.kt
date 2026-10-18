@@ -2,6 +2,7 @@ package com.inventraoficial.inventra.feature.profile.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,18 +26,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraMenuRow
+import com.inventraoficial.inventra.feature.profile.photo.ui.ProfilePhotoHost
+import com.inventraoficial.inventra.feature.profile.photo.ui.ProfilePhotoViewModel
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraBrand
+import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
@@ -48,6 +56,10 @@ fun ProfileScreen(
     roleLabel: String,
     cozinhaName: String,
     canManageMembers: Boolean,
+    photoUrl: String?,
+    isPhotoUploading: Boolean,
+    photoErrorMessage: String?,
+    onAvatarClick: () -> Unit,
     onProfileDetailsClick: () -> Unit,
     onManageMembersClick: () -> Unit,
     onAccountPreferencesClick: () -> Unit,
@@ -73,23 +85,15 @@ fun ProfileScreen(
                         .height(HEADER_HEIGHT - AVATAR_SIZE / 2)
                         .background(InventraBrand, RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)),
             )
-            Box(
+            ProfileAvatar(
+                photoUrl = photoUrl,
+                isUploading = isPhotoUploading,
+                onClick = onAvatarClick,
                 modifier =
                     Modifier
                         .align(Alignment.TopCenter)
-                        .padding(top = (HEADER_HEIGHT - AVATAR_SIZE) / 2 - 8.dp)
-                        .size(AVATAR_SIZE)
-                        .border(3.dp, Color.White, CircleShape)
-                        .background(Color.Black, CircleShape),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(48.dp),
-                )
-            }
+                        .padding(top = (HEADER_HEIGHT - AVATAR_SIZE) / 2 - 8.dp),
+            )
         }
         Text(
             text = fullName,
@@ -111,8 +115,21 @@ fun ProfileScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 24.dp),
+                    .padding(bottom = if (photoErrorMessage == null) 24.dp else 8.dp),
         )
+        photoErrorMessage?.let { message ->
+            Text(
+                text = message,
+                fontFamily = Montserrat,
+                fontSize = 13.sp,
+                color = InventraDanger,
+                textAlign = TextAlign.Center,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            )
+        }
         Column(
             modifier =
                 Modifier
@@ -147,18 +164,71 @@ fun ProfileScreen(
 }
 
 @Composable
+private fun ProfileAvatar(
+    photoUrl: String?,
+    isUploading: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .size(AVATAR_SIZE)
+                .clip(CircleShape)
+                .background(Color.Black)
+                .border(3.dp, Color.White, CircleShape)
+                .clickable(enabled = !isUploading, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (photoUrl == null) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(48.dp),
+            )
+        } else {
+            AsyncImage(
+                model = photoUrl,
+                contentDescription = "Foto de perfil",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.matchParentSize(),
+            )
+        }
+        if (isUploading) {
+            Box(
+                modifier =
+                    Modifier
+                        .matchParentSize()
+                        .background(Color.Black.copy(alpha = 0.4f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(32.dp))
+            }
+        }
+    }
+}
+
+@Composable
 fun ProfileRoute(
     navigator: Navigator,
     viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory),
+    photoViewModel: ProfilePhotoViewModel = viewModel(factory = ProfilePhotoViewModel.Factory),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val photoState by photoViewModel.uiState.collectAsState()
+    ProfilePhotoHost(uiState = photoState, viewModel = photoViewModel)
 
     ProfileScreen(
         fullName = uiState.fullName,
         roleLabel = uiState.roleLabel,
         cozinhaName = uiState.cozinhaName,
         canManageMembers = uiState.canManageMembers,
+        photoUrl = photoState.photoUrl,
+        isPhotoUploading = photoState.isUploading,
+        photoErrorMessage = photoState.errorMessage,
+        onAvatarClick = photoViewModel::onAvatarClick,
         onProfileDetailsClick = { navigator.navigate(Screen.ProfileDetails) },
         onManageMembersClick = { navigator.navigate(Screen.ManageMembers) },
         onAccountPreferencesClick = { navigator.navigate(Screen.AccountPreferences) },
@@ -176,6 +246,10 @@ private fun ProfileScreenPreview() {
         roleLabel = "Gerente",
         cozinhaName = "Sabor Filial Sul",
         canManageMembers = true,
+        photoUrl = null,
+        isPhotoUploading = false,
+        photoErrorMessage = null,
+        onAvatarClick = {},
         onProfileDetailsClick = {},
         onManageMembersClick = {},
         onAccountPreferencesClick = {},
