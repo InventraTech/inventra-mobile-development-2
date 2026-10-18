@@ -16,7 +16,7 @@ interface LastNotifiedAlertStore {
     )
 }
 
-private val Context.alertNotificationsDataStore by preferencesDataStore(name = "alert_notifications")
+internal val Context.alertNotificationsDataStore by preferencesDataStore(name = "alert_notifications")
 
 class DataStoreLastNotifiedAlertStore(
     private val context: Context,

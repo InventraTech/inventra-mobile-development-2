@@ -44,6 +44,8 @@ import com.inventraoficial.inventra.data.repository.RequisitionRepository
 import com.inventraoficial.inventra.data.repository.StockRepository
 import com.inventraoficial.inventra.data.repository.SupplierRepository
 import com.inventraoficial.inventra.data.session.SessionManager
+import com.inventraoficial.inventra.feature.notifications.background.AccessRequestChecker
+import com.inventraoficial.inventra.feature.notifications.background.DataStoreKnownAccessRequestStore
 import com.inventraoficial.inventra.feature.notifications.background.DataStoreLastNotifiedAlertStore
 import com.inventraoficial.inventra.feature.notifications.background.NewAlertsChecker
 import com.inventraoficial.inventra.feature.notifications.background.SystemAlertNotifier
@@ -73,6 +75,7 @@ interface AppContainer {
     val locationProvider: LocationProvider
     val alertNotifier: SystemAlertNotifier
     val newAlertsChecker: NewAlertsChecker
+    val accessRequestChecker: AccessRequestChecker
 }
 
 class DefaultAppContainer(
@@ -189,6 +192,16 @@ class DefaultAppContainer(
             alertRepository = alertRepository,
             appPreferences = appPreferences,
             store = DataStoreLastNotifiedAlertStore(context),
+            notifier = alertNotifier,
+        )
+    }
+
+    override val accessRequestChecker: AccessRequestChecker by lazy {
+        AccessRequestChecker(
+            authRepository = authRepository,
+            kitchenAccessRepository = kitchenAccessRepository,
+            appPreferences = appPreferences,
+            store = DataStoreKnownAccessRequestStore(context),
             notifier = alertNotifier,
         )
     }
