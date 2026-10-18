@@ -175,10 +175,10 @@ fun RegisterRoute(
 
     LaunchedEffect(uiState.isRegistered) {
         if (uiState.isRegistered) {
-            if (uiState.role == InventraUserRole.Supervisor) {
-                navigator.replaceStack(Screen.CreateCozinha)
-            } else {
-                navigator.navigateTopLevel(Screen.Home)
+            when (uiState.role) {
+                InventraUserRole.Supervisor -> navigator.replaceStack(Screen.CreateCozinha)
+                InventraUserRole.Estoquista -> navigator.replaceStack(Screen.SelectCozinha)
+                null -> navigator.navigateTopLevel(Screen.Home)
             }
         }
     }

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
 import com.inventraoficial.inventra.data.local.mustCreateKitchen
+import com.inventraoficial.inventra.data.local.mustJoinKitchen
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.session.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +38,12 @@ class StartViewModel(
         viewModelScope.launch {
             if (authRepository.hasSession()) {
                 val user = authRepository.currentUser.first()
-                _startScreen.value = if (user?.mustCreateKitchen == true) Screen.CreateCozinha else Screen.Home
+                _startScreen.value =
+                    when {
+                        user?.mustCreateKitchen == true -> Screen.CreateCozinha
+                        user?.mustJoinKitchen == true -> Screen.RequestSent
+                        else -> Screen.Home
+                    }
                 authRepository.refreshCurrentUser()
             } else {
                 _startScreen.value = Screen.Login

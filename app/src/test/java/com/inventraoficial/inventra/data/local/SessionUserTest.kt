@@ -69,4 +69,14 @@ class SessionUserTest {
         assertFalse(supervisor.copy(kitchen = cozinha).toSessionUser().mustCreateKitchen)
         assertFalse(userSemCozinha.toSessionUser().mustCreateKitchen)
     }
+
+    @Test
+    fun `so estoquista sem cozinha precisa entrar em uma cozinha`() {
+        val supervisor = userSemCozinha.copy(profile = ProfileSummary(id = 1, accessType = AccessType.SUPERVISOR))
+        val cozinha = KitchenSummary(id = 7, name = "Sabor Filial Sul")
+
+        assertTrue(userSemCozinha.toSessionUser().mustJoinKitchen)
+        assertFalse(userSemCozinha.copy(kitchen = cozinha).toSessionUser().mustJoinKitchen)
+        assertFalse(supervisor.toSessionUser().mustJoinKitchen)
+    }
 }

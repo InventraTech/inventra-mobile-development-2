@@ -158,10 +158,10 @@ fun LoginRoute(
 
     LaunchedEffect(uiState.isLoggedIn) {
         if (uiState.isLoggedIn) {
-            if (uiState.mustCreateKitchen) {
-                navigator.replaceStack(Screen.CreateCozinha)
-            } else {
-                navigator.navigateTopLevel(Screen.Home)
+            when {
+                uiState.mustCreateKitchen -> navigator.replaceStack(Screen.CreateCozinha)
+                uiState.mustJoinKitchen -> navigator.replaceStack(Screen.RequestSent)
+                else -> navigator.navigateTopLevel(Screen.Home)
             }
         }
     }

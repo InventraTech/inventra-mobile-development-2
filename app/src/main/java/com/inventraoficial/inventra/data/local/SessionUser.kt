@@ -28,3 +28,6 @@ fun UserResponse.toSessionUser() =
 
 val SessionUser.mustCreateKitchen: Boolean
     get() = accessType == AccessType.SUPERVISOR && kitchenId == null
+
+val SessionUser.mustJoinKitchen: Boolean
+    get() = accessType == AccessType.ESTOQUISTA && kitchenId == null

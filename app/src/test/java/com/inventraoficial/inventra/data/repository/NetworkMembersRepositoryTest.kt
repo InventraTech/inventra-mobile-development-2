@@ -2,6 +2,7 @@ package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.KitchenAccessApi
 import com.inventraoficial.inventra.data.remote.api.UserApi
+import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.CreateKitchenAccessRequest
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.KitchenAccessRequestResponse
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.KitchenAccessRequestStatus
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.RejectKitchenAccessRequest
@@ -47,6 +48,12 @@ class NetworkMembersRepositoryTest {
             lastReject = id to request
             return response.copy(status = KitchenAccessRequestStatus.REJECTED)
         }
+
+        override suspend fun create(request: CreateKitchenAccessRequest): KitchenAccessRequestResponse {
+            error("nao usado")
+        }
+
+        override suspend fun mine(): KitchenAccessRequestResponse = error("nao usado")
     }
 
     private class FakeUserApi : UserApi {

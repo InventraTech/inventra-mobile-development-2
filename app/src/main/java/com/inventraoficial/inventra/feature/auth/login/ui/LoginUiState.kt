@@ -7,6 +7,7 @@ data class LoginUiState(
     val errorMessage: String? = null,
     val isLoggedIn: Boolean = false,
     val mustCreateKitchen: Boolean = false,
+    val mustJoinKitchen: Boolean = false,
 ) {
     val isLoginEnabled: Boolean
         get() = login.isNotBlank() && password.isNotBlank() && !isLoading

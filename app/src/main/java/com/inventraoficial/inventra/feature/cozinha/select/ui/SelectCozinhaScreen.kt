@@ -1,5 +1,10 @@
 package com.inventraoficial.inventra.feature.cozinha.select.ui
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,51 +14,76 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material3.Icon
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraCloseButton
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraFilterChip
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraCozinhaRequestStatus
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraCozinhaRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWithFilter
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraCozinhaSheet
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraBrand
+import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.InventraSurface
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
+private val LOCATION_PERMISSIONS =
+    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+
 @Composable
 fun SelectCozinhaScreen(
-    searchQuery: String,
+    uiState: SelectCozinhaUiState,
     onSearchQueryChange: (String) -> Unit,
     onFilterIconClick: () -> Unit,
-    viewMode: CozinhaViewMode,
     onViewModeSelect: (CozinhaViewMode) -> Unit,
-    cozinhas: List<CozinhaListItem>,
     onCozinhaClick: (CozinhaListItem) -> Unit,
+    onRequestAccessClick: () -> Unit,
+    onSheetDismiss: () -> Unit,
+    onRetryClick: () -> Unit,
     onCloseClick: () -> Unit,
+    onNearMeClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    uiState.selectedCozinha?.let { cozinha ->
+        InventraCozinhaSheet(
+            name = cozinha.name,
+            location = cozinha.location,
+            distance = cozinha.distance,
+            status = cozinha.status,
+            onRequestClick = onRequestAccessClick,
+            onDismiss = onSheetDismiss,
+            isLoading = uiState.isRequesting,
+            errorMessage = uiState.requestErrorMessage,
+        )
+    }
+
     Column(
         modifier =
             modifier
@@ -81,36 +111,123 @@ fun SelectCozinhaScreen(
                     .padding(16.dp),
         ) {
             InventraSearchWithFilter(
-                query = searchQuery,
+                query = uiState.searchQuery,
                 onQueryChange = onSearchQueryChange,
                 onFilterClick = onFilterIconClick,
                 placeholder = "Buscar cozinha...",
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier.padding(bottom = 12.dp),
+            )
+            NearMeRow(
+                isNearMe = uiState.isNearMe,
+                isLocating = uiState.isLocating,
+                message = uiState.locationMessage,
+                onClick = onNearMeClick,
+                modifier = Modifier.padding(bottom = 12.dp),
             )
             ViewModeToggle(
-                selected = viewMode,
+                selected = uiState.viewMode,
                 onSelect = onViewModeSelect,
                 modifier = Modifier.padding(bottom = 16.dp),
             )
-            if (viewMode == CozinhaViewMode.List) {
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(cozinhas) { cozinha ->
-                        InventraCozinhaRow(
-                            name = cozinha.name,
-                            subtitle = cozinha.subtitle,
-                            status = cozinha.status,
-                            onClick = { onCozinhaClick(cozinha) },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-            } else {
-                MapPlaceholder(modifier = Modifier.weight(1f))
+            when {
+                uiState.isLoading && uiState.cozinhas.isEmpty() -> CenteredLoading(modifier = Modifier.weight(1f))
+                uiState.errorMessage != null ->
+                    ErrorState(
+                        message = uiState.errorMessage,
+                        onRetryClick = onRetryClick,
+                        modifier = Modifier.weight(1f),
+                    )
+                uiState.viewMode == CozinhaViewMode.List ->
+                    CozinhaList(
+                        cozinhas = uiState.cozinhas,
+                        isLoading = uiState.isLoading,
+                        onCozinhaClick = onCozinhaClick,
+                        modifier = Modifier.weight(1f),
+                    )
+                else ->
+                    CozinhaMap(
+                        cozinhas = uiState.cozinhas,
+                        userLocation = uiState.userLocation.takeIf { uiState.isNearMe },
+                        showMyLocation = uiState.hasLocationPermission,
+                        onCozinhaClick = onCozinhaClick,
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                    )
             }
         }
+    }
+}
+
+@Composable
+private fun CozinhaList(
+    cozinhas: List<CozinhaListItem>,
+    isLoading: Boolean,
+    onCozinhaClick: (CozinhaListItem) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        if (isLoading) {
+            LinearProgressIndicator(
+                color = InventraPurple,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+            )
+        }
+        if (cozinhas.isEmpty()) {
+            Text(
+                "Nenhuma cozinha encontrada.",
+                color = InventraMuted,
+                fontSize = 14.sp,
+                fontFamily = Montserrat,
+            )
+        } else {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(cozinhas, key = { it.id }) { cozinha ->
+                    InventraCozinhaRow(
+                        name = cozinha.name,
+                        subtitle = cozinha.subtitle,
+                        status = cozinha.status,
+                        onClick = { onCozinhaClick(cozinha) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CenteredLoading(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(color = InventraPurple)
+    }
+}
+
+@Composable
+private fun ErrorState(
+    message: String,
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            message,
+            fontSize = 15.sp,
+            fontFamily = Montserrat,
+            textAlign = TextAlign.Center,
+        )
+        InventraSecondaryButton(text = "Tentar novamente", onClick = onRetryClick)
     }
 }
 
@@ -153,53 +270,82 @@ private fun ViewModeToggle(
 }
 
 @Composable
-private fun MapPlaceholder(modifier: Modifier = Modifier) {
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .background(InventraPurple.copy(alpha = 0.05f), RoundedCornerShape(12.dp)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Default.Map,
-                contentDescription = null,
-                tint = InventraPurple,
-                modifier = Modifier.height(40.dp),
+private fun NearMeRow(
+    isNearMe: Boolean,
+    isLocating: Boolean,
+    message: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            InventraFilterChip(
+                label = if (isNearMe) "Perto de mim (até 50 km)" else "Perto de mim",
+                selected = isNearMe,
+                onClick = onClick,
             )
-            Text(
-                text = "Mapa em breve",
-                fontFamily = Montserrat,
-                fontWeight = FontWeight.Bold,
-                color = InventraPurple,
-                modifier = Modifier.padding(top = 8.dp),
-            )
+            if (isLocating) {
+                CircularProgressIndicator(
+                    color = InventraPurple,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        }
+        if (message != null) {
+            Text(message, color = InventraMuted, fontSize = 12.sp, fontFamily = Montserrat)
         }
     }
 }
 
+private fun Context.hasLocationPermission(): Boolean =
+    LOCATION_PERMISSIONS.any { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
+
 @Composable
 fun SelectCozinhaRoute(
     navigator: Navigator,
-    viewModel: SelectCozinhaViewModel = viewModel(),
+    viewModel: SelectCozinhaViewModel = viewModel(factory = SelectCozinhaViewModel.Factory),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val locationPermission =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+            viewModel.onLocationPermissionResult(result.values.any { it })
+        }
+
+    LaunchedEffect(Unit) {
+        viewModel.onLocationPermissionChecked(context.hasLocationPermission())
+    }
+
+    LaunchedEffect(uiState.isRequestSent) {
+        if (uiState.isRequestSent) navigator.replaceStack(Screen.RequestSent)
+    }
+
+    LaunchedEffect(uiState.isLoggedOut) {
+        if (uiState.isLoggedOut) navigator.replaceStack(Screen.Login)
+    }
 
     SelectCozinhaScreen(
-        searchQuery = uiState.searchQuery,
+        uiState = uiState,
         onSearchQueryChange = viewModel::onSearchQueryChange,
         onFilterIconClick = viewModel::onFilterIconClick,
-        viewMode = uiState.viewMode,
         onViewModeSelect = viewModel::onViewModeSelect,
-        cozinhas = uiState.cozinhas,
-        onCozinhaClick = { cozinha ->
-            if (cozinha.status == InventraCozinhaRequestStatus.Disponivel) {
-                navigator.navigate(Screen.RequestSent)
+        onCozinhaClick = viewModel::onCozinhaClick,
+        onRequestAccessClick = viewModel::onRequestAccessClick,
+        onSheetDismiss = viewModel::onSheetDismiss,
+        onRetryClick = viewModel::onRetryClick,
+        onCloseClick = viewModel::onCloseClick,
+        onNearMeClick = {
+            if (uiState.isNearMe || uiState.hasLocationPermission) {
+                viewModel.onNearMeClick()
+            } else {
+                locationPermission.launch(LOCATION_PERMISSIONS)
             }
         },
-        onCloseClick = { navigator.replaceStack(Screen.Login) },
         modifier = modifier,
     )
 }
@@ -209,25 +355,41 @@ fun SelectCozinhaRoute(
 @Composable
 private fun SelectCozinhaScreenPreview() {
     SelectCozinhaScreen(
-        searchQuery = "",
+        uiState =
+            SelectCozinhaUiState(
+                cozinhas =
+                    listOf(
+                        CozinhaListItem(
+                            id = 1,
+                            name = "Restaurante Sabor Caseiro",
+                            location = "São Paulo, SP",
+                            distance = "3,2 km",
+                            status = InventraCozinhaRequestStatus.Disponivel,
+                        ),
+                        CozinhaListItem(
+                            id = 2,
+                            name = "Tung Tung Tung Sahur",
+                            location = "Rio de Janeiro, RJ",
+                            distance = null,
+                            status = InventraCozinhaRequestStatus.Pendente,
+                        ),
+                        CozinhaListItem(
+                            id = 3,
+                            name = "Instituto J&F",
+                            location = null,
+                            distance = null,
+                            status = InventraCozinhaRequestStatus.Recusada,
+                        ),
+                    ),
+            ),
         onSearchQueryChange = {},
         onFilterIconClick = {},
-        viewMode = CozinhaViewMode.List,
         onViewModeSelect = {},
-        cozinhas =
-            listOf(
-                CozinhaListItem(
-                    name = "Restaurante Sabor Caseiro",
-                    subtitle = "Matriz · São Paulo, SP",
-                    status = InventraCozinhaRequestStatus.Disponivel,
-                ),
-                CozinhaListItem(
-                    name = "Tung Tung Tung Sahur",
-                    subtitle = "Filial · Rio de Janeiro, RJ",
-                    status = InventraCozinhaRequestStatus.Pendente,
-                ),
-            ),
         onCozinhaClick = {},
+        onRequestAccessClick = {},
+        onSheetDismiss = {},
+        onRetryClick = {},
         onCloseClick = {},
+        onNearMeClick = {},
     )
 }
