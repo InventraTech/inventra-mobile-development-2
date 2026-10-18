@@ -49,6 +49,7 @@ import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraBrand
+import com.inventraoficial.inventra.ui.theme.InventraGold
 import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.InventraSurface
@@ -56,6 +57,26 @@ import com.inventraoficial.inventra.ui.theme.Montserrat
 
 private val LOCATION_PERMISSIONS =
     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+@Composable
+private fun PendingRequestBanner(
+    cozinhaName: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text =
+            "Você tem um pedido pendente para $cozinhaName. Dá para ver as cozinhas, " +
+                "mas pedir em outra só depois da resposta.",
+        fontFamily = Montserrat,
+        fontSize = 13.sp,
+        color = InventraPurple,
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(InventraGold.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+                .padding(12.dp),
+    )
+}
 
 @Composable
 fun SelectCozinhaScreen(
@@ -81,6 +102,10 @@ fun SelectCozinhaScreen(
             onDismiss = onSheetDismiss,
             isLoading = uiState.isRequesting,
             errorMessage = uiState.requestErrorMessage,
+            blockedMessage =
+                uiState.pendingCozinhaName
+                    ?.takeIf { cozinha.status != InventraCozinhaRequestStatus.Pendente }
+                    ?.let { "Você já tem um pedido pendente para $it. Aguarde a resposta antes de pedir em outra." },
         )
     }
 
@@ -110,6 +135,7 @@ fun SelectCozinhaScreen(
                     .weight(1f)
                     .padding(16.dp),
         ) {
+            uiState.pendingCozinhaName?.let { name -> PendingRequestBanner(name, Modifier.padding(bottom = 12.dp)) }
             InventraSearchWithFilter(
                 query = uiState.searchQuery,
                 onQueryChange = onSearchQueryChange,
@@ -338,7 +364,8 @@ fun SelectCozinhaRoute(
         onRequestAccessClick = viewModel::onRequestAccessClick,
         onSheetDismiss = viewModel::onSheetDismiss,
         onRetryClick = viewModel::onRetryClick,
-        onCloseClick = viewModel::onCloseClick,
+        // Aberta por cima de "Minhas solicitações", fechar volta para lá; como primeira tela, faz logout.
+        onCloseClick = { if (navigator.canGoBack) navigator.back() else viewModel.onCloseClick() },
         onNearMeClick = {
             if (uiState.isNearMe || uiState.hasLocationPermission) {
                 viewModel.onNearMeClick()

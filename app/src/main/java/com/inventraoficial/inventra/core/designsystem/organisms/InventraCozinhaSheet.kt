@@ -49,6 +49,7 @@ fun InventraCozinhaSheet(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
     errorMessage: String? = null,
+    blockedMessage: String? = null,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -64,6 +65,7 @@ fun InventraCozinhaSheet(
             onRequestClick = onRequestClick,
             isLoading = isLoading,
             errorMessage = errorMessage,
+            blockedMessage = blockedMessage,
             modifier = Modifier.navigationBarsPadding(),
         )
     }
@@ -79,6 +81,8 @@ fun InventraCozinhaSheetContent(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
     errorMessage: String? = null,
+    // Motivo para não deixar pedir (ex.: já existe um pedido pendente em outra cozinha).
+    blockedMessage: String? = null,
 ) {
     Column(
         modifier =
@@ -117,7 +121,7 @@ fun InventraCozinhaSheetContent(
             }
         }
         Text(
-            text = status.helperText(),
+            text = blockedMessage ?: status.helperText(),
             fontFamily = Montserrat,
             fontSize = 14.sp,
             color = InventraMuted,
@@ -134,7 +138,7 @@ fun InventraCozinhaSheetContent(
             text = status.actionText(),
             onClick = onRequestClick,
             modifier = Modifier.fillMaxWidth(),
-            enabled = status != InventraCozinhaRequestStatus.Pendente,
+            enabled = status != InventraCozinhaRequestStatus.Pendente && blockedMessage == null,
             isLoading = isLoading,
         )
     }

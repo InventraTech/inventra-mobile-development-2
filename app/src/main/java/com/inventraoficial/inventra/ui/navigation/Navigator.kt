@@ -8,6 +8,9 @@ class Navigator(
     val currentBackStack: List<Screen>
         get() = backStack
 
+    val canGoBack: Boolean
+        get() = backStack.size > 1
+
     fun back() {
         backStack.removeLastOrNull()
     }

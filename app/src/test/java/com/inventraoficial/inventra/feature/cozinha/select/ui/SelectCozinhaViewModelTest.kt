@@ -2,8 +2,10 @@ package com.inventraoficial.inventra.feature.cozinha.select.ui
 
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraCozinhaRequestStatus
 import com.inventraoficial.inventra.data.local.FakeLocationProvider
+import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.KitchenAccessRequestStatus
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.FakeKitchenAccessRepository
+import com.inventraoficial.inventra.data.repository.FakeMembersRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -30,7 +32,8 @@ class SelectCozinhaViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        kitchenAccessRepository = FakeKitchenAccessRepository()
+        // Sem pedido pendente: a seleção de cozinhas libera o pedido de entrada.
+        kitchenAccessRepository = FakeKitchenAccessRepository(myRequestResult = Result.success(null))
         authRepository = FakeAuthRepository(hasSession = true)
         locationProvider = FakeLocationProvider()
     }
@@ -199,6 +202,33 @@ class SelectCozinhaViewModelTest {
             advanceUntilIdle()
 
             assertTrue(kitchenAccessRepository.requestedKitchenIds.isEmpty())
+        }
+
+    @Test
+    fun `com pedido pendente em outra cozinha so mostra as cozinhas e nao deixa pedir`() =
+        runTest(testDispatcher) {
+            kitchenAccessRepository.myRequestResult = Result.success(FakeMembersRepository.pendingRequest)
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            assertEquals("Sabor Filial Sul", viewModel.uiState.value.pendingCozinhaName)
+
+            viewModel.onCozinhaClick(viewModel.uiState.value.cozinhas[1])
+            viewModel.onRequestAccessClick()
+            advanceUntilIdle()
+
+            assertTrue(kitchenAccessRepository.requestedKitchenIds.isEmpty())
+            assertFalse(viewModel.uiState.value.isRequestSent)
+        }
+
+    @Test
+    fun `pedido recusado nao bloqueia um novo pedido`() =
+        runTest(testDispatcher) {
+            val rejected = FakeMembersRepository.pendingRequest.copy(status = KitchenAccessRequestStatus.REJECTED)
+            kitchenAccessRepository.myRequestResult = Result.success(rejected)
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            assertNull(viewModel.uiState.value.pendingCozinhaName)
         }
 
     @Test
