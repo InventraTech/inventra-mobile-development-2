@@ -32,6 +32,7 @@ data class ScanUiState(
     val errorMessage: String? = null,
     val canManageStock: Boolean = false,
     val canReport: Boolean = false,
+    val canCreateProduct: Boolean = false,
     val isManualEntryOpen: Boolean = false,
     val manualCode: String = "",
 ) {
@@ -51,6 +52,7 @@ data class ScanActions(
     val onStockEntryClick: (Int) -> Unit,
     val onSeeProductClick: (Int) -> Unit,
     val onReportClick: () -> Unit,
+    val onCreateProductClick: (String) -> Unit,
     val onManualEntryClick: () -> Unit,
     val onManualCodeChange: (String) -> Unit,
     val onManualCodeSubmit: () -> Unit,

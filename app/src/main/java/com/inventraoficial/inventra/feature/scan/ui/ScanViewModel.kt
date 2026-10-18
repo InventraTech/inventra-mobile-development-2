@@ -41,6 +41,7 @@ class ScanViewModel(
                 it.copy(
                     canManageStock = accessType == AccessType.SUPERVISOR || accessType == AccessType.ESTOQUISTA,
                     canReport = accessType == AccessType.ESTOQUISTA,
+                    canCreateProduct = accessType == AccessType.SUPERVISOR,
                 )
             }
         }

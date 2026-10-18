@@ -82,7 +82,7 @@ class ScanViewModelTest {
     }
 
     @Test
-    fun `estoquista pode dar baixa e avisar, supervisor so dar baixa e comprador nenhum`() =
+    fun `estoquista pode dar baixa e avisar, supervisor dar baixa e cadastrar e comprador nenhum`() =
         runTest(testDispatcher) {
             val estoquista = createViewModel(AccessType.ESTOQUISTA)
             val supervisor = createViewModel(AccessType.SUPERVISOR)
@@ -90,9 +90,11 @@ class ScanViewModelTest {
             advanceUntilIdle()
 
             assertTrue(estoquista.uiState.value.canManageStock && estoquista.uiState.value.canReport)
-            assertTrue(supervisor.uiState.value.canManageStock)
+            assertFalse(estoquista.uiState.value.canCreateProduct)
+            assertTrue(supervisor.uiState.value.canManageStock && supervisor.uiState.value.canCreateProduct)
             assertFalse(supervisor.uiState.value.canReport)
             assertFalse(comprador.uiState.value.canManageStock || comprador.uiState.value.canReport)
+            assertFalse(comprador.uiState.value.canCreateProduct)
         }
 
     @Test

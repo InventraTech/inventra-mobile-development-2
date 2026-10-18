@@ -335,6 +335,7 @@ class NotificationViewModelTest {
                     11 to NotificationTarget.Requisition(12),
                     12 to NotificationTarget.Requisition(13),
                     13 to NotificationTarget.Product(13),
+                    14 to NotificationTarget.NewProduct("7898080640611"),
                 ),
                 viewModel.uiState.value.targets,
             )

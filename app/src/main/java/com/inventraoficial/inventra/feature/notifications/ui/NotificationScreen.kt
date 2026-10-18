@@ -191,6 +191,7 @@ private fun NotificationTarget.toScreen(): Screen =
         is NotificationTarget.Product -> Screen.StockDetail(productId)
         is NotificationTarget.Requisition -> Screen.RequisitionDetail(requisitionId)
         NotificationTarget.Members -> Screen.ManageMembers
+        is NotificationTarget.NewProduct -> Screen.ProductCreate(barcode)
     }
 
 @Suppress("UnusedPrivateMember")
