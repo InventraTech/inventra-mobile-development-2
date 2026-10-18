@@ -1,9 +1,14 @@
 package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.StockApi
+import com.inventraoficial.inventra.data.remote.dto.stock.BatchConsumptionResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.ConsumeProductRequest
+import com.inventraoficial.inventra.data.remote.dto.stock.ConsumedBatch
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchStatus
+import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementReason
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
 import kotlinx.coroutines.test.runTest
@@ -75,6 +80,22 @@ class NetworkStockRepositoryTest {
             error?.let { throw it }
             lastKitchenStock = kitchenId
             return listOf(FakeStockRepository.stockItem(1, "Arroz Camil", "Grãos", 24.0, 2))
+        }
+
+        var lastConsume: ConsumeProductRequest? = null
+            private set
+
+        override suspend fun consume(request: ConsumeProductRequest): List<BatchConsumptionResponse> {
+            error?.let { throw it }
+            lastConsume = request
+            return listOf(
+                BatchConsumptionResponse(
+                    batch = ConsumedBatch(id = 1, batchNumber = "0001", expirationDate = "2026-10-11"),
+                    consumedQuantity = request.quantity,
+                    remainingQuantity = 0.0,
+                    status = StockBatchStatus.WRITTEN_OFF,
+                ),
+            )
         }
     }
 
@@ -156,5 +177,17 @@ class NetworkStockRepositoryTest {
 
             assertTrue(result.isSuccess)
             assertEquals(Triple(5013, StockMovementType.WRITE_OFF, 30), api.lastMovements)
+        }
+
+    @Test
+    fun `consume envia cozinha, produto, quantidade e motivo`() =
+        runTest {
+            val api = FakeStockApi(listOf(batch), listOf(alert))
+            val repository = NetworkStockRepository(api, json)
+
+            val result = repository.consume(7, 5013, 2.5, StockMovementReason.LOSS)
+
+            assertEquals(listOf("0001"), result.getOrNull()?.map { it.batch.batchNumber })
+            assertEquals(ConsumeProductRequest(7, 5013, 2.5, StockMovementReason.LOSS), api.lastConsume)
         }
 }

@@ -102,4 +102,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.play.services.location)
     implementation(libs.maps.compose)
+    implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.androidx.camera.mlkit.vision)
 }

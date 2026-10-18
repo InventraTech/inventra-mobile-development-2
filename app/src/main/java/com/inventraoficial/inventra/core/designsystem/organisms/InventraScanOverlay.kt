@@ -5,9 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -23,16 +24,15 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
+// Moldura do scan sobre a câmera, com um painel embaixo para o que a tela precisar mostrar.
 @Composable
 fun InventraScanOverlay(
-    instruction: String,
-    onScan: () -> Unit,
     modifier: Modifier = Modifier,
+    panel: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Box(
@@ -78,20 +78,21 @@ fun InventraScanOverlay(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(250.dp)
+                    .heightIn(min = 250.dp)
                     .background(InventraBackground)
                     .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(instruction, fontFamily = Montserrat, fontSize = 15.sp)
-            InventraPrimaryButton(text = "Escanear", onClick = onScan, modifier = Modifier.fillMaxWidth().padding(40.dp))
-        }
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+            content = panel,
+        )
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview
 @Composable
 private fun InventraScanOverlayPreview() {
-    InventraScanOverlay(instruction = "Posicione o código de barras na moldura", onScan = {})
+    InventraScanOverlay {
+        Text("Aponte a câmera para o código de barras", fontFamily = Montserrat, fontSize = 15.sp)
+    }
 }

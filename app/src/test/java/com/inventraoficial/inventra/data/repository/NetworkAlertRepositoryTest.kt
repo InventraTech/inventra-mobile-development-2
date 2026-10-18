@@ -2,6 +2,7 @@ package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.AlertApi
 import com.inventraoficial.inventra.data.remote.dto.alert.AlertResponse
+import com.inventraoficial.inventra.data.remote.dto.alert.ReportUnregisteredProductRequest
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
@@ -43,6 +44,15 @@ class NetworkAlertRepositoryTest {
         override suspend fun markAsRead(id: Int): AlertResponse {
             lastReadId = id
             return alerts.first { it.id == id }.copy(read = true)
+        }
+
+        var lastReport: ReportUnregisteredProductRequest? = null
+            private set
+
+        override suspend fun reportUnregisteredProduct(request: ReportUnregisteredProductRequest): AlertResponse {
+            error?.let { throw it }
+            lastReport = request
+            return FakeAlertRepository.alert(99, "UNREGISTERED_PRODUCT", "2026-10-17T10:00:00")
         }
     }
 
@@ -103,5 +113,17 @@ class NetworkAlertRepositoryTest {
 
             assertTrue(result.isSuccess)
             assertEquals(7, api.lastReadAll)
+        }
+
+    @Test
+    fun `reportUnregisteredProduct envia a cozinha e o codigo`() =
+        runTest {
+            val api = FakeAlertApi(emptyList())
+            val repository = NetworkAlertRepository(api, json)
+
+            val result = repository.reportUnregisteredProduct(kitchenId = 7, barcode = "7894900011517")
+
+            assertEquals("UNREGISTERED_PRODUCT", result.getOrNull()?.type)
+            assertEquals(ReportUnregisteredProductRequest(7, "7894900011517"), api.lastReport)
         }
 }

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUserRole
 import com.inventraoficial.inventra.data.local.mustCreateKitchen
+import com.inventraoficial.inventra.data.local.mustJoinKitchen
 import com.inventraoficial.inventra.data.local.toSessionUser
 import com.inventraoficial.inventra.data.remote.auth.google.GoogleSignInCancelledException
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
@@ -72,12 +73,14 @@ class GoogleSignInViewModel(
         authRepository
             .loginWithGoogle(idToken, accessType)
             .onSuccess { user ->
+                val sessionUser = user.toSessionUser()
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         pendingSignUp = null,
                         isLoggedIn = true,
-                        mustCreateKitchen = user.toSessionUser().mustCreateKitchen,
+                        mustCreateKitchen = sessionUser.mustCreateKitchen,
+                        mustJoinKitchen = sessionUser.mustJoinKitchen,
                     )
                 }
             }.onFailure { error ->
