@@ -41,6 +41,11 @@ sealed interface Screen : NavKey {
         val productId: Int,
     ) : Screen
 
+    // Cadastro de produto pelo supervisor; com o código escaneado, já vem preenchido.
+    data class ProductCreate(
+        val barcode: String? = null,
+    ) : Screen
+
     data object Chat : Screen
 
     data object Profile : Screen
