@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -137,11 +138,21 @@ private fun DetailContent(
             onExitsClick = actions.onExitsClick,
         )
         uiState.history?.let { HistoryList(it) }
-        InventraPrimaryButton(
-            text = "Dar Baixa",
-            onClick = actions.onStockOutClick,
+        Row(
             modifier = Modifier.fillMaxWidth(),
-        )
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            InventraPrimaryButton(
+                text = "Dar Entrada",
+                onClick = actions.onStockEntryClick,
+                modifier = Modifier.weight(1f),
+            )
+            InventraPrimaryButton(
+                text = "Dar Baixa",
+                onClick = actions.onStockOutClick,
+                modifier = Modifier.weight(1f),
+            )
+        }
     }
 }
 
@@ -230,6 +241,7 @@ fun StockDetailRoute(
                 onSeeAllBatchesClick = viewModel::onSeeAllBatchesClick,
                 onEntriesClick = viewModel::onEntriesClick,
                 onExitsClick = viewModel::onExitsClick,
+                onStockEntryClick = { navigator.navigate(Screen.StockEntry(productId)) },
                 onStockOutClick = { navigator.navigate(Screen.StockOut(productId)) },
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },

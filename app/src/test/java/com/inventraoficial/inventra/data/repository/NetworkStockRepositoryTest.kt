@@ -6,6 +6,7 @@ import com.inventraoficial.inventra.data.remote.dto.stock.ConsumeProductRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.ConsumedBatch
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.LowStockAlertResponse
+import com.inventraoficial.inventra.data.remote.dto.stock.RegisterStockEntryRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchStatus
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementReason
@@ -96,6 +97,15 @@ class NetworkStockRepositoryTest {
                     status = StockBatchStatus.WRITTEN_OFF,
                 ),
             )
+        }
+
+        var lastEntry: RegisterStockEntryRequest? = null
+            private set
+
+        override suspend fun registerEntry(request: RegisterStockEntryRequest): StockBatchResponse {
+            error?.let { throw it }
+            lastEntry = request
+            return FakeStockRepository.batch(1, "Leite Integral", request.expirationDate.orEmpty())
         }
     }
 
@@ -189,5 +199,28 @@ class NetworkStockRepositoryTest {
 
             assertEquals(listOf("0001"), result.getOrNull()?.map { it.batch.batchNumber })
             assertEquals(ConsumeProductRequest(7, 5013, 2.5, StockMovementReason.LOSS), api.lastConsume)
+        }
+
+    @Test
+    fun `registerEntry envia o lote novo e devolve o lote criado`() =
+        runTest {
+            val api = FakeStockApi(listOf(batch), listOf(alert))
+            val repository = NetworkStockRepository(api, json)
+            val request = RegisterStockEntryRequest(5013, 7, "L2026-010", 12.0, "2026-10-17", "2026-11-30")
+
+            val result = repository.registerEntry(request)
+
+            assertEquals("2026-11-30", result.getOrNull()?.expirationDate)
+            assertEquals(request, api.lastEntry)
+        }
+
+    @Test
+    fun `registerEntry com falha de rede devolve falha`() =
+        runTest {
+            val api = FakeStockApi(emptyList(), emptyList(), error = IOException("sem sinal"))
+            val repository = NetworkStockRepository(api, json)
+            val request = RegisterStockEntryRequest(5013, 7, "L2026-010", 12.0, "2026-10-17", "2026-11-30")
+
+            assertTrue(repository.registerEntry(request).isFailure)
         }
 }
