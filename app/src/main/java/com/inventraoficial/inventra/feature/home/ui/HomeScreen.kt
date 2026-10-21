@@ -39,6 +39,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraPriority
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraStat
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraStatGrid
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.feature.notifications.RequestNotificationPermissionOnStart
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -179,6 +180,7 @@ fun HomeRoute(
     LaunchedEffect(Unit) {
         viewModel.onScreenVisible()
     }
+    RequestNotificationPermissionOnStart()
 
     HomeScreen(
         userName = uiState.userName,

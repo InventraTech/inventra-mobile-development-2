@@ -81,6 +81,18 @@ class NetworkAlertRepositoryTest {
         }
 
     @Test
+    fun `unreadAlerts busca so os nao lidos da cozinha`() =
+        runTest {
+            val api = FakeAlertApi(listOf(unread, read))
+            val repository = NetworkAlertRepository(api, json)
+
+            val result = repository.unreadAlerts(kitchenId = 7)
+
+            assertEquals(listOf(unread), result.getOrNull())
+            assertEquals(7 to true, api.lastList)
+        }
+
+    @Test
     fun `markAsRead envia o id do alerta`() =
         runTest {
             val api = FakeAlertApi(listOf(unread))

@@ -27,11 +27,22 @@ class AccountPreferencesViewModel(
                 _uiState.update { it.copy(theme = mode) }
             }
         }
+        viewModelScope.launch {
+            appPreferences.alertNotificationsEnabled.collect { enabled ->
+                _uiState.update { it.copy(alertNotifications = enabled) }
+            }
+        }
     }
 
     fun onThemeSelect(theme: ThemeMode) {
         viewModelScope.launch {
             appPreferences.setThemeMode(theme)
+        }
+    }
+
+    fun onAlertNotificationsChange(enabled: Boolean) {
+        viewModelScope.launch {
+            appPreferences.setAlertNotificationsEnabled(enabled)
         }
     }
 

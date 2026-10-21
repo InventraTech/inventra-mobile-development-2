@@ -16,6 +16,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val appPreferences = (application as InventraApplication).container.appPreferences
+        // Veio do toque numa notificação: abre a tela de Notificações (só na criação, não ao girar a tela).
+        val openNotifications =
+            savedInstanceState == null && intent.getBooleanExtra(EXTRA_OPEN_NOTIFICATIONS, false)
         setContent {
             val themeMode by appPreferences.themeMode.collectAsState(initial = ThemeMode.System)
             val darkTheme =
@@ -25,8 +28,12 @@ class MainActivity : ComponentActivity() {
                     ThemeMode.System -> isSystemInDarkTheme()
                 }
             InventraTheme(darkTheme = darkTheme) {
-                SetupNavigation()
+                SetupNavigation(openNotifications = openNotifications)
             }
         }
+    }
+
+    companion object {
+        const val EXTRA_OPEN_NOTIFICATIONS = "open_notifications"
     }
 }

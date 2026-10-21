@@ -13,8 +13,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -58,7 +58,10 @@ import com.inventraoficial.inventra.ui.theme.LocalInventraPalette
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
-fun SetupNavigation(startViewModel: StartViewModel = viewModel(factory = StartViewModel.Factory)) {
+fun SetupNavigation(
+    openNotifications: Boolean = false,
+    startViewModel: StartViewModel = viewModel(factory = StartViewModel.Factory),
+) {
     val startScreen by startViewModel.startScreen.collectAsState()
     val bottomDestinations by startViewModel.bottomDestinations.collectAsState()
 
@@ -71,8 +74,11 @@ fun SetupNavigation(startViewModel: StartViewModel = viewModel(factory = StartVi
                     .background(InventraBackground),
         )
     } else {
+        // Pela notificação, abre as Notificações por cima da Home; voltar leva para a Home.
+        val initialStack =
+            if (openNotifications && screen == Screen.Home) listOf(screen, Screen.Notifications) else listOf(screen)
         AppNavigation(
-            startScreen = screen,
+            initialStack = initialStack,
             sessionExpired = startViewModel.sessionExpired,
             bottomDestinations = bottomDestinations,
         )
@@ -81,13 +87,13 @@ fun SetupNavigation(startViewModel: StartViewModel = viewModel(factory = StartVi
 
 @Composable
 private fun AppNavigation(
-    startScreen: Screen,
+    initialStack: List<Screen>,
     sessionExpired: SharedFlow<Unit>,
     bottomDestinations: List<InventraBottomDestination>,
 ) {
     val navigator =
         remember {
-            Navigator(mutableStateListOf(startScreen))
+            Navigator(initialStack.toMutableStateList())
         }
 
     LaunchedEffect(Unit) {

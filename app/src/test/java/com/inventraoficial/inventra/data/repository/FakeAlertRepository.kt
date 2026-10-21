@@ -39,6 +39,15 @@ class FakeAlertRepository(
         return Result.success(alerts.count { !it.read })
     }
 
+    var unreadAlertsCalls = mutableListOf<Int>()
+        private set
+
+    override suspend fun unreadAlerts(kitchenId: Int): Result<List<AlertResponse>> {
+        unreadAlertsCalls += kitchenId
+        error?.let { return Result.failure(it) }
+        return Result.success(alerts.filter { !it.read })
+    }
+
     override suspend fun markAsRead(id: Int): Result<AlertResponse> {
         markedAsRead += id
         markAsReadError?.let { return Result.failure(it) }
