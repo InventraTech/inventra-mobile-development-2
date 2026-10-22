@@ -31,6 +31,11 @@ class NewAlertsCheckerTest {
         override fun show(alerts: List<AlertResponse>) {
             shown += alerts
         }
+
+        override fun showAccessDecision(
+            cozinhaName: String,
+            approved: Boolean,
+        ) = Unit
     }
 
     private val alertRepository = FakeAlertRepository()

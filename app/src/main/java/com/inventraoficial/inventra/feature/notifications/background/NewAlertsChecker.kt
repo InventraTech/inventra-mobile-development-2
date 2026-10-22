@@ -8,6 +8,12 @@ import kotlinx.coroutines.flow.first
 
 interface AlertNotifier {
     fun show(alerts: List<AlertResponse>)
+
+    // Resposta do supervisor ao pedido de entrada de quem ainda não tem cozinha.
+    fun showAccessDecision(
+        cozinhaName: String,
+        approved: Boolean,
+    )
 }
 
 // Procura alertas não lidos que ainda não viraram notificação no celular. Roda pelo AlertCheckWorker.

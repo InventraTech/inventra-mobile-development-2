@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.feature.cozinha.requestsent.ui
 
+import com.inventraoficial.inventra.core.designsystem.molecules.InventraCozinhaRequestStatus
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.KitchenAccessRequestStatus
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.FakeKitchenAccessRepository
@@ -18,10 +19,15 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.time.Clock
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RequestSentViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
+    private val today = LocalDate.of(2026, 10, 17)
+    private val clock = Clock.fixed(today.atTime(12, 0).toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
     private val pending = FakeMembersRepository.pendingRequest
     private lateinit var kitchenAccessRepository: FakeKitchenAccessRepository
     private lateinit var authRepository: FakeAuthRepository
@@ -38,7 +44,7 @@ class RequestSentViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel() = RequestSentViewModel(kitchenAccessRepository, authRepository)
+    private fun createViewModel() = RequestSentViewModel(kitchenAccessRepository, authRepository, clock)
 
     @Test
     fun `comeca carregando`() {
@@ -48,9 +54,9 @@ class RequestSentViewModelTest {
     }
 
     @Test
-    fun `pedido pendente mostra a cozinha e a data de vencimento`() =
+    fun `pedido pendente mostra a cozinha, o envio e o prazo`() =
         runTest(testDispatcher) {
-            kitchenAccessRepository.myRequestResult = Result.success(pending.copy(expiresAt = "2026-10-18T12:00:00"))
+            kitchenAccessRepository.myRequestResult = Result.success(pending.copy(expiresAt = "2026-10-22T12:00:00"))
             val viewModel = createViewModel()
             advanceUntilIdle()
 
@@ -58,12 +64,29 @@ class RequestSentViewModelTest {
             assertFalse(state.isLoading)
             assertEquals(RequestSentStatus.Pending, state.status)
             assertEquals("Sabor Filial Sul", state.cozinhaName)
-            assertEquals("18/10/2026", state.expiresAt)
+            assertEquals("10/10/2026", state.sentAt)
+            assertEquals("22/10/2026", state.expiresAt)
+            assertEquals("vence em 5 dias", state.expiresIn)
+            assertFalse(state.canRequestAnother)
             assertNull(state.destination)
         }
 
     @Test
-    fun `pedido recusado mostra o motivo sem espacos`() =
+    fun `prazo de amanha e de hoje`() =
+        runTest(testDispatcher) {
+            kitchenAccessRepository.myRequestResult = Result.success(pending.copy(expiresAt = "2026-10-18T12:00:00"))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            assertEquals("vence amanhã", viewModel.uiState.value.expiresIn)
+
+            kitchenAccessRepository.myRequestResult = Result.success(pending.copy(expiresAt = "2026-10-17T23:00:00"))
+            viewModel.onRefreshClick()
+            advanceUntilIdle()
+            assertEquals("vence hoje", viewModel.uiState.value.expiresIn)
+        }
+
+    @Test
+    fun `pedido recusado mostra o motivo sem espacos e deixa pedir em outra`() =
         runTest(testDispatcher) {
             val reason = "  Não faz parte da equipe  "
             val rejected = pending.copy(status = KitchenAccessRequestStatus.REJECTED, reason = reason)
@@ -74,6 +97,8 @@ class RequestSentViewModelTest {
             val state = viewModel.uiState.value
             assertEquals(RequestSentStatus.Rejected, state.status)
             assertEquals("Não faz parte da equipe", state.rejectionReason)
+            assertNull(state.expiresIn)
+            assertTrue(state.canRequestAnother)
         }
 
     @Test
@@ -88,6 +113,36 @@ class RequestSentViewModelTest {
         }
 
     @Test
+    fun `lista as outras cozinhas pedidas, sem a do pedido atual`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            val others = viewModel.uiState.value.otherRequests
+            assertEquals(listOf(8, 9), others.map { it.id })
+            assertEquals(
+                listOf(InventraCozinhaRequestStatus.Recusada, InventraCozinhaRequestStatus.Pendente),
+                others.map { it.status },
+            )
+            assertEquals(listOf("" to null), kitchenAccessRepository.discoverCalls)
+        }
+
+    @Test
+    fun `falha na busca de cozinhas nao atrapalha o pedido atual`() =
+        runTest(testDispatcher) {
+            kitchenAccessRepository.discoverResult = Result.failure(Exception("Muitas buscas"))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            assertNull(viewModel.uiState.value.errorMessage)
+            assertEquals("Sabor Filial Sul", viewModel.uiState.value.cozinhaName)
+            assertTrue(
+                viewModel.uiState.value.otherRequests
+                    .isEmpty(),
+            )
+        }
+
+    @Test
     fun `pedido aprovado atualiza o usuario e vai para a Home`() =
         runTest(testDispatcher) {
             kitchenAccessRepository.myRequestResult =
@@ -97,6 +152,7 @@ class RequestSentViewModelTest {
 
             assertEquals(1, authRepository.refreshCalls)
             assertEquals(RequestSentDestination.Home, viewModel.uiState.value.destination)
+            assertTrue(kitchenAccessRepository.discoverCalls.isEmpty())
         }
 
     @Test
@@ -140,7 +196,7 @@ class RequestSentViewModelTest {
         }
 
     @Test
-    fun `atualizar status consulta de novo e desliga o refreshing`() =
+    fun `atualizar status consulta o pedido e as cozinhas de novo e desliga o refreshing`() =
         runTest(testDispatcher) {
             val viewModel = createViewModel()
             advanceUntilIdle()
@@ -151,16 +207,51 @@ class RequestSentViewModelTest {
 
             assertFalse(viewModel.uiState.value.isRefreshing)
             assertEquals(2, kitchenAccessRepository.myRequestCalls)
+            assertEquals(2, kitchenAccessRepository.discoverCalls.size)
         }
 
     @Test
-    fun `escolher outra cozinha volta para a selecao`() {
-        val viewModel = createViewModel()
+    fun `atualizacao automatica so confere o pedido e nao roda enquanto carrega`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            viewModel.onAutoRefresh()
+            advanceUntilIdle()
+            assertEquals(1, kitchenAccessRepository.myRequestCalls)
 
-        viewModel.onChooseAnotherClick()
+            viewModel.onAutoRefresh()
+            advanceUntilIdle()
 
-        assertEquals(RequestSentDestination.SelectCozinha, viewModel.uiState.value.destination)
-    }
+            assertEquals(2, kitchenAccessRepository.myRequestCalls)
+            assertEquals(1, kitchenAccessRepository.discoverCalls.size)
+        }
+
+    @Test
+    fun `atualizacao automatica que falha mantem o pedido na tela, sem erro`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            kitchenAccessRepository.myRequestResult = Result.failure(Exception("Sem conexão"))
+            viewModel.onAutoRefresh()
+            advanceUntilIdle()
+
+            assertNull(viewModel.uiState.value.errorMessage)
+            assertEquals("Sabor Filial Sul", viewModel.uiState.value.cozinhaName)
+        }
+
+    @Test
+    fun `atualizacao automatica percebe a aprovacao e vai para a Home`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            kitchenAccessRepository.myRequestResult =
+                Result.success(pending.copy(status = KitchenAccessRequestStatus.APPROVED))
+            viewModel.onAutoRefresh()
+            advanceUntilIdle()
+
+            assertEquals(RequestSentDestination.Home, viewModel.uiState.value.destination)
+        }
 
     @Test
     fun `sair da conta faz logout e vai para o Login`() =

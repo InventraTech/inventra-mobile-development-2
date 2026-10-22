@@ -19,7 +19,9 @@ class AlertCheckWorker(
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val container = (applicationContext as InventraApplication).container
-        // Sem conexão ou com erro no servidor, tenta de novo na próxima rodada.
+        // Sem conexão ou com erro no servidor, tenta de novo na próxima rodada. O pedido de entrada vem
+        // primeiro: se foi aprovado, a sessão ganha a cozinha e os alertas dela já entram nesta rodada.
+        container.accessRequestChecker.check()
         container.newAlertsChecker.check()
         return Result.success()
     }

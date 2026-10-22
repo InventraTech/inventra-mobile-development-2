@@ -34,4 +34,6 @@ data class SelectCozinhaUiState(
     val hasLocationPermission: Boolean = false,
     val userLocation: GeoPoint? = null,
     val locationMessage: String? = null,
+    // Nome da cozinha do pedido pendente: com ele, o mapa só mostra as cozinhas e não deixa pedir em outra.
+    val pendingCozinhaName: String? = null,
 )

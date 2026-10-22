@@ -36,6 +36,7 @@ class SelectCozinhaViewModel(
 
     init {
         load()
+        loadPendingRequest()
     }
 
     fun onSearchQueryChange(query: String) {
@@ -68,7 +69,8 @@ class SelectCozinhaViewModel(
     fun onRequestAccessClick() {
         val state = _uiState.value
         val target = state.selectedCozinha ?: return
-        if (state.isRequesting || target.status == InventraCozinhaRequestStatus.Pendente) return
+        val blocked = target.status == InventraCozinhaRequestStatus.Pendente || state.pendingCozinhaName != null
+        if (state.isRequesting || blocked) return
 
         _uiState.update { it.copy(isRequesting = true, requestErrorMessage = null) }
         viewModelScope.launch {
@@ -123,6 +125,15 @@ class SelectCozinhaViewModel(
                 }.onFailure { error ->
                     _uiState.update { it.copy(isLocating = false, locationMessage = error.message) }
                 }
+        }
+    }
+
+    private fun loadPendingRequest() {
+        viewModelScope.launch {
+            kitchenAccessRepository.myRequest().onSuccess { request ->
+                val pending = request?.takeIf { it.status == KitchenAccessRequestStatus.PENDING }
+                _uiState.update { it.copy(pendingCozinhaName = pending?.kitchen?.name) }
+            }
         }
     }
 
