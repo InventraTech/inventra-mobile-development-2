@@ -153,6 +153,17 @@ class RegisterViewModelTest {
         }
 
     @Test
+    fun `cargo Comprador e enviado como COMPRADOR`() =
+        runTest(testDispatcher) {
+            preencherFormulario(role = InventraUserRole.Comprador)
+
+            viewModel.onRegisterClick()
+            advanceUntilIdle()
+
+            assertEquals(AccessType.COMPRADOR, repository.lastAccessType)
+        }
+
+    @Test
     fun `falha no cadastro mostra a mensagem do repositorio`() =
         runTest(testDispatcher) {
             repository.result = Result.failure(Exception("E-mail já cadastrado."))

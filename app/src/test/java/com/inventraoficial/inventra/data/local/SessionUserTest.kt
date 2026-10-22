@@ -71,12 +71,15 @@ class SessionUserTest {
     }
 
     @Test
-    fun `so estoquista sem cozinha precisa entrar em uma cozinha`() {
+    fun `estoquista e comprador sem cozinha precisam entrar em uma cozinha`() {
         val supervisor = userSemCozinha.copy(profile = ProfileSummary(id = 1, accessType = AccessType.SUPERVISOR))
+        val comprador = userSemCozinha.copy(profile = ProfileSummary(id = 3, accessType = AccessType.COMPRADOR))
         val cozinha = KitchenSummary(id = 7, name = "Sabor Filial Sul")
 
         assertTrue(userSemCozinha.toSessionUser().mustJoinKitchen)
+        assertTrue(comprador.toSessionUser().mustJoinKitchen)
         assertFalse(userSemCozinha.copy(kitchen = cozinha).toSessionUser().mustJoinKitchen)
+        assertFalse(comprador.copy(kitchen = cozinha).toSessionUser().mustJoinKitchen)
         assertFalse(supervisor.toSessionUser().mustJoinKitchen)
     }
 }

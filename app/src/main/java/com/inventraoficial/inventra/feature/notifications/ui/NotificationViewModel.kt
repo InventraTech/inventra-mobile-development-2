@@ -17,6 +17,7 @@ import com.inventraoficial.inventra.feature.notifications.ACCESS_REQUEST_TYPE
 import com.inventraoficial.inventra.feature.notifications.REQUISITION_APPROVED_TYPE
 import com.inventraoficial.inventra.feature.notifications.REQUISITION_PREFIX
 import com.inventraoficial.inventra.feature.notifications.REQUISITION_SUBMITTED_TYPE
+import com.inventraoficial.inventra.feature.notifications.UNREGISTERED_PRODUCT_TYPE
 import com.inventraoficial.inventra.feature.notifications.stockTypes
 import com.inventraoficial.inventra.feature.notifications.subtitle
 import com.inventraoficial.inventra.feature.notifications.title
@@ -170,6 +171,7 @@ private fun AlertResponse.target(): NotificationTarget? =
     when {
         type == ACCESS_REQUEST_TYPE -> NotificationTarget.Members
         type.startsWith(REQUISITION_PREFIX) -> refKey?.toIntOrNull()?.let { NotificationTarget.Requisition(it) }
+        type == UNREGISTERED_PRODUCT_TYPE -> refKey?.let { NotificationTarget.NewProduct(it) }
         type in stockTypes -> product?.let { NotificationTarget.Product(it.id) }
         else -> null
     }

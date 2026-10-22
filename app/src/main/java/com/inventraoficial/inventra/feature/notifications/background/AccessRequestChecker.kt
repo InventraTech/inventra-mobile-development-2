@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.inventraoficial.inventra.data.local.AppPreferences
-import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
+import com.inventraoficial.inventra.data.local.mustJoinKitchen
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.KitchenAccessRequestStatus
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.KitchenAccessRepository
@@ -37,7 +37,7 @@ class DataStoreKnownAccessRequestStore(
     private fun key(userId: String) = stringPreferencesKey("access_request_$userId")
 }
 
-// O backend só manda alertas para quem já está numa cozinha. Para o estoquista que ainda espera a
+// O backend só manda alertas para quem já está numa cozinha. Para o estoquista ou comprador que ainda espera a
 // resposta do pedido de entrada, este verificador confere o pedido e avisa quando o supervisor responde.
 class AccessRequestChecker(
     private val authRepository: AuthRepository,
@@ -48,7 +48,7 @@ class AccessRequestChecker(
 ) {
     suspend fun check(): Result<Unit> {
         val user = authRepository.currentUser.first()
-        val waiting = user?.accessType == AccessType.ESTOQUISTA && user.kitchenId == null
+        val waiting = user?.mustJoinKitchen == true
         val enabled = appPreferences.alertNotificationsEnabled.first()
         if (user == null || !waiting || !enabled) return Result.success(Unit)
 

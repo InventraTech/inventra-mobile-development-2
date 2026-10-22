@@ -3,8 +3,11 @@ package com.inventraoficial.inventra.data.repository
 import com.inventraoficial.inventra.data.remote.api.ProductApi
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeSource
+import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
+import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.PageProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
+import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -44,6 +47,25 @@ class NetworkProductRepositoryTest {
             barcodeError?.let { throw it }
             return lookup
         }
+
+        var created: CreateProductRequest? = null
+            private set
+        var unitsCalls = 0
+            private set
+        var unitsError: Exception? = null
+
+        override suspend fun create(request: CreateProductRequest): ProductResponse {
+            created = request
+            return FakeProductRepository.product(77, request.name)
+        }
+
+        override suspend fun units(): List<UnitResponse> {
+            unitsCalls++
+            unitsError?.let { throw it }
+            return FakeProductRepository.defaultUnits
+        }
+
+        override suspend fun categories(): List<CategoryResponse> = FakeProductRepository.defaultCategories
     }
 
     private fun httpError(code: Int) = HttpException(Response.error<Any>(code, "".toResponseBody()))
@@ -77,5 +99,44 @@ class NetworkProductRepositoryTest {
             val repository = NetworkProductRepository(FakeProductApi(lookup, httpError(500)), json)
 
             assertTrue(repository.findByBarcode("7891234567890", kitchenId = 7).isFailure)
+        }
+
+    @Test
+    fun `create envia o pedido e devolve o produto criado`() =
+        runTest {
+            val api = FakeProductApi(lookup)
+            val repository = NetworkProductRepository(api, json)
+            val request = CreateProductRequest(name = "Coca-Cola 2L", unitId = 4, barcode = "7894900011517")
+
+            val result = repository.create(request)
+
+            assertEquals(77, result.getOrNull()?.id)
+            assertEquals(request, api.created)
+        }
+
+    @Test
+    fun `units guarda a lista e nao busca de novo`() =
+        runTest {
+            val api = FakeProductApi(lookup)
+            val repository = NetworkProductRepository(api, json)
+
+            repository.units()
+            val second = repository.units()
+
+            assertEquals(FakeProductRepository.defaultUnits, second.getOrNull())
+            assertEquals(1, api.unitsCalls)
+        }
+
+    @Test
+    fun `units que falha tenta de novo na proxima vez`() =
+        runTest {
+            val api = FakeProductApi(lookup).apply { unitsError = httpError(500) }
+            val repository = NetworkProductRepository(api, json)
+
+            assertTrue(repository.units().isFailure)
+            api.unitsError = null
+
+            assertTrue(repository.units().isSuccess)
+            assertEquals(2, api.unitsCalls)
         }
 }

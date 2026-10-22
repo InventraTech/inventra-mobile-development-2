@@ -153,7 +153,7 @@ private fun ColumnScope.ScanPanel(
             InventraSecondaryButton(text = "Tentar novamente", onClick = actions.onScanAgainClick)
         }
         result is ScanResult.Found -> FoundPanel(result, uiState.canManageStock, actions)
-        result is ScanResult.NotRegistered -> NotRegisteredPanel(result, uiState.canReport, actions)
+        result is ScanResult.NotRegistered -> NotRegisteredPanel(result, uiState, actions)
         !uiState.hasCameraPermission -> {
             PanelText(uiState.permissionMessage ?: "Aguardando a permissão da câmera")
             InventraTextLink(text = "Digitar o código", onClick = actions.onManualEntryClick)
@@ -221,14 +221,20 @@ private fun FoundPanel(
 @Composable
 private fun NotRegisteredPanel(
     result: ScanResult.NotRegistered,
-    canReport: Boolean,
+    uiState: ScanUiState,
     actions: ScanActions,
 ) {
     Text("Produto não cadastrado", fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     PanelText("Código ${result.barcode}")
     result.suggestion?.let { PanelText("Parece ser: $it") }
     when {
-        !canReport -> PanelText("Este código ainda não está no catálogo da cozinha.")
+        uiState.canCreateProduct ->
+            InventraPrimaryButton(
+                text = "Cadastrar produto",
+                onClick = { actions.onCreateProductClick(result.barcode) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        !uiState.canReport -> PanelText("Este código ainda não está no catálogo da cozinha.")
         result.isReported ->
             Text(
                 "Avisamos o supervisor da cozinha.",
@@ -329,6 +335,11 @@ fun ScanRoute(
                 onStockEntryClick = { productId -> navigator.navigate(Screen.StockEntry(productId)) },
                 onSeeProductClick = { productId -> navigator.navigate(Screen.StockDetail(productId)) },
                 onReportClick = viewModel::onReportClick,
+                onCreateProductClick = { barcode ->
+                    // Limpa o resultado: ao voltar do cadastro, a câmera já está pronta para o próximo código.
+                    viewModel.onScanAgainClick()
+                    navigator.navigate(Screen.ProductCreate(barcode))
+                },
                 onManualEntryClick = viewModel::onManualEntryClick,
                 onManualCodeChange = viewModel::onManualCodeChange,
                 onManualCodeSubmit = viewModel::onManualCodeSubmit,
@@ -349,6 +360,7 @@ private val previewActions =
         onStockEntryClick = {},
         onSeeProductClick = {},
         onReportClick = {},
+        onCreateProductClick = {},
         onManualEntryClick = {},
         onManualCodeChange = {},
         onManualCodeSubmit = {},

@@ -30,4 +30,9 @@ sealed interface NotificationTarget {
     ) : NotificationTarget
 
     data object Members : NotificationTarget
+
+    // Produto que o estoquista escaneou e não está no catálogo: abre o cadastro com o código.
+    data class NewProduct(
+        val barcode: String,
+    ) : NotificationTarget
 }

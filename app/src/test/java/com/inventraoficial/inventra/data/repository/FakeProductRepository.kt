@@ -1,7 +1,10 @@
 package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
+import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
+import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
+import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockCategory
 import com.inventraoficial.inventra.data.remote.dto.stock.StockUnit
 
@@ -40,7 +43,39 @@ class FakeProductRepository(
         return barcodeResult
     }
 
+    var createResult: Result<ProductResponse>? = null
+    var createRequests = mutableListOf<CreateProductRequest>()
+        private set
+
+    override suspend fun create(request: CreateProductRequest): Result<ProductResponse> {
+        createRequests += request
+        return createResult ?: Result.success(product(id = 99, name = request.name))
+    }
+
+    var unitsResult: Result<List<UnitResponse>> = Result.success(defaultUnits)
+    var categoriesResult: Result<List<CategoryResponse>> = Result.success(defaultCategories)
+
+    override suspend fun units(): Result<List<UnitResponse>> = unitsResult
+
+    override suspend fun categories(): Result<List<CategoryResponse>> = categoriesResult
+
     companion object {
+        val defaultUnits =
+            listOf(
+                UnitResponse(1, "KG", "Quilograma"),
+                UnitResponse(2, "G", "Grama"),
+                UnitResponse(4, "L", "Litro"),
+                UnitResponse(5, "ML", "Mililitro"),
+                UnitResponse(6, "UN", "Unidade"),
+                UnitResponse(10, "CX50G", "Caixa de 50g"),
+            )
+
+        val defaultCategories =
+            listOf(
+                CategoryResponse(5012, "Laticínios"),
+                CategoryResponse(5015, "Mercearia"),
+            )
+
         fun product(
             id: Int,
             name: String,

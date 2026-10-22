@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,16 +25,23 @@ fun InventraRoleSelector(
     ) {
         InventraSelectableCard(
             icon = Icons.Default.VerifiedUser,
-            label = "Sou supervisor",
+            label = "Supervisor",
             selected = selectedRole == InventraUserRole.Supervisor,
             onClick = { onRoleSelect(InventraUserRole.Supervisor) },
             modifier = Modifier.weight(1f),
         )
         InventraSelectableCard(
             icon = Icons.Default.Inventory2,
-            label = "Sou estoquista",
+            label = "Estoquista",
             selected = selectedRole == InventraUserRole.Estoquista,
             onClick = { onRoleSelect(InventraUserRole.Estoquista) },
+            modifier = Modifier.weight(1f),
+        )
+        InventraSelectableCard(
+            icon = Icons.Default.ShoppingCart,
+            label = "Comprador",
+            selected = selectedRole == InventraUserRole.Comprador,
+            onClick = { onRoleSelect(InventraUserRole.Comprador) },
             modifier = Modifier.weight(1f),
         )
     }

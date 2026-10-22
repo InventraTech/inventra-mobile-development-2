@@ -89,6 +89,19 @@ class AccessRequestCheckerTest {
         }
 
     @Test
+    fun `comprador sem cozinha tambem e avisado da aprovacao`() =
+        runTest {
+            store.saved["1"] = "req-1:PENDING"
+            kitchenAccessRepository.myRequestResult =
+                Result.success(pending.copy(status = KitchenAccessRequestStatus.APPROVED))
+
+            checker(accessType = AccessType.COMPRADOR).check()
+
+            assertEquals(listOf("Sabor Filial Sul" to true), notifier.decisions)
+            assertEquals(1, authRepository.refreshCalls)
+        }
+
+    @Test
     fun `pendente que foi recusado avisa sem atualizar a sessao`() =
         runTest {
             store.saved["1"] = "req-1:PENDING"

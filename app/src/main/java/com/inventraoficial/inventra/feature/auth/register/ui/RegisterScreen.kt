@@ -177,7 +177,9 @@ fun RegisterRoute(
         if (uiState.isRegistered) {
             when (uiState.role) {
                 InventraUserRole.Supervisor -> navigator.replaceStack(Screen.CreateCozinha)
-                InventraUserRole.Estoquista -> navigator.replaceStack(Screen.SelectCozinha)
+                InventraUserRole.Estoquista,
+                InventraUserRole.Comprador,
+                -> navigator.replaceStack(Screen.SelectCozinha)
                 null -> navigator.navigateTopLevel(Screen.Home)
             }
         }

@@ -2,14 +2,12 @@ package com.inventraoficial.inventra.feature.stock.stockentry.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,7 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraPickerField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
@@ -196,7 +194,7 @@ private fun StockEntryForm(
             modifier = Modifier.fillMaxWidth(),
         )
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            PickerField(
+            InventraPickerField(
                 label = "Validade",
                 value = uiState.expirationDate?.format(dateFormatter),
                 placeholder = "dd/mm/aaaa",
@@ -204,7 +202,7 @@ private fun StockEntryForm(
                 onClick = { openDateField = DateField.Expiration },
                 modifier = Modifier.weight(1f),
             )
-            PickerField(
+            InventraPickerField(
                 label = "Entrada",
                 value = uiState.entryDate?.format(dateFormatter),
                 placeholder = "dd/mm/aaaa",
@@ -263,40 +261,6 @@ private fun StockEntryForm(
     }
 }
 
-// Campo que abre uma escolha (data ou fornecedor) em vez de receber texto digitado.
-@Composable
-private fun PickerField(
-    label: String,
-    value: String?,
-    placeholder: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(text = label, fontFamily = Montserrat, fontSize = 18.sp, color = InventraPurple)
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(54.dp)
-                    .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
-                    .clickable(onClick = onClick)
-                    .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = value ?: placeholder,
-                fontFamily = Montserrat,
-                fontSize = if (value == null) 13.sp else 15.sp,
-                color = if (value == null) InventraMuted else Color.Unspecified,
-                modifier = Modifier.weight(1f),
-            )
-            Icon(imageVector = icon, contentDescription = null, tint = InventraPurple)
-        }
-    }
-}
-
 @Composable
 private fun SupplierField(
     suppliers: List<SupplierOption>,
@@ -305,7 +269,7 @@ private fun SupplierField(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
-        PickerField(
+        InventraPickerField(
             label = "Fornecedor (opcional)",
             value = selectedName,
             placeholder = "Escolha o fornecedor",
