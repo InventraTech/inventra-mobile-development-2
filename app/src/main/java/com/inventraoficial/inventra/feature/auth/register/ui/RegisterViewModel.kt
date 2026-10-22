@@ -55,6 +55,7 @@ class RegisterViewModel(
             when (role) {
                 InventraUserRole.Supervisor -> AccessType.SUPERVISOR
                 InventraUserRole.Estoquista -> AccessType.ESTOQUISTA
+                InventraUserRole.Comprador -> AccessType.COMPRADOR
             }
 
         _uiState.update { it.copy(errorMessage = null, isLoading = true) }
