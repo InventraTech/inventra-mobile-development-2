@@ -200,6 +200,21 @@ class GoogleSignInViewModelTest {
         }
 
     @Test
+    fun `cargo Comprador e enviado como COMPRADOR`() =
+        runTest {
+            repository.result = registrationRequired
+            clicarNoGoogle()
+            advanceUntilIdle()
+            repository.result = Result.success(FakeAuthRepository.fakeUser)
+
+            viewModel.onRoleSelect(InventraUserRole.Comprador)
+            viewModel.onConfirmSignUp()
+            advanceUntilIdle()
+
+            assertEquals(AccessType.COMPRADOR, repository.lastAccessType)
+        }
+
+    @Test
     fun `fechar a escolha de cargo limpa o cadastro pendente`() =
         runTest {
             repository.result = registrationRequired

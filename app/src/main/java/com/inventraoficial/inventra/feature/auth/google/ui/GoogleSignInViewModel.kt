@@ -97,6 +97,7 @@ class GoogleSignInViewModel(
         when (this) {
             InventraUserRole.Supervisor -> AccessType.SUPERVISOR
             InventraUserRole.Estoquista -> AccessType.ESTOQUISTA
+            InventraUserRole.Comprador -> AccessType.COMPRADOR
         }
 
     companion object {
