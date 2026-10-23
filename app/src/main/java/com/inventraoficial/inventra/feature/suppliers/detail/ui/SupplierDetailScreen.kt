@@ -56,6 +56,7 @@ fun SupplierDetailScreen(
     email: String?,
     products: List<SupplierProduct>,
     deliveryHistory: List<DeliveryHistoryEntry>,
+    showsDeliveries: Boolean,
     isLoading: Boolean,
     errorMessage: String?,
     onBackClick: () -> Unit,
@@ -127,27 +128,29 @@ fun SupplierDetailScreen(
                         phone?.let { InventraContactRow(icon = Icons.Default.Call, text = it) }
                         email?.let { InventraContactRow(icon = Icons.Default.Email, text = it) }
                     }
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        SectionTitle(text = "Produtos fornecidos")
-                        if (products.isEmpty()) EmptyText(text = "Nenhum produto entregue nesta cozinha.")
-                        products.forEach { product ->
-                            InventraSupplierProductRow(
-                                name = product.name,
-                                infoText = product.infoText,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
-                    }
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        SectionTitle(text = "Histórico de entregas")
-                        if (deliveryHistory.isEmpty()) EmptyText(text = "Nenhuma entrega registrada.")
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            deliveryHistory.forEach { entry ->
-                                InventraDeliveryHistoryRow(
-                                    date = entry.date,
-                                    productName = entry.productName,
-                                    quantityLabel = entry.quantityLabel,
+                    if (showsDeliveries) {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            SectionTitle(text = "Produtos fornecidos")
+                            if (products.isEmpty()) EmptyText(text = "Nenhum produto entregue nesta cozinha.")
+                            products.forEach { product ->
+                                InventraSupplierProductRow(
+                                    name = product.name,
+                                    infoText = product.infoText,
+                                    modifier = Modifier.fillMaxWidth(),
                                 )
+                            }
+                        }
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            SectionTitle(text = "Histórico de entregas")
+                            if (deliveryHistory.isEmpty()) EmptyText(text = "Nenhuma entrega registrada.")
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                deliveryHistory.forEach { entry ->
+                                    InventraDeliveryHistoryRow(
+                                        date = entry.date,
+                                        productName = entry.productName,
+                                        quantityLabel = entry.quantityLabel,
+                                    )
+                                }
                             }
                         }
                     }
@@ -227,6 +230,7 @@ fun SupplierDetailRoute(
         email = uiState.email,
         products = uiState.products,
         deliveryHistory = uiState.deliveryHistory,
+        showsDeliveries = uiState.showsDeliveries,
         isLoading = uiState.isLoading,
         errorMessage = uiState.errorMessage,
         onBackClick = { navigator.back() },
@@ -255,6 +259,7 @@ private fun SupplierDetailScreenPreview() {
             listOf(
                 DeliveryHistoryEntry(date = "14/08/2026", productName = "Arroz Camil", quantityLabel = "Qtd. 12"),
             ),
+        showsDeliveries = true,
         isLoading = false,
         errorMessage = null,
         onBackClick = {},

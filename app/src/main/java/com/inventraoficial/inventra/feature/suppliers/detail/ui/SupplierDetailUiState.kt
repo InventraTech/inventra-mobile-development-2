@@ -22,6 +22,7 @@ data class SupplierDetailUiState(
     val email: String? = null,
     val products: List<SupplierProduct> = emptyList(),
     val deliveryHistory: List<DeliveryHistoryEntry> = emptyList(),
+    val showsDeliveries: Boolean = true,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 )

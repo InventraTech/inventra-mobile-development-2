@@ -42,7 +42,11 @@ class SupplierDetailViewModel(
     private fun load() {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            val supplier = supplierRepository.supplier(supplierId)
+            val supplier =
+                supplierRepository.supplier(supplierId).getOrElse { error ->
+                    _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
+                    return@launch
+                }
             val kitchenId = authRepository.currentUser.first()?.kitchenId
             val batches =
                 if (kitchenId == null) {
@@ -50,13 +54,8 @@ class SupplierDetailViewModel(
                 } else {
                     stockRepository.batches(kitchenId)
                 }
-            val error = supplier.exceptionOrNull() ?: batches.exceptionOrNull()
-            if (error != null) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
-                return@launch
-            }
-            val delivered = batches.getOrThrow().filter { it.supplier?.id == supplierId }
-            _uiState.update { it.withSupplier(supplier.getOrThrow(), delivered) }
+            val delivered = batches.getOrNull()?.filter { it.supplier?.id == supplierId }
+            _uiState.update { it.withSupplier(supplier, delivered) }
         }
     }
 
@@ -65,9 +64,9 @@ class SupplierDetailViewModel(
 
         private fun SupplierDetailUiState.withSupplier(
             supplier: SupplierResponse,
-            delivered: List<StockBatchResponse>,
+            delivered: List<StockBatchResponse>?,
         ): SupplierDetailUiState {
-            val newestFirst = delivered.sortedByDescending { it.entryDate }
+            val newestFirst = delivered.orEmpty().sortedByDescending { it.entryDate }
             return copy(
                 name = supplier.legalName,
                 rating = supplier.rating ?: 0,
@@ -76,6 +75,7 @@ class SupplierDetailViewModel(
                 email = supplier.email?.takeIf { it.isNotBlank() },
                 products = buildProducts(newestFirst),
                 deliveryHistory = newestFirst.take(MAX_HISTORY).map { it.toHistoryEntry() },
+                showsDeliveries = delivered != null,
                 isLoading = false,
             )
         }

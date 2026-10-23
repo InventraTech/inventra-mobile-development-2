@@ -160,6 +160,19 @@ class StartViewModelTest {
         }
 
     @Test
+    fun `comprador com cozinha abre nas requisicoes`() =
+        runTest(testDispatcher) {
+            val user = sessionUser(AccessType.COMPRADOR, kitchenId = 7)
+            val repository = FakeAuthRepository(hasSession = true, initialUser = user)
+            val viewModel = StartViewModel(repository, SessionManager())
+
+            advanceUntilIdle()
+
+            assertEquals(Screen.RequirementsList, viewModel.startScreen.value)
+            assertEquals(Screen.RequirementsList, viewModel.homeScreen.value)
+        }
+
+    @Test
     fun `estoquista com cozinha abre na Home`() =
         runTest(testDispatcher) {
             val user = sessionUser(AccessType.ESTOQUISTA, kitchenId = 7)

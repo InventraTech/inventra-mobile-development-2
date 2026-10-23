@@ -24,8 +24,19 @@ fun Screen.toBottomDestination(): InventraBottomDestination? =
     }
 
 fun bottomDestinationsFor(accessType: AccessType?): List<InventraBottomDestination> =
-    if (accessType == AccessType.ESTOQUISTA) {
-        InventraBottomDestination.entries - InventraBottomDestination.History
-    } else {
-        InventraBottomDestination.entries
+    when (accessType) {
+        AccessType.ESTOQUISTA -> InventraBottomDestination.entries - InventraBottomDestination.History
+        AccessType.COMPRADOR ->
+            listOf(
+                InventraBottomDestination.Suppliers,
+                InventraBottomDestination.History,
+                InventraBottomDestination.Perfil,
+            )
+        else -> InventraBottomDestination.entries
+    }
+
+fun homeScreenFor(accessType: AccessType?): Screen =
+    when (accessType) {
+        AccessType.COMPRADOR -> Screen.RequirementsList
+        else -> Screen.Home
     }

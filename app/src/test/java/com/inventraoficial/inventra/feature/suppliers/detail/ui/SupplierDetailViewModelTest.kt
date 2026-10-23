@@ -172,13 +172,37 @@ class SupplierDetailViewModelTest {
         }
 
     @Test
-    fun `tentar novamente limpa o erro e recarrega`() =
+    fun `sem acesso aos lotes mostra o fornecedor sem produtos e historico`() =
         runTest(testDispatcher) {
-            stockRepository.batchesError = IOException("Sem conexão")
+            stockRepository.batchesError = IOException("Acesso negado")
             val viewModel = createViewModel()
             advanceUntilIdle()
 
-            stockRepository.batchesError = null
+            val state = viewModel.uiState.value
+            assertNull(state.errorMessage)
+            assertEquals("Seara Alimentos", state.name)
+            assertFalse(state.showsDeliveries)
+            assertTrue(state.products.isEmpty())
+            assertTrue(state.deliveryHistory.isEmpty())
+        }
+
+    @Test
+    fun `com acesso aos lotes mostra produtos e historico`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.showsDeliveries)
+        }
+
+    @Test
+    fun `tentar novamente limpa o erro e recarrega`() =
+        runTest(testDispatcher) {
+            supplierRepository.error = IOException("Sem conexão")
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            supplierRepository.error = null
             viewModel.onRetryClick()
             advanceUntilIdle()
 

@@ -180,7 +180,7 @@ fun RegisterRoute(
                 InventraUserRole.Estoquista,
                 InventraUserRole.Comprador,
                 -> navigator.replaceStack(Screen.SelectCozinha)
-                null -> navigator.navigateTopLevel(Screen.Home)
+                null -> navigator.navigateHome()
             }
         }
     }

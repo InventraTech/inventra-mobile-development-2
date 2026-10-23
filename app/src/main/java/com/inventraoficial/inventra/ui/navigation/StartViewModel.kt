@@ -33,6 +33,10 @@ class StartViewModel(
         authRepository.currentUser
             .map { user -> bottomDestinationsFor(user?.accessType) }
             .stateIn(viewModelScope, SharingStarted.Eagerly, InventraBottomDestination.entries)
+    val homeScreen: StateFlow<Screen> =
+        authRepository.currentUser
+            .map { user -> homeScreenFor(user?.accessType) }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, Screen.Home)
 
     init {
         viewModelScope.launch {
@@ -42,7 +46,7 @@ class StartViewModel(
                     when {
                         user?.mustCreateKitchen == true -> Screen.CreateCozinha
                         user?.mustJoinKitchen == true -> Screen.RequestSent
-                        else -> Screen.Home
+                        else -> homeScreenFor(user?.accessType)
                     }
                 authRepository.refreshCurrentUser()
             } else {

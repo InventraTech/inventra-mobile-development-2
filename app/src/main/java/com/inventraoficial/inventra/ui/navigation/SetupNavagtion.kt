@@ -65,6 +65,7 @@ fun SetupNavigation(
 ) {
     val startScreen by startViewModel.startScreen.collectAsState()
     val bottomDestinations by startViewModel.bottomDestinations.collectAsState()
+    val homeScreen by startViewModel.homeScreen.collectAsState()
 
     val screen = startScreen
     if (screen == null) {
@@ -75,13 +76,18 @@ fun SetupNavigation(
                     .background(InventraBackground),
         )
     } else {
-        // Pela notificação, abre as Notificações por cima da Home; voltar leva para a Home.
+        // Pela notificação, abre as Notificações por cima da tela inicial; voltar leva para ela.
         val initialStack =
-            if (openNotifications && screen == Screen.Home) listOf(screen, Screen.Notifications) else listOf(screen)
+            if (openNotifications && screen.toBottomDestination() != null) {
+                listOf(screen, Screen.Notifications)
+            } else {
+                listOf(screen)
+            }
         AppNavigation(
             initialStack = initialStack,
             sessionExpired = startViewModel.sessionExpired,
             bottomDestinations = bottomDestinations,
+            homeScreen = homeScreen,
         )
     }
 }
@@ -91,11 +97,16 @@ private fun AppNavigation(
     initialStack: List<Screen>,
     sessionExpired: SharedFlow<Unit>,
     bottomDestinations: List<InventraBottomDestination>,
+    homeScreen: Screen,
 ) {
     val navigator =
         remember {
-            Navigator(initialStack.toMutableStateList())
+            Navigator(initialStack.toMutableStateList(), homeScreen)
         }
+
+    LaunchedEffect(homeScreen) {
+        navigator.updateHome(homeScreen)
+    }
 
     LaunchedEffect(Unit) {
         sessionExpired.collect {

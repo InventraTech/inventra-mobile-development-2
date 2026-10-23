@@ -13,8 +13,27 @@ class BottomDestinationsTest {
     }
 
     @Test
-    fun `supervisor e comprador veem todas as abas`() {
+    fun `supervisor ve todas as abas`() {
         assertEquals(InventraBottomDestination.entries, bottomDestinationsFor(AccessType.SUPERVISOR))
-        assertEquals(InventraBottomDestination.entries, bottomDestinationsFor(AccessType.COMPRADOR))
+    }
+
+    @Test
+    fun `comprador ve so fornecedores, requisicoes e perfil`() {
+        assertEquals(
+            listOf(
+                InventraBottomDestination.Suppliers,
+                InventraBottomDestination.History,
+                InventraBottomDestination.Perfil,
+            ),
+            bottomDestinationsFor(AccessType.COMPRADOR),
+        )
+    }
+
+    @Test
+    fun `comprador abre nas requisicoes e os outros na Home`() {
+        assertEquals(Screen.RequirementsList, homeScreenFor(AccessType.COMPRADOR))
+        assertEquals(Screen.Home, homeScreenFor(AccessType.SUPERVISOR))
+        assertEquals(Screen.Home, homeScreenFor(AccessType.ESTOQUISTA))
+        assertEquals(Screen.Home, homeScreenFor(null))
     }
 }
