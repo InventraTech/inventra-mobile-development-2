@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.inventraoficial.inventra.ui.theme.InventraInk
 import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.InventraSurface
@@ -132,7 +133,7 @@ private fun SearchField(
             value = query,
             onValueChange = onQueryChange,
             singleLine = true,
-            textStyle = TextStyle(fontFamily = Montserrat, fontSize = 15.sp),
+            textStyle = TextStyle(fontFamily = Montserrat, fontSize = 15.sp, color = InventraInk),
             modifier = Modifier.weight(1f),
             decorationBox = { inner ->
                 if (query.isEmpty()) Text("Buscar", fontFamily = Montserrat, fontSize = 15.sp, color = InventraMuted)
