@@ -51,6 +51,22 @@ class NavigatorSaverTest {
     }
 
     @Test
+    fun `fluxo de redefinir senha volta igual depois de girar a tela`() {
+        val stack =
+            listOf(
+                Screen.Login,
+                Screen.ForgotPassword(email = "ana@inventra.com"),
+                Screen.ResetCode(email = "ana@inventra.com"),
+                Screen.NewPassword(email = "ana@inventra.com", resetToken = "token"),
+            )
+        val navigator = navigator(*stack.toTypedArray())
+
+        val restored = navigator.rotate()
+
+        assertEquals(stack, restored?.currentBackStack)
+    }
+
+    @Test
     fun `pilha salva vazia abre o app pela pilha inicial`() {
         val navigator = navigator()
 
