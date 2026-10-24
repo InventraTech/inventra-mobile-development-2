@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@Suppress("TooManyFunctions")
 class ManageMembersViewModel(
     private val membersRepository: MembersRepository,
     private val authRepository: AuthRepository,
@@ -72,6 +73,27 @@ class ManageMembersViewModel(
         }
     }
 
+    fun onDeactivateClick(member: CozinhaMember) {
+        if (member.isCurrentUser) return
+        _uiState.update { it.copy(deactivateTarget = member, actionErrorMessage = null) }
+    }
+
+    fun onDeactivateDismiss() {
+        _uiState.update { it.copy(deactivateTarget = null) }
+    }
+
+    fun onDeactivateConfirm() {
+        val target = _uiState.value.deactivateTarget ?: return
+        _uiState.update { it.copy(deactivateTarget = null, processingMemberId = target.id) }
+        viewModelScope.launch {
+            membersRepository
+                .deactivate(target.id)
+                .onSuccess { reload() }
+                .onFailure { error -> _uiState.update { it.copy(actionErrorMessage = error.message) } }
+            _uiState.update { it.copy(processingMemberId = null) }
+        }
+    }
+
     private fun load() {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
@@ -88,7 +110,11 @@ class ManageMembersViewModel(
         _uiState.update {
             it.copy(
                 pendingRequests = pending.getOrDefault(emptyList()).map { request -> request.toPendingMemberRequest() },
-                members = members.getOrDefault(emptyList()).map { user -> user.toCozinhaMember(currentUserId) },
+                members =
+                    members
+                        .getOrDefault(emptyList())
+                        .filter { user -> user.active }
+                        .map { user -> user.toCozinhaMember(currentUserId) },
                 errorMessage = error?.message,
             )
         }

@@ -20,6 +20,8 @@ interface MembersRepository {
         requestId: String,
         reason: String?,
     ): Result<KitchenAccessRequestResponse>
+
+    suspend fun deactivate(userId: String): Result<Unit>
 }
 
 class NetworkMembersRepository(
@@ -42,4 +44,6 @@ class NetworkMembersRepository(
         val request = RejectKitchenAccessRequest(reason)
         return apiCall(json) { kitchenAccessApi.reject(requestId, request) }
     }
+
+    override suspend fun deactivate(userId: String): Result<Unit> = apiCall(json) { userApi.deactivate(userId) }
 }

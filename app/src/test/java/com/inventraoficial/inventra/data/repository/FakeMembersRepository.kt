@@ -18,6 +18,9 @@ class FakeMembersRepository(
         private set
     var rejected = mutableListOf<Pair<String, String?>>()
         private set
+    var deactivateError: Exception? = null
+    var deactivatedIds = mutableListOf<String>()
+        private set
 
     override suspend fun pendingRequests(): Result<List<KitchenAccessRequestResponse>> =
         pendingError?.let { Result.failure(it) } ?: Result.success(pending.toList())
@@ -41,6 +44,13 @@ class FakeMembersRepository(
         val request = pending.first { it.id == requestId }
         pending.remove(request)
         return Result.success(request.copy(status = KitchenAccessRequestStatus.REJECTED, reason = reason))
+    }
+
+    override suspend fun deactivate(userId: String): Result<Unit> {
+        deactivateError?.let { return Result.failure(it) }
+        deactivatedIds += userId
+        members.replaceAll { if (it.id == userId) it.copy(active = false) else it }
+        return Result.success(Unit)
     }
 
     companion object {

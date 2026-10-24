@@ -63,6 +63,8 @@ class NetworkAuthRepositoryTest {
             return respond().copy(photoUrl = null)
         }
 
+        override suspend fun deactivate(id: String) = error("nao usado")
+
         companion object {
             const val PHOTO_URL = "https://res.cloudinary.com/inventra/image/upload/v2/inventra/users/1.jpg"
         }

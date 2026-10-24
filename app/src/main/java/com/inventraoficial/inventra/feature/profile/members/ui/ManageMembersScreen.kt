@@ -45,10 +45,24 @@ fun ManageMembersScreen(
     onRejectReasonChange: (String) -> Unit,
     onRejectConfirm: () -> Unit,
     onRejectDismiss: () -> Unit,
+    onDeactivateClick: (CozinhaMember) -> Unit,
+    onDeactivateConfirm: () -> Unit,
+    onDeactivateDismiss: () -> Unit,
     onRetryClick: () -> Unit,
     onCloseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    uiState.deactivateTarget?.let { target ->
+        InventraConfirmDialog(
+            title = "Desativar membro?",
+            message = "${target.name} não vai mais conseguir entrar no app nem acessar a cozinha.",
+            confirmText = "Desativar",
+            onConfirm = onDeactivateConfirm,
+            onDismiss = onDeactivateDismiss,
+            isDestructive = true,
+        )
+    }
+
     uiState.rejectTarget?.let { target ->
         InventraConfirmDialog(
             title = "Recusar solicitação?",
@@ -96,6 +110,7 @@ fun ManageMembersScreen(
                     uiState = uiState,
                     onAcceptClick = onAcceptClick,
                     onRejectClick = onRejectClick,
+                    onDeactivateClick = onDeactivateClick,
                 )
         }
     }
@@ -106,6 +121,7 @@ private fun MembersContent(
     uiState: ManageMembersUiState,
     onAcceptClick: (PendingMemberRequest) -> Unit,
     onRejectClick: (PendingMemberRequest) -> Unit,
+    onDeactivateClick: (CozinhaMember) -> Unit,
 ) {
     Column(
         modifier =
@@ -138,12 +154,13 @@ private fun MembersContent(
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionTitle(text = "Membros · ${uiState.members.size}")
             uiState.members.forEach { member ->
+                val canDeactivate = !member.isCurrentUser && uiState.processingMemberId != member.id
                 InventraMemberRow(
                     initials = member.initials,
                     name = member.name,
                     roleLabel = member.roleLabel,
                     isOwner = member.isCurrentUser,
-                    onRemoveClick = null,
+                    onDeactivateClick = if (canDeactivate) ({ onDeactivateClick(member) }) else null,
                     modifier = Modifier.fillMaxWidth(),
                     photoUrl = member.photoUrl,
                 )
@@ -208,6 +225,9 @@ fun ManageMembersRoute(
         onRejectReasonChange = viewModel::onRejectReasonChange,
         onRejectConfirm = viewModel::onRejectConfirm,
         onRejectDismiss = viewModel::onRejectDismiss,
+        onDeactivateClick = viewModel::onDeactivateClick,
+        onDeactivateConfirm = viewModel::onDeactivateConfirm,
+        onDeactivateDismiss = viewModel::onDeactivateDismiss,
         onRetryClick = viewModel::onRetryClick,
         onCloseClick = { navigator.back() },
         modifier = modifier,
@@ -239,6 +259,13 @@ private fun ManageMembersScreenPreview() {
                             roleLabel = "Supervisor",
                             isCurrentUser = true,
                         ),
+                        CozinhaMember(
+                            id = "3",
+                            initials = "PL",
+                            name = "Paula Lima",
+                            roleLabel = "Estoquista",
+                            isCurrentUser = false,
+                        ),
                     ),
             ),
         onAcceptClick = {},
@@ -246,6 +273,9 @@ private fun ManageMembersScreenPreview() {
         onRejectReasonChange = {},
         onRejectConfirm = {},
         onRejectDismiss = {},
+        onDeactivateClick = {},
+        onDeactivateConfirm = {},
+        onDeactivateDismiss = {},
         onRetryClick = {},
         onCloseClick = {},
     )

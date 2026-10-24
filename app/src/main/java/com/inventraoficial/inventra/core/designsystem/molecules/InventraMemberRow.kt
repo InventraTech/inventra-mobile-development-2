@@ -28,7 +28,7 @@ fun InventraMemberRow(
     name: String,
     roleLabel: String,
     isOwner: Boolean,
-    onRemoveClick: (() -> Unit)?,
+    onDeactivateClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     photoUrl: String? = null,
 ) {
@@ -53,8 +53,8 @@ fun InventraMemberRow(
             InventraBadge(text = roleLabel, variant = InventraBadgeVariant.Brand)
         } else {
             InventraBadge(text = roleLabel, variant = InventraBadgeVariant.Brand, outlined = true)
-            if (onRemoveClick != null) {
-                InventraTextLink(text = "Remover", onClick = onRemoveClick, color = InventraDanger)
+            if (onDeactivateClick != null) {
+                InventraTextLink(text = "Desativar", onClick = onDeactivateClick, color = InventraDanger)
             }
         }
     }
@@ -69,6 +69,6 @@ private fun InventraMemberRowPreview() {
         name = "Paula Lima",
         roleLabel = "Estoquista",
         isOwner = false,
-        onRemoveClick = {},
+        onDeactivateClick = {},
     )
 }
