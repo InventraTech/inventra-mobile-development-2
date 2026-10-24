@@ -25,6 +25,7 @@ data class StockOutUiState(
     val hasStock: Boolean = false,
     val quantity: String = "",
     val reason: StockOutReason = StockOutReason.Usage,
+    val isConfirmDialogOpen: Boolean = false,
     val isSubmitting: Boolean = false,
     val submitError: String? = null,
     val consumedBatches: List<ConsumedBatchLine>? = null,
