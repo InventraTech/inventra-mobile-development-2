@@ -15,13 +15,16 @@ private data class SavedNavigator(
 
 private fun Navigator.toSaved() = SavedNavigator(currentBackStack, home)
 
+private fun Navigator.encode(): String = Json.encodeToString(SavedNavigator.serializer(), toSaved())
+
+private fun decodeNavigator(saved: String): Navigator? =
+    runCatching { Json.decodeFromString(SavedNavigator.serializer(), saved) }
+        .getOrNull()
+        ?.takeIf { it.backStack.isNotEmpty() }
+        ?.toNavigator()
+
 fun navigatorSaver(): Saver<Navigator, String> =
     Saver(
-        save = { Json.encodeToString(SavedNavigator.serializer(), it.toSaved()) },
-        restore = { saved ->
-            runCatching { Json.decodeFromString(SavedNavigator.serializer(), saved) }
-                .getOrNull()
-                ?.takeIf { it.backStack.isNotEmpty() }
-                ?.toNavigator()
-        },
+        save = { it.encode() },
+        restore = ::decodeNavigator,
     )
