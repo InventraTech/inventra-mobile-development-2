@@ -9,13 +9,14 @@ import kotlinx.serialization.json.Json
 private data class SavedNavigator(
     val backStack: List<Screen>,
     val home: Screen,
-)
+) {
+    fun toNavigator() = Navigator(backStack.toMutableStateList(), home)
+}
+
+private fun Navigator.toSaved() = SavedNavigator(currentBackStack, home)
 
 fun navigatorSaver(): Saver<Navigator, String> =
     Saver(
-        save = { Json.encodeToString(SavedNavigator.serializer(), SavedNavigator(it.currentBackStack, it.home)) },
-        restore = {
-            val saved = Json.decodeFromString(SavedNavigator.serializer(), it)
-            Navigator(saved.backStack.toMutableStateList(), saved.home)
-        },
+        save = { Json.encodeToString(SavedNavigator.serializer(), it.toSaved()) },
+        restore = { Json.decodeFromString(SavedNavigator.serializer(), it).toNavigator() },
     )
