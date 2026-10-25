@@ -49,4 +49,13 @@ class NavigatorSaverTest {
 
         assertNull(restored)
     }
+
+    @Test
+    fun `pilha salva vazia abre o app pela pilha inicial`() {
+        val navigator = navigator()
+
+        val restored = navigator.rotate()
+
+        assertNull(restored)
+    }
 }
