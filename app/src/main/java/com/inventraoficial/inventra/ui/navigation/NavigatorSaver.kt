@@ -21,6 +21,7 @@ fun navigatorSaver(): Saver<Navigator, String> =
         restore = { saved ->
             runCatching { Json.decodeFromString(SavedNavigator.serializer(), saved) }
                 .getOrNull()
+                ?.takeIf { it.backStack.isNotEmpty() }
                 ?.toNavigator()
         },
     )
