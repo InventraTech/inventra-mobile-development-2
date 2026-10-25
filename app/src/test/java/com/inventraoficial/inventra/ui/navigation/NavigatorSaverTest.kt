@@ -1,0 +1,33 @@
+package com.inventraoficial.inventra.ui.navigation
+
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.saveable.SaverScope
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class NavigatorSaverTest {
+    private val scope = SaverScope { true }
+
+    private fun navigator(
+        vararg stack: Screen,
+        home: Screen = Screen.Home,
+    ) = Navigator(mutableStateListOf(*stack), home)
+
+    private fun Navigator.rotate(): Navigator? {
+        val saver = navigatorSaver()
+        val saved = with(saver) { scope.save(this@rotate) } ?: return null
+        return saver.restore(saved)
+    }
+
+    @Test
+    fun `pilha de telas volta igual depois de girar a tela`() {
+        val navigator = navigator(Screen.Home, Screen.StockList, Screen.StockDetail(productId = 7))
+
+        val restored = navigator.rotate()
+
+        assertEquals(
+            listOf(Screen.Home, Screen.StockList, Screen.StockDetail(productId = 7)),
+            restored?.currentBackStack,
+        )
+    }
+}
