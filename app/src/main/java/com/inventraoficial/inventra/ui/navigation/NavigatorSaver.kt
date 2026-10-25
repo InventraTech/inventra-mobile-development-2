@@ -18,5 +18,9 @@ private fun Navigator.toSaved() = SavedNavigator(currentBackStack, home)
 fun navigatorSaver(): Saver<Navigator, String> =
     Saver(
         save = { Json.encodeToString(SavedNavigator.serializer(), it.toSaved()) },
-        restore = { Json.decodeFromString(SavedNavigator.serializer(), it).toNavigator() },
+        restore = { saved ->
+            runCatching { Json.decodeFromString(SavedNavigator.serializer(), saved) }
+                .getOrNull()
+                ?.toNavigator()
+        },
     )
