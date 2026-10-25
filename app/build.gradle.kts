@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.kover)
 }
 
 // A chave do Google Maps fica fora do Git: vem do local.properties (MAPS_API_KEY=...) ou da variável de ambiente.
@@ -64,6 +65,20 @@ detekt {
     buildUponDefaultConfig = true
     config.setFrom(file("config/detekt/detekt.yml"))
     baseline = file("detekt-baseline.xml")
+}
+
+kover {
+    reports {
+        filters {
+            excludes {
+                annotatedBy(
+                    "androidx.compose.runtime.Composable",
+                    "androidx.compose.ui.tooling.preview.Preview",
+                )
+                classes("*.BuildConfig", "*ComposableSingletons*")
+            }
+        }
+    }
 }
 
 dependencies {
