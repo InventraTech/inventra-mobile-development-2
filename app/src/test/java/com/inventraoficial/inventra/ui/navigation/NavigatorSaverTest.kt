@@ -3,6 +3,7 @@ package com.inventraoficial.inventra.ui.navigation
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.saveable.SaverScope
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class NavigatorSaverTest {
@@ -40,5 +41,12 @@ class NavigatorSaverTest {
 
         assertEquals(Screen.RequirementsList, restored?.home)
         assertEquals(listOf(Screen.RequirementsList), restored?.currentBackStack)
+    }
+
+    @Test
+    fun `estado salvo ilegivel abre o app pela pilha inicial`() {
+        val restored = navigatorSaver().restore("""{"backStack":[{"type":"TelaQueNaoExisteMais"}]}""")
+
+        assertNull(restored)
     }
 }
