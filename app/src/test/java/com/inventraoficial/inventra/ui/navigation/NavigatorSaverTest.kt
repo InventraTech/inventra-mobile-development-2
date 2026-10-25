@@ -30,4 +30,15 @@ class NavigatorSaverTest {
             restored?.currentBackStack,
         )
     }
+
+    @Test
+    fun `comprador continua com as requisicoes como inicio depois de girar a tela`() {
+        val navigator = navigator(Screen.RequirementsList, Screen.Suppliers, home = Screen.RequirementsList)
+
+        val restored = navigator.rotate()
+        restored?.navigateHome()
+
+        assertEquals(Screen.RequirementsList, restored?.home)
+        assertEquals(listOf(Screen.RequirementsList), restored?.currentBackStack)
+    }
 }
