@@ -1,6 +1,5 @@
 package com.inventraoficial.inventra.feature.stock.detail.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,20 +24,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraProductImage
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraDeliveryHistoryRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatch
@@ -116,15 +112,14 @@ private fun DetailContent(
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        Image(
-            painter = painterResource(id = uiState.productImageRes),
-            contentDescription = uiState.productName,
-            contentScale = ContentScale.Crop,
+        InventraProductImage(
+            photoUrl = uiState.productPhotoUrl,
+            shape = RoundedCornerShape(16.dp),
+            iconSize = 56.dp,
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
-                    .clip(RoundedCornerShape(16.dp)),
+                    .height(180.dp),
         )
         uiState.productDetails?.let {
             Text(text = it, fontFamily = Montserrat, fontSize = 14.sp, color = InventraMuted)
@@ -275,7 +270,7 @@ private fun StockDetailScreenPreview() {
     StockDetailScreen(
         uiState =
             StockDetailUiState(
-                productImageRes = R.drawable.ic_inventra_logo,
+                productPhotoUrl = null,
                 productName = "Leite Integral",
                 canEdit = true,
                 productDetails = "Italac · Laticínios",

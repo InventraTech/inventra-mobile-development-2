@@ -144,6 +144,22 @@ class StockDetailViewModelTest {
             assertEquals("Italac · Laticínios", state.productDetails)
             assertEquals(listOf(leiteId), productRepository.calls)
             assertEquals(listOf<Int?>(leiteId), stockRepository.batchesProductIds)
+            assertNull(state.productPhotoUrl)
+        }
+
+    @Test
+    fun `mostra a foto do produto quando a API manda`() =
+        runTest(testDispatcher) {
+            val foto = "https://images.openfoodfacts.org/images/products/789/808/064/0017/front_pt.jpg"
+            productRepository =
+                FakeProductRepository(
+                    products = listOf(FakeProductRepository.product(leiteId, "Leite Integral").copy(photoUrl = foto)),
+                )
+
+            val viewModel = createVisibleViewModel()
+            advanceUntilIdle()
+
+            assertEquals(foto, viewModel.uiState.value.productPhotoUrl)
         }
 
     @Test

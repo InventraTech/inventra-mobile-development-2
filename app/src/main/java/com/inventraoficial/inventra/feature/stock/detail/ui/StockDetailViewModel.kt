@@ -118,6 +118,7 @@ class StockDetailViewModel(
         _uiState.update {
             it.copy(
                 productName = product.name,
+                productPhotoUrl = product.photoUrl,
                 productDetails = product.details(),
                 totalValue = "${formatQuantity(total)} $unitSymbol",
                 totalCaption =
