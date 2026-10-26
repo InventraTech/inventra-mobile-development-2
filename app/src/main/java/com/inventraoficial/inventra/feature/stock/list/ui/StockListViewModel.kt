@@ -213,7 +213,7 @@ private fun KitchenStockItemResponse.toProduct(): Product {
         }
     return Product(
         id = product.id,
-        imageRes = R.drawable.ic_inventra_logo,
+        photoUrl = product.photoUrl,
         title = product.name,
         quantity = "${quantityFormat.format(totalQuantity)} ${unit.symbol}",
         batchInfo = if (lowStock) "$batches · abaixo do mínimo" else batches,

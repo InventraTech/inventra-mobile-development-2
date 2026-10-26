@@ -23,6 +23,7 @@ data class StockBatchResponse(
 data class ProductSummary(
     val id: Int,
     val name: String,
+    val photoUrl: String? = null,
 )
 
 @Serializable
