@@ -21,7 +21,7 @@ val iaBaseUrl: String = localProperties.getProperty("ia.baseUrl", "http://10.0.2
 val apiBaseUrl: String =
     localProperties.getProperty("API_BASE_URL")
         ?: System.getenv("API_BASE_URL")
-        ?: "https://ms-inventra-api.onrender.com/api/"
+        ?: "http://34.201.182.193/api/"
 
 android {
     namespace = "com.inventraoficial.inventra"
