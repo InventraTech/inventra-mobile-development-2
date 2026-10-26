@@ -57,6 +57,9 @@ class NetworkMembersRepositoryTest {
     }
 
     private class FakeUserApi : UserApi {
+        var lastDeactivatedId: String? = null
+            private set
+
         override suspend fun listMembers(): List<UserResponse> = listOf(FakeMembersRepository.supervisor)
 
         override suspend fun me(): UserResponse = FakeMembersRepository.supervisor
@@ -64,6 +67,10 @@ class NetworkMembersRepositoryTest {
         override suspend fun updatePhoto(file: MultipartBody.Part): UserResponse = error("nao usado")
 
         override suspend fun removePhoto(): UserResponse = error("nao usado")
+
+        override suspend fun deactivate(id: String) {
+            lastDeactivatedId = id
+        }
     }
 
     @Test
@@ -109,6 +116,18 @@ class NetworkMembersRepositoryTest {
             repository.reject("req-1", "Não faz parte da equipe")
 
             assertEquals("req-1" to RejectKitchenAccessRequest("Não faz parte da equipe"), api.lastReject)
+        }
+
+    @Test
+    fun `deactivate envia o id do usuario`() =
+        runTest {
+            val userApi = FakeUserApi()
+            val repository = NetworkMembersRepository(FakeKitchenAccessApi(request), userApi, json)
+
+            val result = repository.deactivate("est-1")
+
+            assertTrue(result.isSuccess)
+            assertEquals("est-1", userApi.lastDeactivatedId)
         }
 
     @Test

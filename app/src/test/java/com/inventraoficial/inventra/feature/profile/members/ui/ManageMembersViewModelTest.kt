@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.feature.profile.members.ui
 
 import com.inventraoficial.inventra.data.local.toSessionUser
+import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.AccessRequestUser
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.FakeMembersRepository
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,10 @@ class ManageMembersViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var membersRepository: FakeMembersRepository
     private lateinit var viewModel: ManageMembersViewModel
+    private val paula =
+        FakeMembersRepository.estoquista(
+            AccessRequestUser(id = "est-2", name = "Paula Lima", email = "paula@inventra.com"),
+        )
 
     @Before
     fun setUp() {
@@ -171,6 +176,97 @@ class ManageMembersViewModelTest {
 
             assertNull(viewModelComErro.uiState.value.errorMessage)
             assertEquals(1, viewModelComErro.uiState.value.pendingRequests.size)
+        }
+
+    @Test
+    fun `desativar abre o dialogo e so desativa ao confirmar`() =
+        runTest(testDispatcher) {
+            membersRepository.members.add(paula)
+            viewModel.onRetryClick()
+            advanceUntilIdle()
+            val member =
+                viewModel.uiState.value.members
+                    .first { it.id == paula.id }
+
+            viewModel.onDeactivateClick(member)
+            assertEquals(member, viewModel.uiState.value.deactivateTarget)
+            assertTrue(membersRepository.deactivatedIds.isEmpty())
+
+            viewModel.onDeactivateConfirm()
+            advanceUntilIdle()
+
+            val state = viewModel.uiState.value
+            assertEquals(listOf(paula.id), membersRepository.deactivatedIds)
+            assertNull(state.deactivateTarget)
+            assertNull(state.processingMemberId)
+            assertEquals(listOf("Jones Silva (você)"), state.members.map { it.name })
+        }
+
+    @Test
+    fun `membros inativos nao aparecem na lista`() =
+        runTest(testDispatcher) {
+            membersRepository.members.add(paula.copy(active = false))
+            viewModel.onRetryClick()
+            advanceUntilIdle()
+
+            assertEquals(
+                listOf("Jones Silva (você)"),
+                viewModel.uiState.value.members
+                    .map { it.name },
+            )
+        }
+
+    @Test
+    fun `cancelar o dialogo nao desativa`() =
+        runTest(testDispatcher) {
+            membersRepository.members.add(paula)
+            viewModel.onRetryClick()
+            advanceUntilIdle()
+
+            viewModel.onDeactivateClick(
+                viewModel.uiState.value.members
+                    .first { it.id == paula.id },
+            )
+            viewModel.onDeactivateDismiss()
+            advanceUntilIdle()
+
+            assertNull(viewModel.uiState.value.deactivateTarget)
+            assertTrue(membersRepository.deactivatedIds.isEmpty())
+            assertEquals(2, viewModel.uiState.value.members.size)
+        }
+
+    @Test
+    fun `nao abre o dialogo para o proprio usuario`() =
+        runTest(testDispatcher) {
+            advanceUntilIdle()
+
+            viewModel.onDeactivateClick(
+                viewModel.uiState.value.members
+                    .single(),
+            )
+
+            assertNull(viewModel.uiState.value.deactivateTarget)
+        }
+
+    @Test
+    fun `falha ao desativar mostra a mensagem e mantem o membro`() =
+        runTest(testDispatcher) {
+            membersRepository.members.add(paula)
+            viewModel.onRetryClick()
+            advanceUntilIdle()
+            membersRepository.deactivateError = Exception("Não é possível desativar a própria conta.")
+
+            viewModel.onDeactivateClick(
+                viewModel.uiState.value.members
+                    .first { it.id == paula.id },
+            )
+            viewModel.onDeactivateConfirm()
+            advanceUntilIdle()
+
+            val state = viewModel.uiState.value
+            assertEquals("Não é possível desativar a própria conta.", state.actionErrorMessage)
+            assertEquals(2, state.members.size)
+            assertNull(state.processingMemberId)
         }
 
     @Test

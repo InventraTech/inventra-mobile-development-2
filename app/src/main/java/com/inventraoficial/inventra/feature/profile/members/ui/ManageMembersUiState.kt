@@ -26,4 +26,6 @@ data class ManageMembersUiState(
     val processingRequestId: String? = null,
     val rejectTarget: PendingMemberRequest? = null,
     val rejectReason: String = "",
+    val deactivateTarget: CozinhaMember? = null,
+    val processingMemberId: String? = null,
 )
