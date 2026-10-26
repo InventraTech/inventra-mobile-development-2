@@ -39,6 +39,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSectionLabel
+import com.inventraoficial.inventra.core.designsystem.molecules.InventraConfirmDialog
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -54,10 +55,26 @@ fun StockOutScreen(
     onQuantityChange: (String) -> Unit,
     onReasonSelect: (StockOutReason) -> Unit,
     onConfirmClick: () -> Unit,
+    onConfirmDialogConfirm: () -> Unit,
+    onConfirmDialogDismiss: () -> Unit,
     onRetryClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    if (uiState.isConfirmDialogOpen) {
+        InventraConfirmDialog(
+            title = "Confirmar baixa?",
+            message =
+                "Sai ${uiState.quantity} ${uiState.unitSymbol} de ${uiState.productName} " +
+                    "do estoque da cozinha, por ${uiState.reason.label.lowercase()}. " +
+                    "Essa baixa não pode ser desfeita.",
+            confirmText = "Dar baixa",
+            onConfirm = onConfirmDialogConfirm,
+            onDismiss = onConfirmDialogDismiss,
+            isDestructive = true,
+        )
+    }
+
     Column(
         modifier =
             modifier
@@ -261,6 +278,8 @@ fun StockOutRoute(
         onQuantityChange = viewModel::onQuantityChange,
         onReasonSelect = viewModel::onReasonSelect,
         onConfirmClick = viewModel::onConfirmClick,
+        onConfirmDialogConfirm = viewModel::onConfirmDialogConfirm,
+        onConfirmDialogDismiss = viewModel::onConfirmDialogDismiss,
         onRetryClick = viewModel::onRetryClick,
         onBackClick = { navigator.back() },
         modifier = modifier,
@@ -285,6 +304,8 @@ private fun StockOutScreenPreview() {
         onQuantityChange = {},
         onReasonSelect = {},
         onConfirmClick = {},
+        onConfirmDialogConfirm = {},
+        onConfirmDialogDismiss = {},
         onRetryClick = {},
         onBackClick = {},
     )
@@ -308,6 +329,8 @@ private fun StockOutDonePreview() {
         onQuantityChange = {},
         onReasonSelect = {},
         onConfirmClick = {},
+        onConfirmDialogConfirm = {},
+        onConfirmDialogDismiss = {},
         onRetryClick = {},
         onBackClick = {},
     )

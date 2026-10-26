@@ -56,10 +56,9 @@ class StockOutViewModel(
 
     fun onConfirmClick() {
         val state = _uiState.value
-        val kitchen = kitchenId
-        if (state.isSubmitting || kitchen == null) return
+        if (state.isSubmitting || kitchenId == null) return
 
-        val quantity = state.quantity.replace(',', '.').toDoubleOrNull()
+        val quantity = state.quantity.toQuantity()
         val error =
             when {
                 quantity == null || quantity <= 0.0 -> "Informe a quantidade da baixa"
@@ -67,12 +66,21 @@ class StockOutViewModel(
                     "A quantidade passa do saldo da cozinha (${state.available} ${state.unitSymbol})"
                 else -> null
             }
-        if (error != null || quantity == null) {
-            _uiState.update { it.copy(submitError = error) }
-            return
-        }
+        _uiState.update { it.copy(submitError = error, isConfirmDialogOpen = error == null) }
+    }
 
-        _uiState.update { it.copy(isSubmitting = true, submitError = null) }
+    fun onConfirmDialogDismiss() {
+        _uiState.update { it.copy(isConfirmDialogOpen = false) }
+    }
+
+    fun onConfirmDialogConfirm() {
+        val state = _uiState.value
+        val kitchen = kitchenId
+        val quantity = state.quantity.toQuantity()
+        if (!state.isConfirmDialogOpen || state.isSubmitting) return
+        if (kitchen == null || quantity == null) return
+
+        _uiState.update { it.copy(isConfirmDialogOpen = false, isSubmitting = true, submitError = null) }
         viewModelScope.launch {
             stockRepository
                 .consume(kitchen, productId, quantity, state.reason.toApi())
@@ -154,6 +162,8 @@ private val quantityFormat = DecimalFormat("#,##0.###", DecimalFormatSymbols(ptB
 private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
 private fun formatQuantity(value: Double): String = quantityFormat.format(value)
+
+private fun String.toQuantity(): Double? = replace(',', '.').toDoubleOrNull()
 
 private fun StockOutReason.toApi(): StockMovementReason =
     when (this) {

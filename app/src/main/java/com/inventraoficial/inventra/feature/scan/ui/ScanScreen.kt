@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,12 +14,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -38,6 +42,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -86,7 +91,11 @@ fun ScanScreen(
     }
 
     LaunchedEffect(uiState.result) {
-        if (uiState.result != null) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        when (uiState.result) {
+            is ScanResult.Found -> haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+            is ScanResult.NotRegistered -> haptic.performHapticFeedback(HapticFeedbackType.Reject)
+            null -> Unit
+        }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -121,7 +130,13 @@ fun ScanScreen(
                 },
                 modifier = Modifier.height(100.dp),
             )
-            InventraScanOverlay(modifier = Modifier.weight(1f)) {
+            val frameColor =
+                when {
+                    uiState.errorMessage != null || uiState.result is ScanResult.NotRegistered -> InventraDanger
+                    uiState.result is ScanResult.Found -> InventraSuccess
+                    else -> InventraPurple
+                }
+            InventraScanOverlay(modifier = Modifier.weight(1f), frameColor = frameColor) {
                 ScanPanel(uiState = uiState, actions = actions)
             }
         }
@@ -224,9 +239,42 @@ private fun NotRegisteredPanel(
     uiState: ScanUiState,
     actions: ScanActions,
 ) {
-    Text("Produto não cadastrado", fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-    PanelText("Código ${result.barcode}")
-    result.suggestion?.let { PanelText("Parece ser: $it") }
+    Box(
+        modifier =
+            Modifier
+                .size(64.dp)
+                .background(InventraDanger.copy(alpha = 0.12f), CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = Icons.Default.SearchOff,
+            contentDescription = null,
+            tint = InventraDanger,
+            modifier = Modifier.size(32.dp),
+        )
+    }
+    Text(
+        "Código não encontrado",
+        fontFamily = Montserrat,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        color = InventraDanger,
+    )
+    Text(
+        result.barcode,
+        fontFamily = FontFamily.Monospace,
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp,
+        letterSpacing = 2.sp,
+        modifier =
+            Modifier
+                .border(1.dp, InventraDanger.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+    )
+    PanelText("Esse produto ainda não está no catálogo da cozinha.")
+    result.suggestion?.let {
+        Text("Parece ser: $it", fontFamily = Montserrat, fontSize = 14.sp, color = InventraMuted)
+    }
     when {
         uiState.canCreateProduct ->
             InventraPrimaryButton(
@@ -234,7 +282,7 @@ private fun NotRegisteredPanel(
                 onClick = { actions.onCreateProductClick(result.barcode) },
                 modifier = Modifier.fillMaxWidth(),
             )
-        !uiState.canReport -> PanelText("Este código ainda não está no catálogo da cozinha.")
+        !uiState.canReport -> Unit
         result.isReported ->
             Text(
                 "Avisamos o supervisor da cozinha.",

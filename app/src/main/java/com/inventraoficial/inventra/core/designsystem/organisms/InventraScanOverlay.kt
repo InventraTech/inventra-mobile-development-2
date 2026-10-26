@@ -32,6 +32,7 @@ import com.inventraoficial.inventra.ui.theme.Montserrat
 @Composable
 fun InventraScanOverlay(
     modifier: Modifier = Modifier,
+    frameColor: Color = InventraPurple,
     panel: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -58,7 +59,6 @@ fun InventraScanOverlay(
                     blendMode = BlendMode.Clear,
                 )
             }
-            val frameColor = InventraPurple
             Canvas(modifier = Modifier.size(width = 280.dp, height = 140.dp)) {
                 val corner = 28.dp.toPx()
                 val stroke = 4.dp.toPx()

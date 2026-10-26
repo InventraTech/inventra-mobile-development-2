@@ -159,7 +159,9 @@ class StockOutViewModelTest {
             viewModel.onReasonSelect(StockOutReason.Loss)
 
             viewModel.onConfirmClick()
+            viewModel.onConfirmDialogConfirm()
             assertTrue(viewModel.uiState.value.isSubmitting)
+            assertFalse(viewModel.uiState.value.isConfirmDialogOpen)
             advanceUntilIdle()
 
             val expectedRequest = ConsumeProductRequest(7, 1, 2.5, StockMovementReason.LOSS)
@@ -183,9 +185,65 @@ class StockOutViewModelTest {
             viewModel.onQuantityChange("1")
 
             viewModel.onConfirmClick()
+            viewModel.onConfirmDialogConfirm()
             advanceUntilIdle()
 
             assertEquals("Saldo insuficiente na cozinha.", viewModel.uiState.value.submitError)
             assertNull(viewModel.uiState.value.consumedBatches)
+        }
+
+    @Test
+    fun `confirmar baixa abre o dialogo sem chamar a API`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            viewModel.onQuantityChange("2")
+
+            viewModel.onConfirmClick()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.isConfirmDialogOpen)
+            assertTrue(stockRepository.consumeCalls.isEmpty())
+        }
+
+    @Test
+    fun `quantidade invalida nao abre o dialogo`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            viewModel.onQuantityChange("30")
+
+            viewModel.onConfirmClick()
+
+            assertFalse(viewModel.uiState.value.isConfirmDialogOpen)
+        }
+
+    @Test
+    fun `cancelar o dialogo nao da baixa`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            viewModel.onQuantityChange("2")
+
+            viewModel.onConfirmClick()
+            viewModel.onConfirmDialogDismiss()
+            advanceUntilIdle()
+
+            assertFalse(viewModel.uiState.value.isConfirmDialogOpen)
+            assertTrue(stockRepository.consumeCalls.isEmpty())
+            assertNull(viewModel.uiState.value.consumedBatches)
+        }
+
+    @Test
+    fun `confirmar no dialogo sem ter aberto nao da baixa`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            viewModel.onQuantityChange("2")
+
+            viewModel.onConfirmDialogConfirm()
+            advanceUntilIdle()
+
+            assertTrue(stockRepository.consumeCalls.isEmpty())
         }
 }
