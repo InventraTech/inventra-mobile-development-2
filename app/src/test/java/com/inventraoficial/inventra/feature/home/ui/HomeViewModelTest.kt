@@ -101,6 +101,28 @@ class HomeViewModelTest {
         }
 
     @Test
+    fun `card de prioridade mostra a foto do produto quando a API manda`() =
+        runTest(testDispatcher) {
+            val foto = "https://images.openfoodfacts.org/images/products/789/808/064/0017/front_pt.jpg"
+            stockRepository =
+                FakeStockRepository(
+                    expiring =
+                        listOf(
+                            batch(1, "Leite Integral", "2026-10-11").let {
+                                it.copy(product = it.product.copy(photoUrl = foto))
+                            },
+                            batch(2, "Feijão Preto", "2026-10-12"),
+                        ),
+                )
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            val items = viewModel.uiState.value.priorityItems
+            assertEquals(foto, items.first { it.title == "Leite Integral" }.photoUrl)
+            assertNull(items.first { it.title == "Feijão Preto" }.photoUrl)
+        }
+
+    @Test
     fun `ordena as prioridades pela data de vencimento`() =
         runTest(testDispatcher) {
             val viewModel = createViewModel()
