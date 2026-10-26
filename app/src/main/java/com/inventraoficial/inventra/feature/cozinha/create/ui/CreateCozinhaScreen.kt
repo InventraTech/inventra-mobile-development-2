@@ -134,7 +134,7 @@ fun CreateCozinhaRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(uiState.isCreated) {
-        if (uiState.isCreated) navigator.navigateTopLevel(Screen.Home)
+        if (uiState.isCreated) navigator.navigateHome()
     }
     LaunchedEffect(uiState.isLoggedOut) {
         if (uiState.isLoggedOut) navigator.replaceStack(Screen.Login)

@@ -4,7 +4,11 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 
 class Navigator(
     private val backStack: SnapshotStateList<Screen>,
+    home: Screen = Screen.Home,
 ) {
+    var home: Screen = home
+        private set
+
     val currentBackStack: List<Screen>
         get() = backStack
 
@@ -20,7 +24,16 @@ class Navigator(
     }
 
     fun navigateTopLevel(screen: Screen) {
-        backStack.navigateTopLevel(screen)
+        backStack.navigateTopLevel(screen, home)
+    }
+
+    fun navigateHome() {
+        navigateTopLevel(home)
+    }
+
+    fun updateHome(screen: Screen) {
+        backStack.replaceHome(home, screen)
+        home = screen
     }
 
     fun replaceStack(screen: Screen) {

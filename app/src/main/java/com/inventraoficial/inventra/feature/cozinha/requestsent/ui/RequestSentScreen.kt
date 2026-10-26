@@ -265,7 +265,7 @@ fun RequestSentRoute(
 
     LaunchedEffect(uiState.destination) {
         when (uiState.destination) {
-            RequestSentDestination.Home -> navigator.navigateTopLevel(Screen.Home)
+            RequestSentDestination.Home -> navigator.navigateHome()
             RequestSentDestination.SelectCozinha -> navigator.replaceStack(Screen.SelectCozinha)
             RequestSentDestination.Login -> navigator.replaceStack(Screen.Login)
             null -> Unit

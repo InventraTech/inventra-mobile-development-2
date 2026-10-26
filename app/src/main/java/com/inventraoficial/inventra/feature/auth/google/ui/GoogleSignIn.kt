@@ -145,7 +145,7 @@ fun GoogleSignInHost(
             when {
                 uiState.mustCreateKitchen -> navigator.replaceStack(Screen.CreateCozinha)
                 uiState.mustJoinKitchen -> navigator.replaceStack(Screen.RequestSent)
-                else -> navigator.navigateTopLevel(Screen.Home)
+                else -> navigator.navigateHome()
             }
         }
     }
