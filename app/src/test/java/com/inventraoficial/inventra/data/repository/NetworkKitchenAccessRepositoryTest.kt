@@ -6,6 +6,7 @@ import com.inventraoficial.inventra.data.remote.api.KitchenApi
 import com.inventraoficial.inventra.data.remote.dto.kitchen.CreateKitchenRequest
 import com.inventraoficial.inventra.data.remote.dto.kitchen.DiscoverKitchenPage
 import com.inventraoficial.inventra.data.remote.dto.kitchen.KitchenResponse
+import com.inventraoficial.inventra.data.remote.dto.kitchen.UpdateKitchenRequest
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.CreateKitchenAccessRequest
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.KitchenAccessRequestResponse
 import com.inventraoficial.inventra.data.remote.dto.kitchenaccess.KitchenAccessRequestStatus
@@ -40,6 +41,13 @@ class NetworkKitchenAccessRepositoryTest {
             lastDiscover = listOf(query, latitude, longitude, size)
             return DiscoverKitchenPage(content = listOf(FakeKitchenAccessRepository.perto))
         }
+
+        override suspend fun find(id: Int): KitchenResponse = error("nao usado")
+
+        override suspend fun update(
+            id: Int,
+            request: UpdateKitchenRequest,
+        ): KitchenResponse = error("nao usado")
     }
 
     private class FakeKitchenAccessApi(
