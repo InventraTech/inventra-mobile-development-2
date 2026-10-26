@@ -1,8 +1,5 @@
 package com.inventraoficial.inventra.feature.cozinha.select.ui
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -35,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraCloseButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraFilterChip
@@ -45,6 +41,8 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraCozinhaR
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWithFilter
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraCozinhaSheet
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.data.local.LOCATION_PERMISSIONS
+import com.inventraoficial.inventra.data.local.hasLocationPermission
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -54,9 +52,6 @@ import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.InventraSurface
 import com.inventraoficial.inventra.ui.theme.Montserrat
-
-private val LOCATION_PERMISSIONS =
-    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
 @Composable
 private fun PendingRequestBanner(
@@ -326,9 +321,6 @@ private fun NearMeRow(
         }
     }
 }
-
-private fun Context.hasLocationPermission(): Boolean =
-    LOCATION_PERMISSIONS.any { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
 
 @Composable
 fun SelectCozinhaRoute(
