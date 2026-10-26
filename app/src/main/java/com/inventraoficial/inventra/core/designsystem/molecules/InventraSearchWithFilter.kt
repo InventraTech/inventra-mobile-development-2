@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.ui.theme.InventraGold
+import com.inventraoficial.inventra.ui.theme.InventraInk
 import com.inventraoficial.inventra.ui.theme.InventraNavInk
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
@@ -46,7 +47,7 @@ fun InventraSearchWithFilter(
             value = query,
             onValueChange = onQueryChange,
             singleLine = true,
-            textStyle = TextStyle(fontFamily = Montserrat, fontSize = 15.sp),
+            textStyle = TextStyle(fontFamily = Montserrat, fontSize = 15.sp, color = InventraInk),
             cursorBrush = SolidColor(InventraPurple),
             modifier =
                 Modifier

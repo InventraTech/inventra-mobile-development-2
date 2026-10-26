@@ -4,7 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
@@ -66,7 +66,7 @@ fun InventraLabeledField(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(54.dp)
+                    .heightIn(min = TextFieldDefaults.MinHeight)
                     .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
         )
     }
