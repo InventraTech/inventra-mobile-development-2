@@ -16,3 +16,4 @@ local.properties
 .kotlin
 .idea/misc.xml
 /.idea/deploymentTargetSelector.xml
+/graphify-out/
