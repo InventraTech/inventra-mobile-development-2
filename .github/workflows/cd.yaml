@@ -1,0 +1,12 @@
+name: CD
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    uses: InventraTech/.github/.github/workflows/cd-android.yaml@main
+    secrets: inherit
