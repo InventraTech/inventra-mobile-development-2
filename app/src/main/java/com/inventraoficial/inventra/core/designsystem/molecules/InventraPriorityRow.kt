@@ -6,16 +6,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,18 +43,28 @@ fun InventraPriorityRow(
     Row(
         modifier =
             modifier
-                .border(1.dp, color = InventraPurple.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
                 .fillMaxWidth()
-                .height(100.dp)
-                .clickable(onClick = onClick),
+                .clip(RoundedCornerShape(10.dp))
+                .border(1.dp, InventraPurple.copy(alpha = 0.2f), RoundedCornerShape(10.dp))
+                .clickable(onClick = onClick)
+                .heightIn(min = 72.dp)
+                .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        InventraThumbnail(painter = painter, modifier = Modifier.padding(15.dp, 0.dp, 15.dp, 0.dp))
-        Column {
-            Text(title, fontFamily = Montserrat, fontWeight = FontWeight.Bold, color = InventraPurple, fontSize = 20.sp)
-            Text(statusText, fontFamily = Montserrat, color = statusColor, fontSize = 16.sp)
-            Text(batch, fontFamily = Montserrat, color = statusColor, fontSize = 18.sp)
+        InventraThumbnail(painter = painter, size = 48.dp)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                title,
+                fontFamily = Montserrat,
+                fontWeight = FontWeight.Bold,
+                color = InventraPurple,
+                fontSize = 15.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(statusText, fontFamily = Montserrat, color = statusColor, fontSize = 12.sp)
+            Text(batch, fontFamily = Montserrat, color = InventraPurple.copy(alpha = 0.6f), fontSize = 12.sp)
         }
     }
 }
