@@ -4,6 +4,10 @@ import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.inventraoficial.inventra.BuildConfig
 import com.inventraoficial.inventra.R
+import com.inventraoficial.inventra.data.event.BufferedClickTracker
+import com.inventraoficial.inventra.data.event.ClickTracker
+import com.inventraoficial.inventra.data.event.DataStoreClickCountStore
+import com.inventraoficial.inventra.data.event.uiClicksDataStore
 import com.inventraoficial.inventra.data.local.AndroidImageCompressor
 import com.inventraoficial.inventra.data.local.AppPreferences
 import com.inventraoficial.inventra.data.local.DataStoreAppPreferences
@@ -15,6 +19,7 @@ import com.inventraoficial.inventra.data.local.ProfilePhotoPreview
 import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.remote.api.AlertApi
 import com.inventraoficial.inventra.data.remote.api.AuthApi
+import com.inventraoficial.inventra.data.remote.api.ClickEventApi
 import com.inventraoficial.inventra.data.remote.api.KitchenAccessApi
 import com.inventraoficial.inventra.data.remote.api.KitchenApi
 import com.inventraoficial.inventra.data.remote.api.PreListApi
@@ -52,6 +57,10 @@ import com.inventraoficial.inventra.feature.notifications.background.DataStoreKn
 import com.inventraoficial.inventra.feature.notifications.background.DataStoreLastNotifiedAlertStore
 import com.inventraoficial.inventra.feature.notifications.background.NewAlertsChecker
 import com.inventraoficial.inventra.feature.notifications.background.SystemAlertNotifier
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -80,6 +89,7 @@ interface AppContainer {
     val alertNotifier: SystemAlertNotifier
     val newAlertsChecker: NewAlertsChecker
     val accessRequestChecker: AccessRequestChecker
+    val clickTracker: ClickTracker
 }
 
 class DefaultAppContainer(
@@ -148,6 +158,10 @@ class DefaultAppContainer(
     private val productApi: ProductApi by lazy { retrofit.create(ProductApi::class.java) }
     private val requisitionApi: RequisitionApi by lazy { retrofit.create(RequisitionApi::class.java) }
     private val preListApi: PreListApi by lazy { retrofit.create(PreListApi::class.java) }
+    private val clickEventApi: ClickEventApi by lazy { retrofit.create(ClickEventApi::class.java) }
+
+    private val backgroundScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.IO + CoroutineExceptionHandler { _, _ -> })
 
     override val authRepository: AuthRepository by lazy {
         NetworkAuthRepository(
@@ -210,6 +224,16 @@ class DefaultAppContainer(
             appPreferences = appPreferences,
             store = DataStoreKnownAccessRequestStore(context),
             notifier = alertNotifier,
+        )
+    }
+
+    override val clickTracker: ClickTracker by lazy {
+        BufferedClickTracker(
+            store = DataStoreClickCountStore(context.uiClicksDataStore),
+            sessionStorage = sessionStorage,
+            clickEventApi = clickEventApi,
+            json = json,
+            scope = backgroundScope,
         )
     }
 

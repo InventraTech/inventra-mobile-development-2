@@ -33,6 +33,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations) {
+            (application as InventraApplication).container.clickTracker.send()
+        }
+    }
+
     companion object {
         const val EXTRA_OPEN_NOTIFICATIONS = "open_notifications"
     }

@@ -5,6 +5,8 @@ import com.inventraoficial.inventra.data.remote.api.ClickEventApi
 import com.inventraoficial.inventra.data.remote.apiCall
 import com.inventraoficial.inventra.data.remote.dto.event.RecordUiClicksRequest
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -14,7 +16,9 @@ import kotlinx.serialization.json.Json
 interface ClickTracker {
     fun track(click: UiClick)
 
-    suspend fun flush()
+    fun send()
+
+    fun sendOnLogin()
 }
 
 class BufferedClickTracker(
@@ -30,7 +34,20 @@ class BufferedClickTracker(
         scope.launch { store.add(click.column) }
     }
 
-    override suspend fun flush() {
+    override fun send() {
+        scope.launch { flush() }
+    }
+
+    override fun sendOnLogin() {
+        scope.launch {
+            sessionStorage.token
+                .filterNotNull()
+                .distinctUntilChanged()
+                .collect { flush() }
+        }
+    }
+
+    suspend fun flush() {
         flushMutex.withLock {
             val counts = store.counts()
             if (counts.isEmpty() || sessionStorage.token.first() == null) return
