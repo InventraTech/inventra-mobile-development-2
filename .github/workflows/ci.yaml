@@ -8,4 +8,4 @@ on:
 
 jobs:
   quality:
-    uses: InventraTech/.github/.github/workflows/ci-kotlin.yaml@main
+    uses: InventraTech/.github/.github/workflows/ci-android.yaml@main
