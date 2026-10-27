@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.ui.navigation
 
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDestination
+import com.inventraoficial.inventra.data.event.UiClick
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 
 fun InventraBottomDestination.toScreen(): Screen =
@@ -10,6 +11,15 @@ fun InventraBottomDestination.toScreen(): Screen =
         InventraBottomDestination.Suppliers -> Screen.Suppliers
         InventraBottomDestination.History -> Screen.RequirementsList
         InventraBottomDestination.Perfil -> Screen.Profile
+    }
+
+fun InventraBottomDestination.toUiClick(): UiClick =
+    when (this) {
+        InventraBottomDestination.Home -> UiClick.NavHome
+        InventraBottomDestination.Stock -> UiClick.NavStock
+        InventraBottomDestination.Suppliers -> UiClick.NavSuppliers
+        InventraBottomDestination.History -> UiClick.NavRequisitions
+        InventraBottomDestination.Perfil -> UiClick.NavProfile
     }
 
 fun Screen.toBottomDestination(): InventraBottomDestination? =

@@ -33,10 +33,13 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
+import com.inventraoficial.inventra.data.event.UiClick
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInButton
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInHost
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInViewModel
 import com.inventraoficial.inventra.feature.auth.google.ui.rememberGoogleSignInClick
+import com.inventraoficial.inventra.ui.event.LocalClickTracker
+import com.inventraoficial.inventra.ui.event.tracked
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -154,6 +157,7 @@ fun LoginRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val googleState by googleViewModel.uiState.collectAsState()
+    val clickTracker = LocalClickTracker.current
     GoogleSignInHost(uiState = googleState, viewModel = googleViewModel, navigator = navigator)
 
     LaunchedEffect(uiState.isLoggedIn) {
@@ -171,10 +175,10 @@ fun LoginRoute(
         onLoginChange = viewModel::onLoginChange,
         senha = uiState.password,
         onPasswordChange = viewModel::onPasswordChange,
-        onLoginClick = viewModel::onLoginClick,
-        onForgotPasswordClick = viewModel::onForgotPasswordClick,
+        onLoginClick = clickTracker.tracked(UiClick.LoginSignIn, viewModel::onLoginClick),
+        onForgotPasswordClick = clickTracker.tracked(UiClick.LoginForgotPassword, viewModel::onForgotPasswordClick),
         onCreateAccountClick = { navigator.navigate(Screen.Register) },
-        onGoogleClick = rememberGoogleSignInClick(googleViewModel),
+        onGoogleClick = clickTracker.tracked(UiClick.LoginGoogle, rememberGoogleSignInClick(googleViewModel)),
         errorMessage = uiState.errorMessage ?: googleState.screenErrorMessage,
         isLoading = uiState.isLoading,
         isGoogleLoading = googleState.isButtonLoading,

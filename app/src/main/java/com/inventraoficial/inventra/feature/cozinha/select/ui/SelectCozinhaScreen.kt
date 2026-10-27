@@ -41,8 +41,11 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraCozinhaR
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWithFilter
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraCozinhaSheet
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.data.event.UiClick
 import com.inventraoficial.inventra.data.local.LOCATION_PERMISSIONS
 import com.inventraoficial.inventra.data.local.hasLocationPermission
+import com.inventraoficial.inventra.ui.event.LocalClickTracker
+import com.inventraoficial.inventra.ui.event.tracked
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -330,6 +333,7 @@ fun SelectCozinhaRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val clickTracker = LocalClickTracker.current
     val locationPermission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
             viewModel.onLocationPermissionResult(result.values.any { it })
@@ -350,14 +354,23 @@ fun SelectCozinhaRoute(
     SelectCozinhaScreen(
         uiState = uiState,
         onSearchQueryChange = viewModel::onSearchQueryChange,
-        onFilterIconClick = viewModel::onFilterIconClick,
-        onViewModeSelect = viewModel::onViewModeSelect,
-        onCozinhaClick = viewModel::onCozinhaClick,
-        onRequestAccessClick = viewModel::onRequestAccessClick,
+        onFilterIconClick = clickTracker.tracked(UiClick.KitchensFilter, viewModel::onFilterIconClick),
+        onViewModeSelect = { mode ->
+            clickTracker.track(if (mode == CozinhaViewMode.List) UiClick.KitchensTabList else UiClick.KitchensTabMap)
+            viewModel.onViewModeSelect(mode)
+        },
+        onCozinhaClick = { cozinha ->
+            if (uiState.viewMode == CozinhaViewMode.Map) clickTracker.track(UiClick.KitchensMapPin)
+            viewModel.onCozinhaClick(cozinha)
+        },
+        onRequestAccessClick = clickTracker.tracked(UiClick.KitchensRequestEntry, viewModel::onRequestAccessClick),
         onSheetDismiss = viewModel::onSheetDismiss,
         onRetryClick = viewModel::onRetryClick,
         // Aberta por cima de "Minhas solicitações", fechar volta para lá; como primeira tela, faz logout.
-        onCloseClick = { if (navigator.canGoBack) navigator.back() else viewModel.onCloseClick() },
+        onCloseClick =
+            clickTracker.tracked(UiClick.KitchensClose) {
+                if (navigator.canGoBack) navigator.back() else viewModel.onCloseClick()
+            },
         onNearMeClick = {
             if (uiState.isNearMe || uiState.hasLocationPermission) {
                 viewModel.onNearMeClick()

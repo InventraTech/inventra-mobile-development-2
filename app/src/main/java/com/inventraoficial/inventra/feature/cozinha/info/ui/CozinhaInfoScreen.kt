@@ -42,8 +42,11 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButto
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSwitchRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.data.event.UiClick
 import com.inventraoficial.inventra.data.local.LOCATION_PERMISSIONS
 import com.inventraoficial.inventra.data.local.hasLocationPermission
+import com.inventraoficial.inventra.ui.event.LocalClickTracker
+import com.inventraoficial.inventra.ui.event.tracked
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraDanger
@@ -275,6 +278,7 @@ fun CozinhaInfoRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val clickTracker = LocalClickTracker.current
     val locationPermission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
             viewModel.onLocationPermissionResult(result.values.any { it })
@@ -297,10 +301,10 @@ fun CozinhaInfoRoute(
                     }
                 },
                 onEditClick = viewModel::onEditClick,
-                onSaveClick = viewModel::onSaveClick,
+                onSaveClick = clickTracker.tracked(UiClick.KitchenEditSave, viewModel::onSaveClick),
                 onCancelClick = viewModel::onCancelClick,
                 onRetryClick = viewModel::onRetryClick,
-                onBackClick = { navigator.back() },
+                onBackClick = clickTracker.tracked(UiClick.KitchenEditBack) { navigator.back() },
             ),
         modifier = modifier,
     )

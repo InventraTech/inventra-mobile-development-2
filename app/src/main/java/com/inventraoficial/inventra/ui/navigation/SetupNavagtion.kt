@@ -55,6 +55,7 @@ import com.inventraoficial.inventra.feature.stock.stockentry.ui.StockEntryRoute
 import com.inventraoficial.inventra.feature.stock.stockout.ui.StockOutRoute
 import com.inventraoficial.inventra.feature.suppliers.detail.ui.SupplierDetailRoute
 import com.inventraoficial.inventra.feature.suppliers.list.ui.SupplierRoute
+import com.inventraoficial.inventra.ui.event.LocalClickTracker
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.LocalInventraPalette
 import kotlinx.coroutines.flow.SharedFlow
@@ -115,6 +116,7 @@ private fun AppNavigation(
         }
     }
 
+    val clickTracker = LocalClickTracker.current
     val currentScreen = navigator.currentBackStack.last()
     val selectedTab = currentScreen.toBottomDestination()
     val isFullBleed = currentScreen.isFullBleed()
@@ -135,6 +137,7 @@ private fun AppNavigation(
                     destinations = bottomDestinations,
                     selected = selectedTab,
                     onSelect = { destination ->
+                        clickTracker.track(destination.toUiClick())
                         navigator.navigateTopLevel(destination.toScreen())
                     },
                 )
