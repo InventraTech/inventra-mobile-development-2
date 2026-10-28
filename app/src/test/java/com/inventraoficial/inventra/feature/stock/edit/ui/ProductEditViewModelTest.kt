@@ -8,6 +8,7 @@ import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRes
 import com.inventraoficial.inventra.data.remote.dto.product.LinkSupplierRequest
 import com.inventraoficial.inventra.data.remote.dto.product.UpdateProductRequest
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
+import com.inventraoficial.inventra.data.repository.FakeProductPhotoRepository
 import com.inventraoficial.inventra.data.repository.FakeProductRepository
 import com.inventraoficial.inventra.data.repository.FakeProductSupplierRepository
 import com.inventraoficial.inventra.data.repository.FakeSupplierRepository
@@ -21,6 +22,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -40,6 +42,8 @@ class ProductEditViewModelTest {
         )
     private val productSupplierRepository = FakeProductSupplierRepository()
     private val searaLink = FakeProductSupplierRepository.link(2, "Seara", referencePrice = 9.9)
+    private val photoRepository = FakeProductPhotoRepository()
+    private val oldPhoto = "https://cdn/ketchup-antigo.jpg"
 
     @Before
     fun setUp() {
@@ -50,7 +54,7 @@ class ProductEditViewModelTest {
                     listOf(
                         FakeProductRepository
                             .product(ketchupId, "Ketchup", brand = "Heinz", categoryName = "Mercearia")
-                            .copy(barcode = "7896102000122"),
+                            .copy(barcode = "7896102000122", photoUrl = oldPhoto),
                     ),
             )
     }
@@ -68,8 +72,80 @@ class ProductEditViewModelTest {
             authRepository = FakeAuthRepository(initialUser = user),
             supplierRepository = supplierRepository,
             productSupplierRepository = productSupplierRepository,
+            productPhotoRepository = photoRepository,
         )
     }
+
+    @Test
+    fun `mostra a foto atual e abre as opcoes ao tocar`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            assertEquals(oldPhoto, viewModel.uiState.value.photo.url)
+
+            viewModel.onPhotoClick()
+            assertTrue(viewModel.uiState.value.photo.isSheetVisible)
+
+            viewModel.onPhotoSheetDismiss()
+            assertFalse(viewModel.uiState.value.photo.isSheetVisible)
+        }
+
+    @Test
+    fun `foto escolhida aparece na hora e depois fica a do servidor`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onPhotoPicked("content://galeria/1")
+            assertEquals("content://galeria/1", viewModel.uiState.value.photo.url)
+            assertTrue(viewModel.uiState.value.photo.isUploading)
+            advanceUntilIdle()
+
+            assertEquals(listOf(ketchupId to "content://galeria/1"), photoRepository.uploads)
+            assertEquals("https://cdn/produto-42.jpg", viewModel.uiState.value.photo.url)
+            assertFalse(viewModel.uiState.value.photo.isUploading)
+        }
+
+    @Test
+    fun `fechar a galeria sem escolher nao envia nada`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onPhotoPicked(null)
+            advanceUntilIdle()
+
+            assertTrue(photoRepository.uploads.isEmpty())
+            assertEquals(oldPhoto, viewModel.uiState.value.photo.url)
+        }
+
+    @Test
+    fun `falha ao enviar volta a foto antiga e mostra o erro`() =
+        runTest(testDispatcher) {
+            photoRepository.error = Exception("Não foi possível ler a imagem.")
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onPhotoPicked("content://galeria/1")
+            advanceUntilIdle()
+
+            val photo = viewModel.uiState.value.photo
+            assertEquals(oldPhoto, photo.url)
+            assertEquals("Não foi possível ler a imagem.", photo.errorMessage)
+        }
+
+    @Test
+    fun `remover a foto deixa o produto sem foto`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onRemovePhotoClick()
+            advanceUntilIdle()
+
+            assertEquals(listOf(ketchupId), photoRepository.removals)
+            assertNull(viewModel.uiState.value.photo.url)
+        }
 
     @Test
     fun `carrega o produto com o estoque minimo da cozinha`() =
