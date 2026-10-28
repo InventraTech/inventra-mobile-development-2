@@ -37,8 +37,8 @@ fun bottomDestinationsFor(accessType: AccessType?): List<InventraBottomDestinati
     when (accessType) {
         AccessType.ESTOQUISTA ->
             listOf(
-                InventraBottomDestination.Home,
                 InventraBottomDestination.Stock,
+                InventraBottomDestination.Home,
                 InventraBottomDestination.Perfil,
             )
         AccessType.COMPRADOR ->
