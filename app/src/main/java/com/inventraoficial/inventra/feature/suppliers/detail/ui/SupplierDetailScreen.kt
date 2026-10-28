@@ -148,8 +148,8 @@ fun SupplierDetailScreen(
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     deliveryHistory.forEach { entry ->
                                         InventraDeliveryHistoryRow(
-                                            date = entry.date,
-                                            productName = entry.productName,
+                                        title = entry.productName,
+                                        subtitle = entry.date,
                                             quantityLabel = entry.quantityLabel,
                                         )
                                     }
