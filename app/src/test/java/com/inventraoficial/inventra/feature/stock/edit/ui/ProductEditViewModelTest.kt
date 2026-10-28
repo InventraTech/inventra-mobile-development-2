@@ -135,6 +135,36 @@ class ProductEditViewModelTest {
         }
 
     @Test
+    fun `foto tirada na camera e enviada como a da galeria`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onPhotoPicked("content://com.inventraoficial.inventra.fileprovider/camera/produto-1.jpg")
+            advanceUntilIdle()
+
+            assertEquals(
+                listOf(ketchupId to "content://com.inventraoficial.inventra.fileprovider/camera/produto-1.jpg"),
+                photoRepository.uploads,
+            )
+        }
+
+    @Test
+    fun `camera negada fecha as opcoes e explica o que fazer`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            viewModel.onPhotoClick()
+
+            viewModel.onCameraDenied()
+
+            val photo = viewModel.uiState.value.photo
+            assertFalse(photo.isSheetVisible)
+            assertEquals("Permita o uso da câmera para tirar a foto, ou escolha uma da galeria.", photo.errorMessage)
+            assertEquals(oldPhoto, photo.url)
+        }
+
+    @Test
     fun `remover a foto deixa o produto sem foto`() =
         runTest(testDispatcher) {
             val viewModel = createViewModel()

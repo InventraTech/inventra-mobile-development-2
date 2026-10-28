@@ -78,6 +78,8 @@ class ProductEditViewModel(
 
     fun onRemovePhotoClick() = sendPhoto(localUrl = null) { productPhotoRepository.remove(productId) }
 
+    fun onCameraDenied() = updatePhoto { it.copy(isSheetVisible = false, errorMessage = CAMERA_DENIED) }
+
     private fun sendPhoto(
         localUrl: String?,
         call: suspend () -> Result<ProductResponse>,
@@ -182,6 +184,7 @@ class ProductEditViewModel(
     companion object {
         private const val ONLY_SUPERVISOR = "Só o supervisor da cozinha pode editar produtos."
         private const val NO_KITCHEN = "Entre em uma cozinha para definir o estoque mínimo."
+        private const val CAMERA_DENIED = "Permita o uso da câmera para tirar a foto, ou escolha uma da galeria."
 
         fun factory(productId: Int): ViewModelProvider.Factory =
             viewModelFactory {

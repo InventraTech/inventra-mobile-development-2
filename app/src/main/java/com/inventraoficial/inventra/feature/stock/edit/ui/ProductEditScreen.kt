@@ -119,6 +119,7 @@ fun ProductEditScreen(
             onPickClick = actions.photo.onPickClick,
             onRemoveClick = actions.photo.onRemoveClick,
             onDismiss = actions.photo.onSheetDismiss,
+            onCameraClick = actions.photo.onCameraClick,
         )
     }
 }
@@ -190,6 +191,11 @@ fun ProductEditRoute(
         rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
             viewModel.onPhotoPicked(uri?.toString())
         }
+    val openCamera =
+        rememberProductCamera(
+            onPhotoTaken = viewModel::onPhotoPicked,
+            onPermissionDenied = viewModel::onCameraDenied,
+        )
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) navigator.back()
@@ -207,6 +213,10 @@ fun ProductEditRoute(
                         onPickClick = {
                             viewModel.onPhotoSheetDismiss()
                             photoPicker.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                        },
+                        onCameraClick = {
+                            viewModel.onPhotoSheetDismiss()
+                            openCamera()
                         },
                         onRemoveClick = viewModel::onRemovePhotoClick,
                     ),

@@ -32,5 +32,6 @@ data class ProductPhotoActions(
     val onPhotoClick: () -> Unit = {},
     val onSheetDismiss: () -> Unit = {},
     val onPickClick: () -> Unit = {},
+    val onCameraClick: () -> Unit = {},
     val onRemoveClick: () -> Unit = {},
 )
