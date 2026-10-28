@@ -184,8 +184,8 @@ private fun AppNavigation(
                     entry<Screen.StockDetail> { key ->
                         StockDetailRoute(productId = key.productId, navigator = navigator)
                     }
-                    entry<Screen.ProductEdit> {
-                        ProductEditRoute(navigator = navigator)
+                    entry<Screen.ProductEdit> { key ->
+                        ProductEditRoute(productId = key.productId, navigator = navigator)
                     }
                     entry<Screen.StockOut> { key ->
                         StockOutRoute(productId = key.productId, navigator = navigator)

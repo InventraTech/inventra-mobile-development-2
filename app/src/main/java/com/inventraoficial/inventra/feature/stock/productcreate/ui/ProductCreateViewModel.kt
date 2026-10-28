@@ -7,16 +7,22 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraPickerOption
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeSource
-import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
+import com.inventraoficial.inventra.feature.stock.productform.MAX_BARCODE_LENGTH
+import com.inventraoficial.inventra.feature.stock.productform.MAX_BRAND_LENGTH
+import com.inventraoficial.inventra.feature.stock.productform.MAX_NAME_LENGTH
+import com.inventraoficial.inventra.feature.stock.productform.isMinStockInput
+import com.inventraoficial.inventra.feature.stock.productform.toCategoryOptions
+import com.inventraoficial.inventra.feature.stock.productform.toDecimal
+import com.inventraoficial.inventra.feature.stock.productform.toUnitOptions
+import com.inventraoficial.inventra.feature.stock.productform.validationError
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -64,7 +70,7 @@ class ProductCreateViewModel(
     }
 
     fun onMinStockChange(minStock: String) {
-        if (minStock.matches(decimalInput)) {
+        if (minStock.isMinStockInput()) {
             _uiState.update { it.copy(minStock = minStock, submitError = null) }
         }
     }
@@ -74,13 +80,7 @@ class ProductCreateViewModel(
         if (state.isSubmitting) return
         val unitId = state.unitId
         val minStock = state.minStock.toDecimal()
-        val error =
-            when {
-                state.name.isBlank() -> "Informe o nome do produto"
-                unitId == null -> "Escolha a unidade de medida"
-                state.minStock.isNotBlank() && minStock == null -> "Informe o estoque mínimo só com números"
-                else -> null
-            }
+        val error = state.form.validationError()
         if (error != null || unitId == null) {
             _uiState.update { it.copy(submitError = error) }
             return
@@ -173,30 +173,6 @@ class ProductCreateViewModel(
             }
     }
 }
-
-// Limites do backend.
-private const val MAX_NAME_LENGTH = 150
-private const val MAX_BRAND_LENGTH = 80
-private const val MAX_BARCODE_LENGTH = 50
-
-private val decimalInput = Regex("^\\d{0,9}([.,]\\d{0,3})?$")
-
-private fun String.toDecimal(): Double? = trim().replace(',', '.').toDoubleOrNull()
-
-// Unidades simples (KG, L, UN...) primeiro; as embalagens com tamanho no código (CX500G...) depois.
-private fun List<UnitResponse>.toUnitOptions(): List<InventraPickerOption> =
-    sortedBy { unit -> unit.symbol.any { it.isDigit() } }
-        .map { unit ->
-            val description = unit.description
-            if (description == null) {
-                InventraPickerOption(unit.id, unit.symbol)
-            } else {
-                InventraPickerOption(unit.id, description, unit.symbol)
-            }
-        }
-
-private fun List<CategoryResponse>.toCategoryOptions(): List<InventraPickerOption> =
-    sortedBy { it.name.lowercase() }.map { InventraPickerOption(it.id, it.name) }
 
 private fun ProductCreateUiState.prefilledWith(
     found: BarcodeLookupResponse?,
