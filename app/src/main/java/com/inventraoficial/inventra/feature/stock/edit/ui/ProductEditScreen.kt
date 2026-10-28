@@ -119,15 +119,7 @@ fun ProductEditRoute(
         uiState = uiState,
         actions =
             ProductEditActions(
-                form =
-                    ProductFormActions(
-                        onNameChange = viewModel::onNameChange,
-                        onBrandChange = viewModel::onBrandChange,
-                        onBarcodeChange = viewModel::onBarcodeChange,
-                        onUnitSelect = viewModel::onUnitSelect,
-                        onCategorySelect = viewModel::onCategorySelect,
-                        onMinStockChange = viewModel::onMinStockChange,
-                    ),
+                form = viewModel.formActions,
                 onSaveClick = viewModel::onSaveClick,
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },
@@ -152,11 +144,14 @@ private fun ProductEditScreenPreview() {
                         units = listOf(InventraPickerOption(id = 6, title = "Unidade", subtitle = "UN")),
                         unitId = 6,
                         minStock = "4",
+                        suppliers = listOf(InventraPickerOption(id = 2, title = "Atacadão")),
+                        supplierId = 2,
+                        referencePrice = "12,50",
                     ),
             ),
         actions =
             ProductEditActions(
-                form = ProductFormActions({}, {}, {}, {}, {}, {}),
+                form = ProductFormActions(),
                 onSaveClick = {},
                 onRetryClick = {},
                 onBackClick = {},

@@ -33,7 +33,29 @@ class NetworkSupplierRepositoryTest {
             lastFindId = id
             return suppliers.first { it.id == id }
         }
+
+        var activeCalls = 0
+            private set
+
+        override suspend fun listActive(): List<SupplierResponse> {
+            error?.let { throw it }
+            activeCalls++
+            return suppliers
+        }
     }
+
+    @Test
+    fun `allSuppliers lista todos os ativos, sem filtrar pela cozinha`() =
+        runTest {
+            val api = FakeSupplierApi(listOf(seara))
+            val repository = NetworkSupplierRepository(api, json)
+
+            val result = repository.allSuppliers()
+
+            assertEquals(listOf(seara), result.getOrNull())
+            assertEquals(1, api.activeCalls)
+            assertEquals(null, api.lastKitchenId)
+        }
 
     @Test
     fun `suppliers lista os fornecedores da cozinha`() =

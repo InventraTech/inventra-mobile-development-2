@@ -12,15 +12,19 @@ import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupRespons
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeSource
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
+import com.inventraoficial.inventra.data.remote.dto.product.LinkSupplierRequest
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
-import com.inventraoficial.inventra.feature.stock.productform.MAX_BARCODE_LENGTH
+import com.inventraoficial.inventra.data.repository.ProductSupplierRepository
+import com.inventraoficial.inventra.data.repository.SupplierRepository
 import com.inventraoficial.inventra.feature.stock.productform.MAX_BRAND_LENGTH
 import com.inventraoficial.inventra.feature.stock.productform.MAX_NAME_LENGTH
-import com.inventraoficial.inventra.feature.stock.productform.isMinStockInput
+import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
+import com.inventraoficial.inventra.feature.stock.productform.productFormActions
 import com.inventraoficial.inventra.feature.stock.productform.toCategoryOptions
 import com.inventraoficial.inventra.feature.stock.productform.toDecimal
+import com.inventraoficial.inventra.feature.stock.productform.toSupplierOptions
 import com.inventraoficial.inventra.feature.stock.productform.toUnitOptions
 import com.inventraoficial.inventra.feature.stock.productform.validationError
 import kotlinx.coroutines.async
@@ -37,9 +41,16 @@ class ProductCreateViewModel(
     private val barcode: String?,
     private val productRepository: ProductRepository,
     private val authRepository: AuthRepository,
+    private val supplierRepository: SupplierRepository,
+    private val productSupplierRepository: ProductSupplierRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(ProductCreateUiState(barcode = barcode.orEmpty()))
+    private val _uiState = MutableStateFlow(ProductCreateUiState(form = ProductFormState(barcode = barcode.orEmpty())))
     val uiState: StateFlow<ProductCreateUiState> = _uiState.asStateFlow()
+
+    val formActions =
+        productFormActions { transform ->
+            _uiState.update { it.copy(form = transform(it.form), submitError = null) }
+        }
 
     init {
         load()
@@ -47,40 +58,12 @@ class ProductCreateViewModel(
 
     fun onRetryClick() = load()
 
-    fun onNameChange(name: String) {
-        _uiState.update { it.copy(name = name.take(MAX_NAME_LENGTH), submitError = null) }
-    }
-
-    fun onBrandChange(brand: String) {
-        _uiState.update { it.copy(brand = brand.take(MAX_BRAND_LENGTH)) }
-    }
-
-    fun onBarcodeChange(barcode: String) {
-        if (barcode.all { it.isDigit() }) {
-            _uiState.update { it.copy(barcode = barcode.take(MAX_BARCODE_LENGTH), submitError = null) }
-        }
-    }
-
-    fun onUnitSelect(unitId: Int?) {
-        _uiState.update { it.copy(unitId = unitId, submitError = null) }
-    }
-
-    fun onCategorySelect(categoryId: Int?) {
-        _uiState.update { it.copy(categoryId = categoryId) }
-    }
-
-    fun onMinStockChange(minStock: String) {
-        if (minStock.isMinStockInput()) {
-            _uiState.update { it.copy(minStock = minStock, submitError = null) }
-        }
-    }
-
     fun onSaveClick() {
         val state = _uiState.value
         if (state.isSubmitting) return
-        val unitId = state.unitId
-        val minStock = state.minStock.toDecimal()
-        val error = state.form.validationError()
+        val form = state.form
+        val unitId = form.unitId
+        val error = form.validationError()
         if (error != null || unitId == null) {
             _uiState.update { it.copy(submitError = error) }
             return
@@ -88,23 +71,29 @@ class ProductCreateViewModel(
 
         val request =
             CreateProductRequest(
-                name = state.name.trim(),
-                brand = state.brand.trim().ifEmpty { null },
-                categoryId = state.categoryId,
+                name = form.name.trim(),
+                brand = form.brand.trim().ifEmpty { null },
+                categoryId = form.categoryId,
                 unitId = unitId,
-                barcode = state.barcode.trim().ifEmpty { null },
+                barcode = form.barcode.trim().ifEmpty { null },
             )
         _uiState.update { it.copy(isSubmitting = true, submitError = null) }
         viewModelScope.launch {
             productRepository
                 .create(request)
                 .onSuccess { product ->
-                    val linked = linkToKitchen(product.id, minStock)
+                    val kitchenLinked = linkToKitchen(product.id, form.minStock.toDecimal())
+                    val supplierLinked =
+                        form.supplierId?.let { supplierId ->
+                            val link = LinkSupplierRequest(supplierId, referencePrice = form.referencePrice.toDecimal())
+                            productSupplierRepository.link(product.id, link).isSuccess
+                        } ?: true
                     _uiState.update {
                         it.copy(
                             isSubmitting = false,
                             createdProduct = SavedProduct(product.id, product.name),
-                            kitchenLinkFailed = !linked,
+                            kitchenLinkFailed = !kitchenLinked,
+                            supplierLinkFailed = !supplierLinked,
                         )
                     }
                 }.onFailure { failure ->
@@ -134,6 +123,7 @@ class ProductCreateViewModel(
             val units = async { productRepository.units() }
             // Categoria é opcional: se a lista não vier, o formulário segue sem ela.
             val categories = async { productRepository.categories().getOrDefault(emptyList()) }
+            val suppliers = async { supplierRepository.allSuppliers().getOrDefault(emptyList()) }
             // Sem a consulta do código o cadastro continua, só não vem preenchido.
             val lookup = barcode?.let { code -> async { productRepository.findByBarcode(code, user.kitchenId) } }
 
@@ -145,13 +135,18 @@ class ProductCreateViewModel(
                 return@launch
             }
             val categoryOptions = categories.await()
+            val supplierOptions = suppliers.await()
             val found = lookup?.await()?.getOrNull()
             _uiState.update {
                 it
                     .copy(
                         isLoading = false,
-                        units = unitOptions.toUnitOptions(),
-                        categories = categoryOptions.toCategoryOptions(),
+                        form =
+                            it.form.copy(
+                                units = unitOptions.toUnitOptions(),
+                                categories = categoryOptions.toCategoryOptions(),
+                                suppliers = supplierOptions.toSupplierOptions(),
+                            ),
                     ).prefilledWith(found, unitOptions)
             }
         }
@@ -168,6 +163,8 @@ class ProductCreateViewModel(
                         barcode = barcode,
                         productRepository = application.container.productRepository,
                         authRepository = application.container.authRepository,
+                        supplierRepository = application.container.supplierRepository,
+                        productSupplierRepository = application.container.productSupplierRepository,
                     )
                 }
             }
@@ -186,9 +183,12 @@ private fun ProductCreateUiState.prefilledWith(
         suggestion != null ->
             copy(
                 isPrefilled = suggestion.name != null || suggestion.brand != null,
-                name = suggestion.name.orEmpty().take(MAX_NAME_LENGTH),
-                brand = suggestion.brand.orEmpty().take(MAX_BRAND_LENGTH),
-                unitId = suggestion.quantity?.let { units.guessUnitId(it) },
+                form =
+                    form.copy(
+                        name = suggestion.name.orEmpty().take(MAX_NAME_LENGTH),
+                        brand = suggestion.brand.orEmpty().take(MAX_BRAND_LENGTH),
+                        unitId = suggestion.quantity?.let { units.guessUnitId(it) },
+                    ),
             )
         else -> this
     }
