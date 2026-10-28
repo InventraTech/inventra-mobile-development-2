@@ -241,9 +241,9 @@ private fun StockMovementResponse.toHistoryEntry(
     val sign = if (type == HistoryType.Entries) "+" else "−"
     val who = user?.name ?: "Sistema"
     return HistoryEntry(
-        date = created.format(dateTimeFormatter),
         title = reason?.let { "$who · ${reasonLabel(it)}" } ?: who,
-        quantityLabel = "$sign${formatQuantity(quantity)} $unitSymbol · lote ${batch.batchNumber}",
+        detail = "${created.format(dateTimeFormatter)} · lote ${batch.batchNumber}",
+        quantityLabel = "$sign${formatQuantity(quantity)} $unitSymbol",
     )
 }
 

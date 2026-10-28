@@ -278,8 +278,8 @@ class StockDetailViewModelTest {
             assertEquals(listOf(StockMovementType.WRITE_OFF), stockRepository.movementsCalls)
             assertEquals(
                 listOf(
-                    HistoryEntry("12/10/2026 14:30", "Mauro Rosa · Uso", "−6 L · lote QA-01"),
-                    HistoryEntry("12/10/2026 14:30", "Sistema · Requisição", "−1,5 L · lote QA-01"),
+                    HistoryEntry("Mauro Rosa · Uso", "12/10/2026 14:30 · lote QA-01", "−6 L"),
+                    HistoryEntry("Sistema · Requisição", "12/10/2026 14:30 · lote QA-01", "−1,5 L"),
                 ),
                 history.entries,
             )
@@ -296,7 +296,7 @@ class StockDetailViewModelTest {
             viewModel.onEntriesClick()
             advanceUntilIdle()
             assertEquals(
-                listOf(HistoryEntry("12/10/2026 14:30", "Mauro Rosa", "+12 L · lote QA-01")),
+                listOf(HistoryEntry("Mauro Rosa", "12/10/2026 14:30 · lote QA-01", "+12 L")),
                 viewModel.uiState.value.history
                     ?.entries,
             )

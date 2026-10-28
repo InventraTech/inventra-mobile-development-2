@@ -33,8 +33,8 @@ enum class HistoryType(
 }
 
 data class HistoryEntry(
-    val date: String,
     val title: String,
+    val detail: String,
     val quantityLabel: String,
 )
 

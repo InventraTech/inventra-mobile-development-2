@@ -50,6 +50,7 @@ import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraInk
 import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -188,9 +189,10 @@ private fun HistoryList(history: HistoryState) {
             else ->
                 history.entries.forEach { entry ->
                     InventraDeliveryHistoryRow(
-                        date = entry.date,
-                        productName = entry.title,
+                        title = entry.title,
+                        subtitle = entry.detail,
                         quantityLabel = entry.quantityLabel,
+                        quantityColor = if (history.type == HistoryType.Entries) InventraSuccess else InventraDanger,
                     )
                 }
         }
@@ -286,7 +288,7 @@ private fun StockDetailScreenPreview() {
                 history =
                     HistoryState(
                         type = HistoryType.Exits,
-                        entries = listOf(HistoryEntry("12/10/2026 14:30", "Mauro Rosa · Uso", "−6 L · lote QA-01")),
+                        entries = listOf(HistoryEntry("Mauro Rosa · Uso", "12/10/2026 14:30 · lote QA-01", "−6 L")),
                     ),
             ),
         actions = StockDetailActions(),
