@@ -55,13 +55,13 @@ fun ProfileScreen(
     fullName: String,
     roleLabel: String,
     cozinhaName: String,
-    canManageMembers: Boolean,
+    canSeeTeam: Boolean,
     photoUrl: String?,
     isPhotoUploading: Boolean,
     photoErrorMessage: String?,
     onAvatarClick: () -> Unit,
     onProfileDetailsClick: () -> Unit,
-    onManageMembersClick: () -> Unit,
+    onTeamClick: () -> Unit,
     onAccountPreferencesClick: () -> Unit,
     onCozinhaInfoClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -142,11 +142,11 @@ fun ProfileScreen(
                 label = "Dados do perfil",
                 onClick = onProfileDetailsClick,
             )
-            if (canManageMembers) {
+            if (canSeeTeam) {
                 InventraMenuRow(
                     icon = Icons.Default.Groups,
-                    label = "Gerenciar membros",
-                    onClick = onManageMembersClick,
+                    label = "Ver equipe",
+                    onClick = onTeamClick,
                 )
             }
             InventraMenuRow(
@@ -224,13 +224,13 @@ fun ProfileRoute(
         fullName = uiState.fullName,
         roleLabel = uiState.roleLabel,
         cozinhaName = uiState.cozinhaName,
-        canManageMembers = uiState.canManageMembers,
+        canSeeTeam = uiState.canSeeTeam,
         photoUrl = photoState.photoUrl,
         isPhotoUploading = photoState.isUploading,
         photoErrorMessage = photoState.errorMessage,
         onAvatarClick = photoViewModel::onAvatarClick,
         onProfileDetailsClick = { navigator.navigate(Screen.ProfileDetails) },
-        onManageMembersClick = { navigator.navigate(Screen.ManageMembers) },
+        onTeamClick = { navigator.navigate(Screen.Team) },
         onAccountPreferencesClick = { navigator.navigate(Screen.AccountPreferences) },
         onCozinhaInfoClick = { navigator.navigate(Screen.CozinhaInfo) },
         modifier = modifier,
@@ -245,13 +245,13 @@ private fun ProfileScreenPreview() {
         fullName = "Jones Arakaki Kogake Passos Maldo",
         roleLabel = "Gerente",
         cozinhaName = "Sabor Filial Sul",
-        canManageMembers = true,
+        canSeeTeam = true,
         photoUrl = null,
         isPhotoUploading = false,
         photoErrorMessage = null,
         onAvatarClick = {},
         onProfileDetailsClick = {},
-        onManageMembersClick = {},
+        onTeamClick = {},
         onAccountPreferencesClick = {},
         onCozinhaInfoClick = {},
     )

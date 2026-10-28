@@ -30,7 +30,7 @@ class ProfileViewModel(
                         fullName = user?.name.orEmpty(),
                         roleLabel = user?.accessType?.toLabel().orEmpty(),
                         cozinhaName = user?.kitchenName ?: "Nenhuma cozinha vinculada",
-                        canManageMembers = user?.accessType == AccessType.SUPERVISOR && user.kitchenId != null,
+                        canSeeTeam = user?.accessType == AccessType.SUPERVISOR && user.kitchenId != null,
                     )
                 }
             }

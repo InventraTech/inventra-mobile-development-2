@@ -10,7 +10,7 @@ import com.inventraoficial.inventra.InventraApplication
 import com.inventraoficial.inventra.data.local.ImageCompressor
 import com.inventraoficial.inventra.data.local.ProfilePhotoPreview
 import com.inventraoficial.inventra.data.repository.AuthRepository
-import com.inventraoficial.inventra.feature.profile.members.ui.initials
+import com.inventraoficial.inventra.feature.profile.team.ui.initials
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
