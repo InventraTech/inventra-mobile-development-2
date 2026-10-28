@@ -223,9 +223,61 @@ class RequirementsListViewModelTest {
             )
             assertEquals(100, viewModel.uiState.value.openedDraftId)
             assertFalse(viewModel.uiState.value.isConvertingPreList)
+            assertNull(viewModel.uiState.value.preList)
 
             viewModel.onDraftOpened()
             assertNull(viewModel.uiState.value.openedDraftId)
+        }
+
+    @Test
+    fun `pre-lista que ja virou compra nao aparece de novo`() =
+        runTest(testDispatcher) {
+            val viewModel = visibleViewModel(RequisitionTestUsers.buyer)
+            advanceUntilIdle()
+            viewModel.onPreListConvertClick()
+            advanceUntilIdle()
+
+            viewModel.onScreenVisible()
+            advanceUntilIdle()
+
+            assertNull(viewModel.uiState.value.preList)
+            assertEquals(1, repository.created.size)
+        }
+
+    @Test
+    fun `compra cancelada ou recusada da pre-lista deixa o card voltar`() =
+        runTest(testDispatcher) {
+            repository.requisitions +=
+                listOf(
+                    requisition(50, status = RequisitionStatus.CANCELLED).copy(origin = "Pré-lista 24/10"),
+                    requisition(51, status = RequisitionStatus.REJECTED).copy(origin = "Pré-lista 24/10"),
+                    requisition(52, type = RequisitionType.TRANSFER).copy(origin = "Pré-lista 24/10"),
+                )
+            val viewModel = visibleViewModel(RequisitionTestUsers.buyer)
+            advanceUntilIdle()
+
+            assertEquals(
+                2,
+                viewModel.uiState.value.preList
+                    ?.id,
+            )
+        }
+
+    @Test
+    fun `falha no meio da conversao cancela o rascunho incompleto`() =
+        runTest(testDispatcher) {
+            repository.addItemErrorAfter = 2
+            val viewModel = visibleViewModel(RequisitionTestUsers.buyer)
+            advanceUntilIdle()
+
+            viewModel.onPreListConvertClick()
+            advanceUntilIdle()
+
+            val state = viewModel.uiState.value
+            assertEquals(listOf("cancel" to 100), repository.actions)
+            assertEquals("Produto inativo.", state.preListErrorMessage)
+            assertNull(state.openedDraftId)
+            assertEquals(2, state.preList?.id)
         }
 
     @Test

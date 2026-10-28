@@ -4,6 +4,8 @@ import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.prelist.PreListResponse
 import com.inventraoficial.inventra.data.remote.dto.requisition.AddRequisitionItemRequest
 import com.inventraoficial.inventra.data.remote.dto.requisition.CreateRequisitionRequest
+import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionResponse
+import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionType
 import com.inventraoficial.inventra.data.repository.RequisitionRepository
 import java.time.LocalDate
@@ -44,14 +46,28 @@ internal fun PreListResponse.toHighlight(): PreListHighlight =
         extraCount = (items.size - MAX_PHOTOS).coerceAtLeast(0),
     )
 
+private const val DISCARDED_DRAFT_REASON = "Pré-lista não foi transformada em compra por completo."
+private val discardedStatuses = setOf(RequisitionStatus.CANCELLED, RequisitionStatus.REJECTED)
+
+internal fun PreListResponse.purchaseOrigin(): String = "Pré-lista ${shortDateText()}"
+
+internal fun PreListResponse.becamePurchaseIn(requisitions: List<RequisitionResponse>): Boolean =
+    requisitions.any {
+        it.type == RequisitionType.PURCHASE && it.origin == purchaseOrigin() && it.status !in discardedStatuses
+    }
+
 internal suspend fun RequisitionRepository.createPurchaseFrom(
     preList: PreListResponse,
     kitchenId: Int,
 ): Int {
-    val request = CreateRequisitionRequest(RequisitionType.PURCHASE, "Pré-lista ${preList.shortDateText()}", kitchenId)
+    val request = CreateRequisitionRequest(RequisitionType.PURCHASE, preList.purchaseOrigin(), kitchenId)
     val draft = create(request).getOrThrow()
-    preList.items.forEach { item ->
-        addItem(draft.id, AddRequisitionItemRequest(item.product.id, item.quantity, item.supplier?.id)).getOrThrow()
-    }
+    runCatching {
+        preList.items.forEach { item ->
+            addItem(draft.id, AddRequisitionItemRequest(item.product.id, item.quantity, item.supplier?.id)).getOrThrow()
+        }
+    }.onFailure {
+        cancel(draft.id, DISCARDED_DRAFT_REASON)
+    }.getOrThrow()
     return draft.id
 }

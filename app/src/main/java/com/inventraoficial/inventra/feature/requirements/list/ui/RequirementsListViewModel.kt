@@ -15,6 +15,7 @@ import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatu
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.PreListRepository
 import com.inventraoficial.inventra.data.repository.RequisitionRepository
+import com.inventraoficial.inventra.feature.prelist.becamePurchaseIn
 import com.inventraoficial.inventra.feature.prelist.createPurchaseFrom
 import com.inventraoficial.inventra.feature.prelist.seesPreLists
 import com.inventraoficial.inventra.feature.prelist.toHighlight
@@ -24,6 +25,8 @@ import com.inventraoficial.inventra.feature.requirements.itemsDetails
 import com.inventraoficial.inventra.feature.requirements.newestFirst
 import com.inventraoficial.inventra.feature.requirements.subtitleText
 import com.inventraoficial.inventra.feature.requirements.titleText
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,7 +62,8 @@ class RequirementsListViewModel(
             runCatching {
                 requisitionRepository.createPurchaseFrom(preList, requireNotNull(kitchenId) { NO_KITCHEN_MESSAGE })
             }.onSuccess { draftId ->
-                _uiState.update { it.copy(isConvertingPreList = false, openedDraftId = draftId) }
+                latestPreList = null
+                _uiState.update { it.copy(isConvertingPreList = false, preList = null, openedDraftId = draftId) }
             }.onFailure { error ->
                 _uiState.update {
                     it.copy(
@@ -86,10 +90,12 @@ class RequirementsListViewModel(
             }
             val isSupervisor = user.accessType == AccessType.SUPERVISOR
             _uiState.update { it.copy(isSupervisor = isSupervisor) }
-            if (user.accessType.seesPreLists()) launch { loadPreList() }
+            val requesterId = if (isSupervisor) null else user.id
+            val requisitions = async { requisitionRepository.requisitions(kitchenId, requesterId = requesterId) }
+            if (user.accessType.seesPreLists()) launch { loadPreList(requisitions) }
 
-            requisitionRepository
-                .requisitions(kitchenId, requesterId = if (isSupervisor) null else user.id)
+            requisitions
+                .await()
                 .onSuccess { all ->
                     val open =
                         all
@@ -112,15 +118,17 @@ class RequirementsListViewModel(
         }
     }
 
-    private suspend fun loadPreList() {
+    private suspend fun loadPreList(requisitions: Deferred<Result<List<RequisitionResponse>>>) {
         val latest =
             preListRepository
                 .preLists()
                 .getOrNull()
                 ?.maxWithOrNull(compareBy({ it.listDate }, { it.id }))
         val detail = latest?.let { preListRepository.preList(it.id).getOrNull() }?.takeIf { it.items.isNotEmpty() }
-        latestPreList = detail
-        _uiState.update { it.copy(preList = detail?.toHighlight()) }
+        val existing = requisitions.await().getOrDefault(emptyList())
+        val pending = detail?.takeUnless { it.becamePurchaseIn(existing) }
+        latestPreList = pending
+        _uiState.update { it.copy(preList = pending?.toHighlight()) }
     }
 
     companion object {
