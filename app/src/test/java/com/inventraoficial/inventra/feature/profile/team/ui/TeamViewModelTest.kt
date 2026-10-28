@@ -61,6 +61,7 @@ class TeamViewModelTest {
             assertTrue(state.members.first().isCurrentUser)
             assertEquals("Supervisor", state.members.first().roleLabel)
             assertEquals("PL", state.members.last().initials)
+            assertEquals("paula@inventra.com", state.members.last().email)
         }
 
     @Test

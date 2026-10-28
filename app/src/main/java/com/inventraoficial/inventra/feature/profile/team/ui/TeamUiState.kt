@@ -4,6 +4,7 @@ data class TeamMember(
     val id: String,
     val initials: String,
     val name: String,
+    val email: String,
     val roleLabel: String,
     val isCurrentUser: Boolean,
     val photoUrl: String? = null,
