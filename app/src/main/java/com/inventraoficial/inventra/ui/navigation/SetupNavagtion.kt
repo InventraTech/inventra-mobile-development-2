@@ -42,8 +42,8 @@ import com.inventraoficial.inventra.feature.home.ui.HomeRoute
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
 import com.inventraoficial.inventra.feature.prelist.detail.ui.PreListDetailRoute
 import com.inventraoficial.inventra.feature.profile.details.ui.ProfileDetailsRoute
-import com.inventraoficial.inventra.feature.profile.members.ui.ManageMembersRoute
 import com.inventraoficial.inventra.feature.profile.preferences.ui.AccountPreferencesRoute
+import com.inventraoficial.inventra.feature.profile.team.ui.TeamRoute
 import com.inventraoficial.inventra.feature.profile.ui.ProfileRoute
 import com.inventraoficial.inventra.feature.requirements.detail.ui.RequisitionDetailRoute
 import com.inventraoficial.inventra.feature.requirements.editor.ui.RequisitionEditorRoute
@@ -232,8 +232,8 @@ private fun AppNavigation(
                     entry<Screen.ProfileDetails> {
                         ProfileDetailsRoute(navigator = navigator)
                     }
-                    entry<Screen.ManageMembers> {
-                        ManageMembersRoute(navigator = navigator)
+                    entry<Screen.Team> {
+                        TeamRoute(navigator = navigator)
                     }
                     entry<Screen.AccountPreferences> {
                         AccountPreferencesRoute(navigator = navigator)

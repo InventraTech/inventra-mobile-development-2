@@ -4,5 +4,5 @@ data class ProfileUiState(
     val fullName: String = "",
     val roleLabel: String = "",
     val cozinhaName: String = "",
-    val canManageMembers: Boolean = false,
+    val canSeeTeam: Boolean = false,
 )

@@ -92,7 +92,7 @@ sealed interface Screen : NavKey {
     data object ProfileDetails : Screen
 
     @Serializable
-    data object ManageMembers : Screen
+    data object Team : Screen
 
     @Serializable
     data object AccountPreferences : Screen

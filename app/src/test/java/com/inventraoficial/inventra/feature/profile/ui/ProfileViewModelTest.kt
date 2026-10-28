@@ -73,9 +73,9 @@ class ProfileViewModelTest {
             val doEstoquista = ProfileViewModel(FakeAuthRepository(initialUser = estoquista))
             advanceUntilIdle()
 
-            assertTrue(comCozinha.uiState.value.canManageMembers)
-            assertFalse(semCozinha.uiState.value.canManageMembers)
-            assertFalse(doEstoquista.uiState.value.canManageMembers)
+            assertTrue(comCozinha.uiState.value.canSeeTeam)
+            assertFalse(semCozinha.uiState.value.canSeeTeam)
+            assertFalse(doEstoquista.uiState.value.canSeeTeam)
         }
 
     private companion object {
