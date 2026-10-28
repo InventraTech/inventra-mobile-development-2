@@ -4,6 +4,12 @@ import com.inventraoficial.inventra.data.remote.dto.stock.SupplierSummary
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class PreListSummaryResponse(
+    val id: Int,
+    val listDate: String,
+)
+
+@Serializable
 data class PreListResponse(
     val id: Int,
     val listDate: String,

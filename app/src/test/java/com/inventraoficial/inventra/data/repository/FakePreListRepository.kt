@@ -3,6 +3,7 @@ package com.inventraoficial.inventra.data.repository
 import com.inventraoficial.inventra.data.remote.dto.prelist.PreListItemResponse
 import com.inventraoficial.inventra.data.remote.dto.prelist.PreListProduct
 import com.inventraoficial.inventra.data.remote.dto.prelist.PreListResponse
+import com.inventraoficial.inventra.data.remote.dto.prelist.PreListSummaryResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.SupplierSummary
 
 class FakePreListRepository(
@@ -14,10 +15,10 @@ class FakePreListRepository(
     var detailCalls = mutableListOf<Int>()
         private set
 
-    override suspend fun preLists(): Result<List<PreListResponse>> {
+    override suspend fun preLists(): Result<List<PreListSummaryResponse>> {
         listCalls++
         error?.let { return Result.failure(it) }
-        return Result.success(preLists.map { it.copy(items = emptyList()) })
+        return Result.success(preLists.map { PreListSummaryResponse(id = it.id, listDate = it.listDate) })
     }
 
     override suspend fun preList(id: Int): Result<PreListResponse> {
