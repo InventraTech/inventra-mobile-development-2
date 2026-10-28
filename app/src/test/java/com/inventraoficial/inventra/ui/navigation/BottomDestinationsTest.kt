@@ -7,11 +7,11 @@ import org.junit.Test
 
 class BottomDestinationsTest {
     @Test
-    fun `estoquista ve so inicio, estoque e perfil`() {
+    fun `estoquista ve estoque, inicio no meio e perfil`() {
         assertEquals(
             listOf(
-                InventraBottomDestination.Home,
                 InventraBottomDestination.Stock,
+                InventraBottomDestination.Home,
                 InventraBottomDestination.Perfil,
             ),
             bottomDestinationsFor(AccessType.ESTOQUISTA),
