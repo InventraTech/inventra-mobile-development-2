@@ -5,6 +5,7 @@ import com.inventraoficial.inventra.data.remote.apiCall
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
+import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import kotlinx.serialization.json.Json
@@ -22,6 +23,11 @@ interface ProductRepository {
     ): Result<BarcodeLookupResponse?>
 
     suspend fun create(request: CreateProductRequest): Result<ProductResponse>
+
+    suspend fun setKitchenParameters(
+        productId: Int,
+        request: KitchenParametersRequest,
+    ): Result<Unit>
 
     suspend fun units(): Result<List<UnitResponse>>
 
@@ -57,6 +63,11 @@ class NetworkProductRepository(
         apiCall(json) {
             productApi.create(request)
         }
+
+    override suspend fun setKitchenParameters(
+        productId: Int,
+        request: KitchenParametersRequest,
+    ): Result<Unit> = apiCall(json) { productApi.setKitchenParameters(productId, request) }
 
     override suspend fun units(): Result<List<UnitResponse>> =
         cachedUnits?.let { Result.success(it) }

@@ -92,7 +92,13 @@ fun ProductCreateScreen(
                     icon = Icons.Default.CheckCircle,
                     iconTint = InventraSuccess,
                     title = "Produto cadastrado",
-                    text = "${created.name} já está no catálogo. Quer dar entrada do estoque agora?",
+                    text =
+                        if (uiState.kitchenLinkFailed) {
+                            "${created.name} já está no catálogo, mas só aparece no estoque da cozinha " +
+                                "depois da primeira entrada. Quer dar entrada agora?"
+                        } else {
+                            "${created.name} já está no catálogo e na lista do estoque. Quer dar entrada agora?"
+                        },
                     product = created,
                     actions = actions,
                     modifier = contentModifier,
@@ -173,6 +179,14 @@ private fun ProductForm(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
+        InventraLabeledField(
+            label = "Estoque mínimo na cozinha (opcional)",
+            value = uiState.minStock,
+            onValueChange = actions.onMinStockChange,
+            keyboardType = KeyboardType.Decimal,
+            placeholder = "Avisamos quando ficar abaixo disso",
+            modifier = Modifier.fillMaxWidth(),
+        )
         InventraLabeledField(
             label = "Código de barras (opcional)",
             value = uiState.barcode,
@@ -286,6 +300,7 @@ fun ProductCreateRoute(
                 onBarcodeChange = viewModel::onBarcodeChange,
                 onUnitSelect = viewModel::onUnitSelect,
                 onCategorySelect = viewModel::onCategorySelect,
+                onMinStockChange = viewModel::onMinStockChange,
                 onSaveClick = viewModel::onSaveClick,
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },
@@ -303,6 +318,7 @@ private val previewActions =
         onBarcodeChange = {},
         onUnitSelect = {},
         onCategorySelect = {},
+        onMinStockChange = {},
         onSaveClick = {},
         onRetryClick = {},
         onBackClick = {},

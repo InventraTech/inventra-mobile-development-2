@@ -20,9 +20,11 @@ data class ProductCreateUiState(
     val unitId: Int? = null,
     val categories: List<InventraPickerOption> = emptyList(),
     val categoryId: Int? = null,
+    val minStock: String = "",
     val isSubmitting: Boolean = false,
     val submitError: String? = null,
     val createdProduct: SavedProduct? = null,
+    val kitchenLinkFailed: Boolean = false,
 ) {
     val unitLabel: String?
         get() = units.firstOrNull { it.id == unitId }?.label()
@@ -40,6 +42,7 @@ data class ProductCreateActions(
     val onBarcodeChange: (String) -> Unit,
     val onUnitSelect: (Int?) -> Unit,
     val onCategorySelect: (Int?) -> Unit,
+    val onMinStockChange: (String) -> Unit,
     val onSaveClick: () -> Unit,
     val onRetryClick: () -> Unit,
     val onBackClick: () -> Unit,

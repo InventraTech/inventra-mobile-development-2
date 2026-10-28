@@ -3,6 +3,7 @@ package com.inventraoficial.inventra.data.repository
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
+import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockCategory
@@ -50,6 +51,18 @@ class FakeProductRepository(
     override suspend fun create(request: CreateProductRequest): Result<ProductResponse> {
         createRequests += request
         return createResult ?: Result.success(product(id = 99, name = request.name))
+    }
+
+    var kitchenParametersResult: Result<Unit> = Result.success(Unit)
+    var kitchenParametersCalls = mutableListOf<Pair<Int, KitchenParametersRequest>>()
+        private set
+
+    override suspend fun setKitchenParameters(
+        productId: Int,
+        request: KitchenParametersRequest,
+    ): Result<Unit> {
+        kitchenParametersCalls += productId to request
+        return kitchenParametersResult
     }
 
     var unitsResult: Result<List<UnitResponse>> = Result.success(defaultUnits)

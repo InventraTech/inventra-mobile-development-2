@@ -3,12 +3,14 @@ package com.inventraoficial.inventra.data.remote.api
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
+import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.PageProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -36,6 +38,12 @@ interface ProductApi {
     suspend fun create(
         @Body request: CreateProductRequest,
     ): ProductResponse
+
+    @PUT("$PATH/{id}/kitchen-parameters")
+    suspend fun setKitchenParameters(
+        @Path("id") id: Int,
+        @Body request: KitchenParametersRequest,
+    )
 
     @GET("units")
     suspend fun units(): List<UnitResponse>

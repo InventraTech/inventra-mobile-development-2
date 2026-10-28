@@ -5,6 +5,7 @@ import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupRespons
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeSource
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
+import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.PageProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
@@ -57,6 +58,16 @@ class NetworkProductRepositoryTest {
         override suspend fun create(request: CreateProductRequest): ProductResponse {
             created = request
             return FakeProductRepository.product(77, request.name)
+        }
+
+        var kitchenParameters: Pair<Int, KitchenParametersRequest>? = null
+            private set
+
+        override suspend fun setKitchenParameters(
+            id: Int,
+            request: KitchenParametersRequest,
+        ) {
+            kitchenParameters = id to request
         }
 
         override suspend fun units(): List<UnitResponse> {
@@ -112,6 +123,19 @@ class NetworkProductRepositoryTest {
 
             assertEquals(77, result.getOrNull()?.id)
             assertEquals(request, api.created)
+        }
+
+    @Test
+    fun `setKitchenParameters liga o produto a cozinha`() =
+        runTest {
+            val api = FakeProductApi(lookup)
+            val repository = NetworkProductRepository(api, json)
+            val request = KitchenParametersRequest(kitchenId = 7, minStock = 10.0)
+
+            val result = repository.setKitchenParameters(77, request)
+
+            assertTrue(result.isSuccess)
+            assertEquals(77 to request, api.kitchenParameters)
         }
 
     @Test
