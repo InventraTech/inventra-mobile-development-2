@@ -72,6 +72,7 @@ private fun UserResponse.toTeamMember(currentUserId: String?): TeamMember {
         id = id,
         initials = name.initials(),
         name = if (isCurrentUser) "$name (você)" else name,
+        email = email,
         roleLabel = profile.accessType.toLabel(),
         isCurrentUser = isCurrentUser,
         photoUrl = photoUrl,
