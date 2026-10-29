@@ -7,4 +7,14 @@ data class ProfileDetailsUiState(
     val email: String = "",
     val isLogoutDialogVisible: Boolean = false,
     val isLoggedOut: Boolean = false,
+    val leaveKitchen: LeaveKitchenState = LeaveKitchenState(),
+)
+
+data class LeaveKitchenState(
+    val canLeave: Boolean = false,
+    val isSupervisor: Boolean = false,
+    val isDialogVisible: Boolean = false,
+    val isLeaving: Boolean = false,
+    val errorMessage: String? = null,
+    val hasLeft: Boolean = false,
 )

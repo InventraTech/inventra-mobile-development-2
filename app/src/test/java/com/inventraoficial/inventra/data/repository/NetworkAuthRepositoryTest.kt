@@ -65,6 +65,14 @@ class NetworkAuthRepositoryTest {
 
         override suspend fun deactivate(id: String) = error("nao usado")
 
+        var leaveKitchenCalls = 0
+            private set
+
+        override suspend fun leaveKitchen(): UserResponse {
+            leaveKitchenCalls++
+            return respond().copy(kitchen = null)
+        }
+
         companion object {
             const val PHOTO_URL = "https://res.cloudinary.com/inventra/image/upload/v2/inventra/users/1.jpg"
         }
@@ -117,6 +125,11 @@ class NetworkAuthRepositoryTest {
     ): HttpException {
         val responseBody = body.toResponseBody("application/json".toMediaType())
         return HttpException(Response.error<Any>(code, responseBody))
+    }
+
+    private companion object {
+        const val LAST_SUPERVISOR_BODY =
+            """{"title":"Conflict","status":409,"detail":"Promova outro membro a supervisor antes de sair."}"""
     }
 
     private fun repositoryThatThrows(exception: Exception): NetworkAuthRepository {
@@ -474,6 +487,43 @@ class NetworkAuthRepositoryTest {
 
             assertEquals(1, api.removePhotoCalls)
             assertNull(sessionStorage.currentUser?.photoUrl)
+        }
+
+    @Test
+    fun `leaveKitchen tira a cozinha da sessao e mantem o login`() =
+        runTest {
+            val cozinha = KitchenSummary(id = 7, name = "Sabor Filial Sul")
+            val api = FakeUserApi { FakeAuthRepository.fakeUser.copy(kitchen = cozinha) }
+            val repository = loggedRepository(api)
+            repository.refreshCurrentUser()
+            assertEquals(7, sessionStorage.currentUser?.kitchenId)
+
+            val result = repository.leaveKitchen()
+
+            assertTrue(result.isSuccess)
+            assertEquals(1, api.leaveKitchenCalls)
+            assertNull(sessionStorage.currentUser?.kitchenId)
+            assertEquals("jwt", sessionStorage.currentToken)
+        }
+
+    @Test
+    fun `leaveKitchen do ultimo supervisor devolve o detail do backend e mantem a cozinha`() =
+        runTest {
+            val cozinha = KitchenSummary(id = 7, name = "Sabor Filial Sul")
+            var leaving = false
+            val api =
+                FakeUserApi {
+                    if (leaving) throw httpError(409, LAST_SUPERVISOR_BODY)
+                    FakeAuthRepository.fakeUser.copy(kitchen = cozinha)
+                }
+            val repository = loggedRepository(api)
+            repository.refreshCurrentUser()
+            leaving = true
+
+            val result = repository.leaveKitchen()
+
+            assertEquals("Promova outro membro a supervisor antes de sair.", result.exceptionOrNull()?.message)
+            assertEquals(7, sessionStorage.currentUser?.kitchenId)
         }
 
     @Test

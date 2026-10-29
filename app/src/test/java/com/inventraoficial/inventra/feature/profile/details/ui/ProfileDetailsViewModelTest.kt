@@ -124,6 +124,69 @@ class ProfileDetailsViewModelTest {
             assertEquals("Sabor Filial Sul", viewModel.uiState.value.cozinhaName)
         }
 
+    @Test
+    fun `so mostra sair da cozinha para quem tem cozinha`() =
+        runTest(testDispatcher) {
+            repository.emitUser(supervisorComCozinha.copy(kitchenId = null, kitchenName = null))
+            advanceUntilIdle()
+            assertFalse(viewModel.uiState.value.leaveKitchen.canLeave)
+
+            repository.emitUser(supervisorComCozinha)
+            advanceUntilIdle()
+            assertTrue(viewModel.uiState.value.leaveKitchen.canLeave)
+        }
+
+    @Test
+    fun `sair da cozinha so acontece depois de confirmar`() =
+        runTest(testDispatcher) {
+            repository.emitUser(supervisorComCozinha)
+            advanceUntilIdle()
+
+            viewModel.onLeaveKitchenClick()
+            assertTrue(viewModel.uiState.value.leaveKitchen.isDialogVisible)
+            viewModel.onLeaveKitchenDismiss()
+            advanceUntilIdle()
+
+            assertFalse(viewModel.uiState.value.leaveKitchen.isDialogVisible)
+            assertEquals(0, repository.leaveKitchenCalls)
+        }
+
+    @Test
+    fun `confirmar sai da cozinha e marca para onde ir`() =
+        runTest(testDispatcher) {
+            repository.emitUser(supervisorComCozinha.copy(accessType = AccessType.ESTOQUISTA))
+            advanceUntilIdle()
+
+            viewModel.onLeaveKitchenClick()
+            viewModel.onLeaveKitchenConfirm()
+            assertTrue(viewModel.uiState.value.leaveKitchen.isLeaving)
+            advanceUntilIdle()
+
+            val leave = viewModel.uiState.value.leaveKitchen
+            assertEquals(1, repository.leaveKitchenCalls)
+            assertTrue(leave.hasLeft)
+            assertFalse(leave.isSupervisor)
+            assertEquals("Nenhuma cozinha vinculada", viewModel.uiState.value.cozinhaName)
+        }
+
+    @Test
+    fun `ultimo supervisor nao sai e ve a mensagem do backend`() =
+        runTest(testDispatcher) {
+            val lastSupervisor = "Promova outro membro a supervisor antes de sair."
+            repository.leaveKitchenResult = Result.failure(Exception(lastSupervisor))
+            repository.emitUser(supervisorComCozinha)
+            advanceUntilIdle()
+
+            viewModel.onLeaveKitchenConfirm()
+            advanceUntilIdle()
+
+            val leave = viewModel.uiState.value.leaveKitchen
+            assertFalse(leave.hasLeft)
+            assertFalse(leave.isLeaving)
+            assertEquals(lastSupervisor, leave.errorMessage)
+            assertEquals("Sabor Filial Sul", viewModel.uiState.value.cozinhaName)
+        }
+
     private companion object {
         val supervisorComCozinha =
             SessionUser(
