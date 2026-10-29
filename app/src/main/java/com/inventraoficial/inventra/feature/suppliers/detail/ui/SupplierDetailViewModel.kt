@@ -68,6 +68,7 @@ class SupplierDetailViewModel(
         ): SupplierDetailUiState {
             val newestFirst = delivered.orEmpty().sortedByDescending { it.entryDate }
             return copy(
+                photoUrl = supplier.photoUrl,
                 name = supplier.legalName,
                 rating = supplier.rating ?: 0,
                 badgeText = supplier.cnpj,

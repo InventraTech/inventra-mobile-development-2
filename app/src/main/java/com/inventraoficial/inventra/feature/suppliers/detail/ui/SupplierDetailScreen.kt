@@ -21,20 +21,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBadge
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraStarRating
-import com.inventraoficial.inventra.core.designsystem.atoms.InventraThumbnail
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraSupplierImage
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraContactRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraDeliveryHistoryRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSupplierProductRow
@@ -49,7 +46,7 @@ import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
 fun SupplierDetailScreen(
-    imageRes: Int,
+    photoUrl: String?,
     name: String,
     rating: Int,
     badgeText: String,
@@ -102,11 +99,7 @@ fun SupplierDetailScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            InventraThumbnail(
-                                painter = painterResource(imageRes),
-                                size = 64.dp,
-                                contentScale = ContentScale.Fit,
-                            )
+                        InventraSupplierImage(photoUrl = photoUrl, size = 64.dp)
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(
                                     text = name,
@@ -225,7 +218,7 @@ fun SupplierDetailRoute(
     val uiState by viewModel.uiState.collectAsState()
 
     SupplierDetailScreen(
-        imageRes = uiState.imageRes,
+        photoUrl = uiState.photoUrl,
         name = uiState.name,
         rating = uiState.rating,
         badgeText = uiState.badgeText,
@@ -247,7 +240,7 @@ fun SupplierDetailRoute(
 @Composable
 private fun SupplierDetailScreenPreview() {
     SupplierDetailScreen(
-        imageRes = R.drawable.ic_inventra_logo,
+        photoUrl = null,
         name = "Seara Alimentos",
         rating = 5,
         badgeText = "02.914.460/0001-50",

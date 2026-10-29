@@ -11,4 +11,5 @@ data class SupplierResponse(
     val whatsapp: String? = null,
     val rating: Int? = null,
     val active: Boolean = true,
+    val photoUrl: String? = null,
 )
