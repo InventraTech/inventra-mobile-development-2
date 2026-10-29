@@ -1,7 +1,5 @@
 package com.inventraoficial.inventra.feature.suppliers.detail.ui
 
-import com.inventraoficial.inventra.R
-
 data class SupplierProduct(
     val name: String,
     val infoText: String,
@@ -14,7 +12,7 @@ data class DeliveryHistoryEntry(
 )
 
 data class SupplierDetailUiState(
-    val imageRes: Int = R.drawable.ic_inventra_logo,
+    val photoUrl: String? = null,
     val name: String = "",
     val rating: Int = 0,
     val badgeText: String = "",

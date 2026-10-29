@@ -17,13 +17,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWithFilter
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSupplierRow
@@ -98,7 +96,7 @@ fun SupplierScreen(
                         LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             items(suppliers, key = { it.id }) { supplier ->
                                 InventraSupplierRow(
-                                    painter = painterResource(supplier.imageRes),
+                                photoUrl = supplier.photoUrl,
                                     name = supplier.name,
                                     rating = supplier.rating,
                                     badgeText = supplier.badgeText,
@@ -191,8 +189,8 @@ private fun SupplierScreenPreview() {
         onFilterIconClick = {},
         suppliers =
             listOf(
-                Supplier(1, R.drawable.ic_inventra_logo, "Seara Alimentos", 5, "02.914.460/0001-50"),
-                Supplier(2, R.drawable.ic_inventra_logo, "Piracanjuba", 4, "01.234.567/0001-89"),
+                Supplier(1, null, "Seara Alimentos", 5, "02.914.460/0001-50"),
+                Supplier(2, null, "Piracanjuba", 4, "01.234.567/0001-89"),
             ),
         isLoading = false,
         errorMessage = null,
