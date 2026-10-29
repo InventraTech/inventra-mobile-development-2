@@ -22,6 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +43,7 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraDelivery
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatch
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatchesCard
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraHistorySection
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraImageViewer
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTotalCard
@@ -113,15 +117,21 @@ private fun DetailContent(
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
+        var isPhotoExpanded by rememberSaveable { mutableStateOf(false) }
+        val photoUrl = uiState.productPhotoUrl
         InventraProductImage(
-            photoUrl = uiState.productPhotoUrl,
+            photoUrl = photoUrl,
             shape = RoundedCornerShape(16.dp),
             iconSize = 56.dp,
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(180.dp),
+                    .height(220.dp)
+                    .clickable(enabled = photoUrl != null) { isPhotoExpanded = true },
         )
+        if (isPhotoExpanded && photoUrl != null) {
+            InventraImageViewer(photoUrl = photoUrl, onDismiss = { isPhotoExpanded = false })
+        }
         uiState.productDetails?.let {
             Text(text = it, fontFamily = Montserrat, fontSize = 14.sp, color = InventraMuted)
         }
