@@ -24,6 +24,7 @@ import com.inventraoficial.inventra.data.remote.api.KitchenAccessApi
 import com.inventraoficial.inventra.data.remote.api.KitchenApi
 import com.inventraoficial.inventra.data.remote.api.PreListApi
 import com.inventraoficial.inventra.data.remote.api.ProductApi
+import com.inventraoficial.inventra.data.remote.api.ProductPhotoApi
 import com.inventraoficial.inventra.data.remote.api.ProductSupplierApi
 import com.inventraoficial.inventra.data.remote.api.RequisitionApi
 import com.inventraoficial.inventra.data.remote.api.StockApi
@@ -43,12 +44,14 @@ import com.inventraoficial.inventra.data.repository.NetworkKitchenAccessReposito
 import com.inventraoficial.inventra.data.repository.NetworkKitchenRepository
 import com.inventraoficial.inventra.data.repository.NetworkMembersRepository
 import com.inventraoficial.inventra.data.repository.NetworkPreListRepository
+import com.inventraoficial.inventra.data.repository.NetworkProductPhotoRepository
 import com.inventraoficial.inventra.data.repository.NetworkProductRepository
 import com.inventraoficial.inventra.data.repository.NetworkProductSupplierRepository
 import com.inventraoficial.inventra.data.repository.NetworkRequisitionRepository
 import com.inventraoficial.inventra.data.repository.NetworkStockRepository
 import com.inventraoficial.inventra.data.repository.NetworkSupplierRepository
 import com.inventraoficial.inventra.data.repository.PreListRepository
+import com.inventraoficial.inventra.data.repository.ProductPhotoRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
 import com.inventraoficial.inventra.data.repository.ProductSupplierRepository
 import com.inventraoficial.inventra.data.repository.RequisitionRepository
@@ -82,6 +85,7 @@ interface AppContainer {
     val supplierRepository: SupplierRepository
     val productRepository: ProductRepository
     val productSupplierRepository: ProductSupplierRepository
+    val productPhotoRepository: ProductPhotoRepository
     val requisitionRepository: RequisitionRepository
     val preListRepository: PreListRepository
     val sessionManager: SessionManager
@@ -161,6 +165,7 @@ class DefaultAppContainer(
     private val supplierApi: SupplierApi by lazy { retrofit.create(SupplierApi::class.java) }
     private val productApi: ProductApi by lazy { retrofit.create(ProductApi::class.java) }
     private val productSupplierApi: ProductSupplierApi by lazy { retrofit.create(ProductSupplierApi::class.java) }
+    private val productPhotoApi: ProductPhotoApi by lazy { retrofit.create(ProductPhotoApi::class.java) }
     private val requisitionApi: RequisitionApi by lazy { retrofit.create(RequisitionApi::class.java) }
     private val preListApi: PreListApi by lazy { retrofit.create(PreListApi::class.java) }
     private val clickEventApi: ClickEventApi by lazy { retrofit.create(ClickEventApi::class.java) }
@@ -205,6 +210,9 @@ class DefaultAppContainer(
     override val productRepository: ProductRepository by lazy { NetworkProductRepository(productApi, json) }
     override val productSupplierRepository: ProductSupplierRepository by lazy {
         NetworkProductSupplierRepository(productSupplierApi, json)
+    }
+    override val productPhotoRepository: ProductPhotoRepository by lazy {
+        NetworkProductPhotoRepository(productPhotoApi, imageCompressor, json)
     }
 
     override val requisitionRepository: RequisitionRepository by lazy {

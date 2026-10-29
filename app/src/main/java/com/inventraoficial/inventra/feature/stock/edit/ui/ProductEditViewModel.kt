@@ -15,6 +15,7 @@ import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.ProductSupplierResponse
 import com.inventraoficial.inventra.data.remote.dto.product.UpdateProductRequest
 import com.inventraoficial.inventra.data.repository.AuthRepository
+import com.inventraoficial.inventra.data.repository.ProductPhotoRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
 import com.inventraoficial.inventra.data.repository.ProductSupplierRepository
 import com.inventraoficial.inventra.data.repository.SupplierRepository
@@ -41,6 +42,7 @@ class ProductEditViewModel(
     private val authRepository: AuthRepository,
     private val supplierRepository: SupplierRepository,
     private val productSupplierRepository: ProductSupplierRepository,
+    private val productPhotoRepository: ProductPhotoRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductEditUiState())
     val uiState: StateFlow<ProductEditUiState> = _uiState.asStateFlow()
@@ -60,6 +62,42 @@ class ProductEditViewModel(
     }
 
     fun onRetryClick() = load()
+
+    fun onPhotoClick() {
+        if (_uiState.value.photo.isUploading) return
+        updatePhoto { it.copy(isSheetVisible = true, errorMessage = null) }
+    }
+
+    fun onPhotoSheetDismiss() = updatePhoto { it.copy(isSheetVisible = false) }
+
+    fun onPhotoPicked(uri: String?) {
+        updatePhoto { it.copy(isSheetVisible = false) }
+        if (uri == null) return
+        sendPhoto(localUrl = uri) { productPhotoRepository.update(productId, uri) }
+    }
+
+    fun onRemovePhotoClick() = sendPhoto(localUrl = null) { productPhotoRepository.remove(productId) }
+
+    fun onCameraDenied() = updatePhoto { it.copy(isSheetVisible = false, errorMessage = CAMERA_DENIED) }
+
+    private fun sendPhoto(
+        localUrl: String?,
+        call: suspend () -> Result<ProductResponse>,
+    ) {
+        val previous = _uiState.value.photo.url
+        updatePhoto { it.copy(url = localUrl, isSheetVisible = false, isUploading = true, errorMessage = null) }
+        viewModelScope.launch {
+            call()
+                .onSuccess { product -> updatePhoto { it.copy(url = product.photoUrl, isUploading = false) } }
+                .onFailure { error ->
+                    updatePhoto { it.copy(url = previous, isUploading = false, errorMessage = error.message) }
+                }
+        }
+    }
+
+    private fun updatePhoto(transform: (ProductPhotoState) -> ProductPhotoState) {
+        _uiState.update { it.copy(photo = transform(it.photo)) }
+    }
 
     fun onSaveClick() {
         val state = _uiState.value
@@ -130,19 +168,23 @@ class ProductEditViewModel(
             }
             savedParameters = parameters.await()
             savedLinks = links.await()
+            val loaded = productResult.getOrThrow()
             savedForm =
-                productResult.getOrThrow().toForm(savedParameters, savedLinks.firstOrNull()).copy(
+                loaded.toForm(savedParameters, savedLinks.firstOrNull()).copy(
                     units = unitsResult.getOrThrow().toUnitOptions(),
                     categories = categories.await().toCategoryOptions(),
                     suppliers = suppliers.await().toSupplierOptions(),
                 )
-            _uiState.update { it.copy(isLoading = false, form = savedForm) }
+            _uiState.update {
+                it.copy(isLoading = false, form = savedForm, photo = it.photo.copy(url = loaded.photoUrl))
+            }
         }
     }
 
     companion object {
         private const val ONLY_SUPERVISOR = "Só o supervisor da cozinha pode editar produtos."
         private const val NO_KITCHEN = "Entre em uma cozinha para definir o estoque mínimo."
+        private const val CAMERA_DENIED = "Permita o uso da câmera para tirar a foto, ou escolha uma da galeria."
 
         fun factory(productId: Int): ViewModelProvider.Factory =
             viewModelFactory {
@@ -154,6 +196,7 @@ class ProductEditViewModel(
                         authRepository = application.container.authRepository,
                         supplierRepository = application.container.supplierRepository,
                         productSupplierRepository = application.container.productSupplierRepository,
+                        productPhotoRepository = application.container.productPhotoRepository,
                     )
                 }
             }
