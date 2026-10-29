@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -148,13 +149,10 @@ private fun DetailContent(
                 seeAllText = uiState.seeAllBatchesText,
             )
         }
-        InventraLabeledField(
-            label = "Fornecedor",
-            value = uiState.supplier,
-            onValueChange = {},
-            readOnly = true,
-            placeholder = "",
-            modifier = Modifier.fillMaxWidth(),
+        SupplierField(
+            name = uiState.supplier,
+            supplierId = uiState.supplierId,
+            onClick = actions.onSupplierClick,
         )
         InventraHistorySection(
             onEntriesClick = actions.onEntriesClick,
@@ -175,6 +173,40 @@ private fun DetailContent(
                 onClick = actions.onStockOutClick,
                 modifier = Modifier.weight(1f),
             )
+        }
+    }
+}
+
+@Composable
+private fun SupplierField(
+    name: String,
+    supplierId: Int?,
+    onClick: (Int) -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        InventraLabeledField(
+            label = "Fornecedor",
+            value = name,
+            onValueChange = {},
+            readOnly = true,
+            placeholder = "",
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (supplierId != null) {
+            Box(
+                modifier =
+                    Modifier
+                        .matchParentSize()
+                        .clickable { onClick(supplierId) },
+                contentAlignment = Alignment.BottomEnd,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "Ver fornecedor",
+                    tint = InventraPurple,
+                    modifier = Modifier.padding(end = 12.dp, bottom = 16.dp),
+                )
+            }
         }
     }
 }
@@ -268,6 +300,7 @@ fun StockDetailRoute(
                 onStockEntryClick = { navigator.navigate(Screen.StockEntry(productId)) },
                 onStockOutClick = { navigator.navigate(Screen.StockOut(productId)) },
                 onEditClick = { navigator.navigate(Screen.ProductEdit(productId)) },
+                onSupplierClick = { supplierId -> navigator.navigate(Screen.SupplierDetail(supplierId)) },
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },
             ),

@@ -214,6 +214,7 @@ class StockDetailViewModelTest {
             advanceUntilIdle()
 
             assertEquals("Italac Distribuidora", viewModel.uiState.value.supplier)
+            assertEquals(2, viewModel.uiState.value.supplierId)
         }
 
     @Test
@@ -224,6 +225,7 @@ class StockDetailViewModelTest {
             advanceUntilIdle()
 
             assertEquals("Atacadão", viewModel.uiState.value.supplier)
+            assertEquals(9, viewModel.uiState.value.supplierId)
         }
 
     @Test
@@ -250,6 +252,7 @@ class StockDetailViewModelTest {
             assertTrue(state.batches.isEmpty())
             assertNull(state.seeAllBatchesText)
             assertEquals("Sem fornecedor informado", state.supplier)
+            assertNull(state.supplierId)
         }
 
     @Test

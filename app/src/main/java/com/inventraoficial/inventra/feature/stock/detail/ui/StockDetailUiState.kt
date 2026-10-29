@@ -11,6 +11,7 @@ data class StockDetailUiState(
     val batches: List<InventraBatch> = emptyList(),
     val seeAllBatchesText: String? = null,
     val supplier: String = "",
+    val supplierId: Int? = null,
     val history: HistoryState? = null,
     val canEdit: Boolean = false,
     val isLoading: Boolean = false,
@@ -45,6 +46,7 @@ data class StockDetailActions(
     val onStockEntryClick: () -> Unit = {},
     val onStockOutClick: () -> Unit = {},
     val onEditClick: () -> Unit = {},
+    val onSupplierClick: (Int) -> Unit = {},
     val onRetryClick: () -> Unit = {},
     val onBackClick: () -> Unit = {},
 )

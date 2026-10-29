@@ -14,6 +14,7 @@ import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchStatus
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
+import com.inventraoficial.inventra.data.remote.dto.stock.SupplierSummary
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
 import com.inventraoficial.inventra.data.repository.ProductSupplierRepository
@@ -97,7 +98,7 @@ class StockDetailViewModel(
                     .await()
                     .firstOrNull()
                     ?.supplier
-                    ?.legalName
+                    ?.let { SupplierSummary(it.id, it.legalName) }
             show(productResult.getOrThrow(), batchesResult.getOrThrow(), linkedSupplier)
         }
     }
@@ -105,7 +106,7 @@ class StockDetailViewModel(
     private fun show(
         product: ProductResponse,
         batches: List<StockBatchResponse>,
-        linkedSupplier: String?,
+        linkedSupplier: SupplierSummary?,
     ) {
         val today = today()
         unitSymbol = product.unit.symbol
@@ -114,7 +115,7 @@ class StockDetailViewModel(
                 .filter { it.status == StockBatchStatus.ACTIVE && !LocalDate.parse(it.expirationDate).isBefore(today) }
                 .sortedBy { it.expirationDate }
         val total = usableBatches.sumOf { it.currentQuantity }
-        val latestSupplier = batches.maxByOrNull { it.entryDate }?.supplier?.legalName
+        val supplier = linkedSupplier ?: batches.maxByOrNull { it.entryDate }?.supplier
         _uiState.update {
             it.copy(
                 productName = product.name,
@@ -127,7 +128,8 @@ class StockDetailViewModel(
                         1 -> "Em 1 lote dentro da validade."
                         else -> "Em ${usableBatches.size} lotes dentro da validade."
                     },
-                supplier = linkedSupplier ?: latestSupplier ?: "Sem fornecedor informado",
+                supplier = supplier?.legalName ?: "Sem fornecedor informado",
+                supplierId = supplier?.id,
                 isLoading = false,
             )
         }
