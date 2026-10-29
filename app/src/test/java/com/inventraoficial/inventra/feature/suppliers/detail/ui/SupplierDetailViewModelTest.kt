@@ -6,6 +6,7 @@ import com.inventraoficial.inventra.data.remote.dto.stock.SupplierSummary
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.FakeStockRepository
 import com.inventraoficial.inventra.data.repository.FakeStockRepository.Companion.batch
+import com.inventraoficial.inventra.data.repository.FakeSupplierPhotoRepository
 import com.inventraoficial.inventra.data.repository.FakeSupplierRepository
 import com.inventraoficial.inventra.data.repository.FakeSupplierRepository.Companion.supplier
 import kotlinx.coroutines.Dispatchers
@@ -40,10 +41,12 @@ class SupplierDetailViewModelTest {
     private val italac = SupplierSummary(id = 2, legalName = "Italac")
     private lateinit var supplierRepository: FakeSupplierRepository
     private lateinit var stockRepository: FakeStockRepository
+    private lateinit var photoRepository: FakeSupplierPhotoRepository
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        photoRepository = FakeSupplierPhotoRepository()
         supplierRepository =
             FakeSupplierRepository(
                 suppliers =
@@ -94,6 +97,7 @@ class SupplierDetailViewModelTest {
         supplierRepository = supplierRepository,
         authRepository = FakeAuthRepository(initialUser = sessionUser),
         stockRepository = stockRepository,
+        supplierPhotoRepository = photoRepository,
     )
 
     @Test
@@ -209,5 +213,89 @@ class SupplierDetailViewModelTest {
             val state = viewModel.uiState.value
             assertNull(state.errorMessage)
             assertEquals(3, state.deliveryHistory.size)
+        }
+
+    @Test
+    fun `supervisor pode trocar a foto e abre as opcoes ao tocar`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onPhotoClick()
+
+            assertTrue(viewModel.uiState.value.photo.canEdit)
+            assertTrue(viewModel.uiState.value.photo.isSheetVisible)
+        }
+
+    @Test
+    fun `quem nao e supervisor nao abre as opcoes de foto`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel(sessionUser = user.copy(accessType = AccessType.COMPRADOR))
+            advanceUntilIdle()
+
+            viewModel.onPhotoClick()
+
+            assertFalse(viewModel.uiState.value.photo.canEdit)
+            assertFalse(viewModel.uiState.value.photo.isSheetVisible)
+        }
+
+    @Test
+    fun `foto escolhida e enviada e fica com a url da api`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onPhotoPicked("content://galeria/9")
+            assertTrue(viewModel.uiState.value.photo.isUploading)
+            advanceUntilIdle()
+
+            val photo = viewModel.uiState.value.photo
+            assertEquals(listOf(1 to "content://galeria/9"), photoRepository.uploads)
+            assertEquals(FakeSupplierPhotoRepository.uploadedUrl(1), photo.url)
+            assertFalse(photo.isUploading)
+        }
+
+    @Test
+    fun `falha no envio volta a foto anterior e mostra o erro`() =
+        runTest(testDispatcher) {
+            photoRepository.error = IOException("Sem conexão")
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onPhotoPicked("content://galeria/9")
+            advanceUntilIdle()
+
+            val photo = viewModel.uiState.value.photo
+            assertNull(photo.url)
+            assertEquals("Sem conexão", photo.errorMessage)
+        }
+
+    @Test
+    fun `remover foto chama a api e limpa a url`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            viewModel.onPhotoPicked("content://galeria/9")
+            advanceUntilIdle()
+
+            viewModel.onRemovePhotoClick()
+            advanceUntilIdle()
+
+            assertEquals(listOf(1), photoRepository.removals)
+            assertNull(viewModel.uiState.value.photo.url)
+        }
+
+    @Test
+    fun `camera negada fecha as opcoes e explica`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+            viewModel.onPhotoClick()
+
+            viewModel.onCameraDenied()
+
+            val photo = viewModel.uiState.value.photo
+            assertFalse(photo.isSheetVisible)
+            assertTrue(photo.errorMessage.orEmpty().contains("câmera"))
         }
 }
