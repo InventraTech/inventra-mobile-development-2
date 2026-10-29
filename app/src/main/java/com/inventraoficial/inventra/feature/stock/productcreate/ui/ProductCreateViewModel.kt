@@ -12,11 +12,9 @@ import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupRespons
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeSource
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
-import com.inventraoficial.inventra.data.remote.dto.product.LinkSupplierRequest
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
-import com.inventraoficial.inventra.data.repository.ProductSupplierRepository
 import com.inventraoficial.inventra.data.repository.SupplierRepository
 import com.inventraoficial.inventra.feature.stock.productform.MAX_BRAND_LENGTH
 import com.inventraoficial.inventra.feature.stock.productform.MAX_NAME_LENGTH
@@ -42,9 +40,11 @@ class ProductCreateViewModel(
     private val productRepository: ProductRepository,
     private val authRepository: AuthRepository,
     private val supplierRepository: SupplierRepository,
-    private val productSupplierRepository: ProductSupplierRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(ProductCreateUiState(form = ProductFormState(barcode = barcode.orEmpty())))
+    private val _uiState =
+        MutableStateFlow(
+            ProductCreateUiState(form = ProductFormState(barcode = barcode.orEmpty(), isSupplierRequired = true)),
+        )
     val uiState: StateFlow<ProductCreateUiState> = _uiState.asStateFlow()
 
     val formActions =
@@ -63,8 +63,9 @@ class ProductCreateViewModel(
         if (state.isSubmitting) return
         val form = state.form
         val unitId = form.unitId
+        val supplierId = form.supplierId
         val error = form.validationError()
-        if (error != null || unitId == null) {
+        if (error != null || unitId == null || supplierId == null) {
             _uiState.update { it.copy(submitError = error) }
             return
         }
@@ -76,6 +77,8 @@ class ProductCreateViewModel(
                 categoryId = form.categoryId,
                 unitId = unitId,
                 barcode = form.barcode.trim().ifEmpty { null },
+                supplierId = supplierId,
+                referencePrice = form.referencePrice.toDecimal(),
             )
         _uiState.update { it.copy(isSubmitting = true, submitError = null) }
         viewModelScope.launch {
@@ -83,17 +86,11 @@ class ProductCreateViewModel(
                 .create(request)
                 .onSuccess { product ->
                     val kitchenLinked = linkToKitchen(product.id, form.minStock.toDecimal())
-                    val supplierLinked =
-                        form.supplierId?.let { supplierId ->
-                            val link = LinkSupplierRequest(supplierId, referencePrice = form.referencePrice.toDecimal())
-                            productSupplierRepository.link(product.id, link).isSuccess
-                        } ?: true
                     _uiState.update {
                         it.copy(
                             isSubmitting = false,
                             createdProduct = SavedProduct(product.id, product.name),
                             kitchenLinkFailed = !kitchenLinked,
-                            supplierLinkFailed = !supplierLinked,
                         )
                     }
                 }.onFailure { failure ->
@@ -164,7 +161,6 @@ class ProductCreateViewModel(
                         productRepository = application.container.productRepository,
                         authRepository = application.container.authRepository,
                         supplierRepository = application.container.supplierRepository,
-                        productSupplierRepository = application.container.productSupplierRepository,
                     )
                 }
             }

@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.feature.stock.productform
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPickerField
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPickerOption
@@ -15,6 +17,8 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraSearchPi
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import com.inventraoficial.inventra.data.remote.dto.supplier.SupplierResponse
+import com.inventraoficial.inventra.ui.theme.InventraDanger
+import com.inventraoficial.inventra.ui.theme.Montserrat
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -31,6 +35,7 @@ data class ProductFormState(
     val suppliers: List<InventraPickerOption> = emptyList(),
     val supplierId: Int? = null,
     val referencePrice: String = "",
+    val isSupplierRequired: Boolean = false,
 ) {
     val unitLabel: String?
         get() = units.firstOrNull { it.id == unitId }?.label()
@@ -135,11 +140,18 @@ fun ProductFormFields(
     )
     if (form.suppliers.isNotEmpty()) {
         InventraPickerField(
-            label = "Fornecedor (opcional)",
+            label = if (form.isSupplierRequired) "Fornecedor" else "Fornecedor (opcional)",
             value = form.supplierName,
             placeholder = "De quem a cozinha compra",
             onClick = { openPicker = OpenPicker.Supplier },
             modifier = Modifier.fillMaxWidth(),
+        )
+    } else if (form.isSupplierRequired) {
+        Text(
+            text = NO_SUPPLIERS_MESSAGE,
+            fontFamily = Montserrat,
+            fontSize = 14.sp,
+            color = InventraDanger,
         )
     }
     if (form.supplierId != null) {
@@ -178,7 +190,7 @@ fun ProductFormFields(
                 selectedId = form.supplierId,
                 onSelect = actions.onSupplierSelect,
                 onDismiss = { openPicker = null },
-                noneLabel = "Sem fornecedor",
+                noneLabel = if (form.isSupplierRequired) null else "Sem fornecedor",
             )
         null -> Unit
     }
@@ -187,6 +199,8 @@ fun ProductFormFields(
 internal const val MAX_NAME_LENGTH = 150
 internal const val MAX_BRAND_LENGTH = 80
 internal const val MAX_BARCODE_LENGTH = 50
+private const val NO_SUPPLIERS_MESSAGE =
+    "Nenhum fornecedor ativo cadastrado. Cadastre um fornecedor antes de cadastrar o produto."
 private val minStockInput = Regex("^\\d{0,9}([.,]\\d{0,3})?$")
 private val priceInput = Regex("^\\d{0,10}([.,]\\d{0,2})?$")
 private val brazilianSymbols = DecimalFormatSymbols(Locale.forLanguageTag("pt-BR"))
@@ -201,6 +215,7 @@ internal fun ProductFormState.validationError(): String? =
     when {
         name.isBlank() -> "Informe o nome do produto"
         unitId == null -> "Escolha a unidade de medida"
+        isSupplierRequired && supplierId == null -> "Escolha o fornecedor do produto"
         minStock.isNotBlank() && minStock.toDecimal() == null -> "Informe o estoque mínimo só com números"
         referencePrice.isNotBlank() && referencePrice.toDecimal() == null -> "Informe o preço só com números"
         else -> null

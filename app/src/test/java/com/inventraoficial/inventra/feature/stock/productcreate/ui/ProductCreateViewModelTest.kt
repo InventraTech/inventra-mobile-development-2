@@ -6,11 +6,9 @@ import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupRespons
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeSource
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
-import com.inventraoficial.inventra.data.remote.dto.product.LinkSupplierRequest
 import com.inventraoficial.inventra.data.remote.dto.product.OpenFoodFactsSuggestion
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.FakeProductRepository
-import com.inventraoficial.inventra.data.repository.FakeProductSupplierRepository
 import com.inventraoficial.inventra.data.repository.FakeSupplierRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +31,6 @@ class ProductCreateViewModelTest {
     private val barcode = "7894900011517"
     private lateinit var productRepository: FakeProductRepository
     private lateinit var supplierRepository: FakeSupplierRepository
-    private lateinit var productSupplierRepository: FakeProductSupplierRepository
 
     @Before
     fun setUp() {
@@ -47,7 +44,6 @@ class ProductCreateViewModelTest {
                         FakeSupplierRepository.supplier(1, "Atacadão"),
                     ),
             )
-        productSupplierRepository = FakeProductSupplierRepository()
     }
 
     @After
@@ -65,7 +61,6 @@ class ProductCreateViewModelTest {
             productRepository = productRepository,
             authRepository = FakeAuthRepository(initialUser = user),
             supplierRepository = supplierRepository,
-            productSupplierRepository = productSupplierRepository,
         )
     }
 
@@ -218,7 +213,7 @@ class ProductCreateViewModelTest {
         }
 
     @Test
-    fun `salvar exige nome e unidade`() =
+    fun `salvar exige nome, unidade e fornecedor`() =
         runTest(testDispatcher) {
             val viewModel = createViewModel()
             advanceUntilIdle()
@@ -229,6 +224,10 @@ class ProductCreateViewModelTest {
             viewModel.formActions.onNameChange("Coca-Cola 2L")
             viewModel.onSaveClick()
             assertEquals("Escolha a unidade de medida", viewModel.uiState.value.submitError)
+
+            viewModel.formActions.onUnitSelect(4)
+            viewModel.onSaveClick()
+            assertEquals("Escolha o fornecedor do produto", viewModel.uiState.value.submitError)
             assertTrue(productRepository.createRequests.isEmpty())
         }
 
@@ -241,13 +240,14 @@ class ProductCreateViewModelTest {
             viewModel.formActions.onNameChange("  Coca-Cola 2L ")
             viewModel.formActions.onBrandChange("   ")
             viewModel.formActions.onUnitSelect(4)
+            viewModel.formActions.onSupplierSelect(2)
             viewModel.formActions.onCategorySelect(5015)
             viewModel.onSaveClick()
             assertTrue(viewModel.uiState.value.isSubmitting)
             advanceUntilIdle()
 
             assertEquals(
-                listOf(CreateProductRequest("Coca-Cola 2L", null, 5015, 4, barcode)),
+                listOf(CreateProductRequest("Coca-Cola 2L", null, 5015, 4, barcode, supplierId = 2)),
                 productRepository.createRequests,
             )
             assertEquals(SavedProduct(99, "Coca-Cola 2L"), viewModel.uiState.value.createdProduct)
@@ -262,6 +262,7 @@ class ProductCreateViewModelTest {
 
             viewModel.formActions.onNameChange("Ketchup")
             viewModel.formActions.onUnitSelect(6)
+            viewModel.formActions.onSupplierSelect(2)
             viewModel.formActions.onMinStockChange("2,5")
             viewModel.onSaveClick()
             advanceUntilIdle()
@@ -278,6 +279,7 @@ class ProductCreateViewModelTest {
 
             viewModel.formActions.onNameChange("Ketchup")
             viewModel.formActions.onUnitSelect(6)
+            viewModel.formActions.onSupplierSelect(2)
             viewModel.onSaveClick()
             advanceUntilIdle()
 
@@ -306,6 +308,7 @@ class ProductCreateViewModelTest {
 
             viewModel.formActions.onNameChange("Ketchup")
             viewModel.formActions.onUnitSelect(6)
+            viewModel.formActions.onSupplierSelect(2)
             viewModel.formActions.onMinStockChange(",")
             viewModel.onSaveClick()
 
@@ -329,7 +332,7 @@ class ProductCreateViewModelTest {
         }
 
     @Test
-    fun `produto com fornecedor grava o vinculo com o preco de referencia`() =
+    fun `cadastro envia o fornecedor e o preco de referencia junto com o produto`() =
         runTest(testDispatcher) {
             val viewModel = createViewModel()
             advanceUntilIdle()
@@ -341,25 +344,43 @@ class ProductCreateViewModelTest {
             viewModel.onSaveClick()
             advanceUntilIdle()
 
-            assertEquals(
-                listOf(99 to LinkSupplierRequest(supplierId = 2, referencePrice = 12.9)),
-                productSupplierRepository.linkCalls,
-            )
-            assertFalse(viewModel.uiState.value.supplierLinkFailed)
+            val request = productRepository.createRequests.single()
+            assertEquals(2, request.supplierId)
+            assertEquals(12.9, request.referencePrice!!, 0.0)
         }
 
     @Test
-    fun `sem fornecedor nao grava vinculo`() =
+    fun `fornecedor e obrigatorio no cadastro`() =
         runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.form.isSupplierRequired)
+            viewModel.formActions.onNameChange("Ketchup")
+            viewModel.formActions.onUnitSelect(6)
+            viewModel.formActions.onSupplierSelect(null)
+            viewModel.onSaveClick()
+
+            assertEquals("Escolha o fornecedor do produto", viewModel.uiState.value.submitError)
+            assertTrue(productRepository.createRequests.isEmpty())
+        }
+
+    @Test
+    fun `sem fornecedores ativos nao da para cadastrar`() =
+        runTest(testDispatcher) {
+            supplierRepository.suppliers = emptyList()
             val viewModel = createViewModel()
             advanceUntilIdle()
 
             viewModel.formActions.onNameChange("Ketchup")
             viewModel.formActions.onUnitSelect(6)
             viewModel.onSaveClick()
-            advanceUntilIdle()
 
-            assertTrue(productSupplierRepository.linkCalls.isEmpty())
+            assertTrue(
+                viewModel.uiState.value.form.suppliers
+                    .isEmpty(),
+            )
+            assertEquals("Escolha o fornecedor do produto", viewModel.uiState.value.submitError)
         }
 
     @Test
@@ -378,23 +399,6 @@ class ProductCreateViewModelTest {
         }
 
     @Test
-    fun `falha ao ligar o fornecedor ainda mostra o produto cadastrado`() =
-        runTest(testDispatcher) {
-            productSupplierRepository.linkResult = Result.failure(Exception("Erro"))
-            val viewModel = createViewModel()
-            advanceUntilIdle()
-
-            viewModel.formActions.onNameChange("Ketchup")
-            viewModel.formActions.onUnitSelect(6)
-            viewModel.formActions.onSupplierSelect(2)
-            viewModel.onSaveClick()
-            advanceUntilIdle()
-
-            assertEquals(SavedProduct(99, "Ketchup"), viewModel.uiState.value.createdProduct)
-            assertTrue(viewModel.uiState.value.supplierLinkFailed)
-        }
-
-    @Test
     fun `falha ao ligar a cozinha ainda mostra o produto cadastrado`() =
         runTest(testDispatcher) {
             productRepository.kitchenParametersResult = Result.failure(Exception("Erro"))
@@ -403,6 +407,7 @@ class ProductCreateViewModelTest {
 
             viewModel.formActions.onNameChange("Ketchup")
             viewModel.formActions.onUnitSelect(6)
+            viewModel.formActions.onSupplierSelect(2)
             viewModel.onSaveClick()
             advanceUntilIdle()
 
@@ -420,6 +425,7 @@ class ProductCreateViewModelTest {
 
             viewModel.formActions.onNameChange("Coca-Cola 2L")
             viewModel.formActions.onUnitSelect(4)
+            viewModel.formActions.onSupplierSelect(2)
             viewModel.onSaveClick()
             advanceUntilIdle()
 

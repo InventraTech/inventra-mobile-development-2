@@ -155,8 +155,7 @@ private fun ProductCreateUiState.createdText(name: String): String {
         } else {
             "$name já está no catálogo e na lista do estoque."
         }
-    val supplier = if (supplierLinkFailed) " Não deu para ligar o fornecedor; tente de novo pela edição." else ""
-    return "$stock$supplier Quer dar entrada agora?"
+    return "$stock Quer dar entrada agora?"
 }
 
 // Fim do fluxo: produto recém-cadastrado ou código que já estava no catálogo.

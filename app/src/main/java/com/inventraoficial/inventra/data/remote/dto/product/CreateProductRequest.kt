@@ -10,4 +10,6 @@ data class CreateProductRequest(
     val categoryId: Int? = null,
     val unitId: Int,
     val barcode: String? = null,
+    val supplierId: Int,
+    val referencePrice: Double? = null,
 )

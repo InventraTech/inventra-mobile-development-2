@@ -19,7 +19,6 @@ data class ProductCreateUiState(
     val submitError: String? = null,
     val createdProduct: SavedProduct? = null,
     val kitchenLinkFailed: Boolean = false,
-    val supplierLinkFailed: Boolean = false,
 )
 
 data class ProductCreateActions(
