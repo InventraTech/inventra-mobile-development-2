@@ -16,6 +16,7 @@ import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
+import com.inventraoficial.inventra.data.repository.ProductSupplierRepository
 import com.inventraoficial.inventra.data.repository.StockRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,11 +35,13 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit.DAYS
 import java.util.Locale
 
+@Suppress("LongParameterList")
 class StockDetailViewModel(
     private val productId: Int,
     private val productRepository: ProductRepository,
     private val stockRepository: StockRepository,
     private val authRepository: AuthRepository,
+    private val productSupplierRepository: ProductSupplierRepository,
     private val zone: ZoneId = ZoneId.systemDefault(),
     private val today: () -> LocalDate = { LocalDate.now(zone) },
 ) : ViewModel() {
@@ -81,6 +84,7 @@ class StockDetailViewModel(
                 async {
                     kitchenId?.let { stockRepository.batches(it, productId) } ?: Result.success(emptyList())
                 }
+            val links = async { productSupplierRepository.suppliersOf(productId).getOrDefault(emptyList()) }
             val productResult = product.await()
             val batchesResult = batches.await()
             val error = productResult.exceptionOrNull() ?: batchesResult.exceptionOrNull()
@@ -88,13 +92,20 @@ class StockDetailViewModel(
                 _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
                 return@launch
             }
-            show(productResult.getOrThrow(), batchesResult.getOrThrow())
+            val linkedSupplier =
+                links
+                    .await()
+                    .firstOrNull()
+                    ?.supplier
+                    ?.legalName
+            show(productResult.getOrThrow(), batchesResult.getOrThrow(), linkedSupplier)
         }
     }
 
     private fun show(
         product: ProductResponse,
         batches: List<StockBatchResponse>,
+        linkedSupplier: String?,
     ) {
         val today = today()
         unitSymbol = product.unit.symbol
@@ -115,7 +126,7 @@ class StockDetailViewModel(
                         1 -> "Em 1 lote dentro da validade."
                         else -> "Em ${usableBatches.size} lotes dentro da validade."
                     },
-                supplier = latestSupplier ?: "Sem fornecedor informado",
+                supplier = linkedSupplier ?: latestSupplier ?: "Sem fornecedor informado",
                 isLoading = false,
             )
         }
@@ -179,6 +190,7 @@ class StockDetailViewModel(
                         productRepository = application.container.productRepository,
                         stockRepository = application.container.stockRepository,
                         authRepository = application.container.authRepository,
+                        productSupplierRepository = application.container.productSupplierRepository,
                     )
                 }
             }

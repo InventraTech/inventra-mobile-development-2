@@ -40,6 +40,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraPickerOp
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormActions
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormFields
+import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -87,13 +88,7 @@ fun ProductCreateScreen(
                     icon = Icons.Default.CheckCircle,
                     iconTint = InventraSuccess,
                     title = "Produto cadastrado",
-                    text =
-                        if (uiState.kitchenLinkFailed) {
-                            "${created.name} já está no catálogo, mas só aparece no estoque da cozinha " +
-                                "depois da primeira entrada. Quer dar entrada agora?"
-                        } else {
-                            "${created.name} já está no catálogo e na lista do estoque. Quer dar entrada agora?"
-                        },
+                    text = uiState.createdText(created.name),
                     product = created,
                     actions = actions,
                     modifier = contentModifier,
@@ -140,18 +135,7 @@ private fun ProductForm(
                         .padding(12.dp),
             )
         }
-        ProductFormFields(
-            form = uiState.form,
-            actions =
-                ProductFormActions(
-                    onNameChange = actions.onNameChange,
-                    onBrandChange = actions.onBrandChange,
-                    onBarcodeChange = actions.onBarcodeChange,
-                    onUnitSelect = actions.onUnitSelect,
-                    onCategorySelect = actions.onCategorySelect,
-                    onMinStockChange = actions.onMinStockChange,
-                ),
-        )
+        ProductFormFields(form = uiState.form, actions = actions.form)
         uiState.submitError?.let {
             Text(it, fontFamily = Montserrat, fontSize = 14.sp, color = InventraDanger)
         }
@@ -162,6 +146,16 @@ private fun ProductForm(
             modifier = Modifier.fillMaxWidth(),
         )
     }
+}
+
+private fun ProductCreateUiState.createdText(name: String): String {
+    val stock =
+        if (kitchenLinkFailed) {
+            "$name já está no catálogo, mas só aparece no estoque da cozinha depois da primeira entrada."
+        } else {
+            "$name já está no catálogo e na lista do estoque."
+        }
+    return "$stock Quer dar entrada agora?"
 }
 
 // Fim do fluxo: produto recém-cadastrado ou código que já estava no catálogo.
@@ -231,12 +225,7 @@ fun ProductCreateRoute(
         uiState = uiState,
         actions =
             ProductCreateActions(
-                onNameChange = viewModel::onNameChange,
-                onBrandChange = viewModel::onBrandChange,
-                onBarcodeChange = viewModel::onBarcodeChange,
-                onUnitSelect = viewModel::onUnitSelect,
-                onCategorySelect = viewModel::onCategorySelect,
-                onMinStockChange = viewModel::onMinStockChange,
+                form = viewModel.formActions,
                 onSaveClick = viewModel::onSaveClick,
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },
@@ -249,12 +238,7 @@ fun ProductCreateRoute(
 
 private val previewActions =
     ProductCreateActions(
-        onNameChange = {},
-        onBrandChange = {},
-        onBarcodeChange = {},
-        onUnitSelect = {},
-        onCategorySelect = {},
-        onMinStockChange = {},
+        form = ProductFormActions(),
         onSaveClick = {},
         onRetryClick = {},
         onBackClick = {},
@@ -271,12 +255,18 @@ private fun ProductCreateFormPreview() {
             ProductCreateUiState(
                 isLoading = false,
                 isPrefilled = true,
-                name = "Coca-Cola",
-                brand = "Coca-Cola",
-                barcode = "7894900011517",
-                units = listOf(InventraPickerOption(1, "Litro", "L")),
-                unitId = 1,
-                categories = listOf(InventraPickerOption(2, "Mercearia")),
+                form =
+                    ProductFormState(
+                        name = "Coca-Cola",
+                        brand = "Coca-Cola",
+                        barcode = "7894900011517",
+                        units = listOf(InventraPickerOption(1, "Litro", "L")),
+                        unitId = 1,
+                        categories = listOf(InventraPickerOption(2, "Mercearia")),
+                        suppliers = listOf(InventraPickerOption(id = 3, title = "Solar Coca-Cola")),
+                        supplierId = 3,
+                        referencePrice = "9,90",
+                    ),
             ),
         actions = previewActions,
     )

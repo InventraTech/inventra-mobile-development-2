@@ -17,6 +17,15 @@ class FakeSupplierRepository(
         return Result.success(suppliers)
     }
 
+    var allCalls = 0
+        private set
+
+    override suspend fun allSuppliers(): Result<List<SupplierResponse>> {
+        allCalls++
+        error?.let { return Result.failure(it) }
+        return Result.success(suppliers)
+    }
+
     override suspend fun supplier(id: Int): Result<SupplierResponse> {
         requestedIds += id
         error?.let { return Result.failure(it) }

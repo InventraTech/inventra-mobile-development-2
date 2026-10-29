@@ -140,7 +140,7 @@ private fun DetailContent(
             )
         }
         InventraLabeledField(
-            label = "Último fornecedor",
+            label = "Fornecedor",
             value = uiState.supplier,
             onValueChange = {},
             readOnly = true,
