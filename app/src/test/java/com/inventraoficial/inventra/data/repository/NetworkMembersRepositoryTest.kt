@@ -68,6 +68,8 @@ class NetworkMembersRepositoryTest {
 
         override suspend fun removePhoto(): UserResponse = error("nao usado")
 
+        override suspend fun leaveKitchen(): UserResponse = error("nao usado")
+
         override suspend fun deactivate(id: String) {
             lastDeactivatedId = id
         }
