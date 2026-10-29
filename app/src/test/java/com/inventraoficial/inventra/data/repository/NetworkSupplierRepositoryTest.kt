@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.SupplierApi
+import com.inventraoficial.inventra.data.remote.dto.supplier.CreateSupplierRequest
 import com.inventraoficial.inventra.data.remote.dto.supplier.SupplierResponse
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -42,7 +43,29 @@ class NetworkSupplierRepositoryTest {
             activeCalls++
             return suppliers
         }
+
+        var created: CreateSupplierRequest? = null
+            private set
+
+        override suspend fun create(request: CreateSupplierRequest): SupplierResponse {
+            error?.let { throw it }
+            created = request
+            return SupplierResponse(id = 9, legalName = request.legalName, cnpj = request.cnpj)
+        }
     }
+
+    @Test
+    fun `create envia o fornecedor novo e devolve o criado`() =
+        runTest {
+            val api = FakeSupplierApi(emptyList())
+            val repository = NetworkSupplierRepository(api, json)
+            val request = CreateSupplierRequest(legalName = "Atacadão", cnpj = "12.345.678/0001-90", rating = 4)
+
+            val result = repository.create(request)
+
+            assertEquals(9, result.getOrNull()?.id)
+            assertEquals(request, api.created)
+        }
 
     @Test
     fun `allSuppliers lista todos os ativos, sem filtrar pela cozinha`() =
