@@ -11,8 +11,24 @@ data class DeliveryHistoryEntry(
     val quantityLabel: String,
 )
 
+data class SupplierPhotoState(
+    val url: String? = null,
+    val canEdit: Boolean = false,
+    val isSheetVisible: Boolean = false,
+    val isUploading: Boolean = false,
+    val errorMessage: String? = null,
+)
+
+data class SupplierPhotoActions(
+    val onPhotoClick: () -> Unit = {},
+    val onSheetDismiss: () -> Unit = {},
+    val onPickClick: () -> Unit = {},
+    val onCameraClick: () -> Unit = {},
+    val onRemoveClick: () -> Unit = {},
+)
+
 data class SupplierDetailUiState(
-    val photoUrl: String? = null,
+    val photo: SupplierPhotoState = SupplierPhotoState(),
     val name: String = "",
     val rating: Int = 0,
     val badgeText: String = "",
