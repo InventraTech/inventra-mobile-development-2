@@ -66,6 +66,17 @@ class SupplierViewModelTest {
     }
 
     @Test
+    fun `so o supervisor ve o botao de cadastrar fornecedor`() =
+        runTest(testDispatcher) {
+            val supervisor = createViewModel()
+            val comprador = createViewModel(user.copy(accessType = AccessType.COMPRADOR))
+            advanceUntilIdle()
+
+            assertTrue(supervisor.uiState.value.canCreate)
+            assertFalse(comprador.uiState.value.canCreate)
+        }
+
+    @Test
     fun `busca os fornecedores da cozinha do usuario em ordem alfabetica`() =
         runTest(testDispatcher) {
             val viewModel = createViewModel()

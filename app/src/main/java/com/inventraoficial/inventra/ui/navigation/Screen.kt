@@ -54,6 +54,9 @@ sealed interface Screen : NavKey {
     ) : Screen
 
     @Serializable
+    data object SupplierCreate : Screen
+
+    @Serializable
     data object StockList : Screen
 
     @Serializable

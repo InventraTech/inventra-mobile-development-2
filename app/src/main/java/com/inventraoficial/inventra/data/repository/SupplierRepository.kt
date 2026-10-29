@@ -2,6 +2,7 @@ package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.SupplierApi
 import com.inventraoficial.inventra.data.remote.apiCall
+import com.inventraoficial.inventra.data.remote.dto.supplier.CreateSupplierRequest
 import com.inventraoficial.inventra.data.remote.dto.supplier.SupplierResponse
 import kotlinx.serialization.json.Json
 
@@ -11,6 +12,8 @@ interface SupplierRepository {
     suspend fun allSuppliers(): Result<List<SupplierResponse>>
 
     suspend fun supplier(id: Int): Result<SupplierResponse>
+
+    suspend fun create(request: CreateSupplierRequest): Result<SupplierResponse>
 }
 
 class NetworkSupplierRepository(
@@ -22,4 +25,9 @@ class NetworkSupplierRepository(
     override suspend fun allSuppliers() = apiCall(json) { supplierApi.listActive() }
 
     override suspend fun supplier(id: Int): Result<SupplierResponse> = apiCall(json) { supplierApi.find(id) }
+
+    override suspend fun create(request: CreateSupplierRequest): Result<SupplierResponse> =
+        apiCall(json) {
+            supplierApi.create(request)
+        }
 }

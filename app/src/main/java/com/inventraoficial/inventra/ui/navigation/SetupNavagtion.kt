@@ -56,6 +56,7 @@ import com.inventraoficial.inventra.feature.stock.list.ui.StockListRoute
 import com.inventraoficial.inventra.feature.stock.productcreate.ui.ProductCreateRoute
 import com.inventraoficial.inventra.feature.stock.stockentry.ui.StockEntryRoute
 import com.inventraoficial.inventra.feature.stock.stockout.ui.StockOutRoute
+import com.inventraoficial.inventra.feature.suppliers.create.ui.SupplierCreateRoute
 import com.inventraoficial.inventra.feature.suppliers.detail.ui.SupplierDetailRoute
 import com.inventraoficial.inventra.feature.suppliers.list.ui.SupplierRoute
 import com.inventraoficial.inventra.ui.event.LocalClickTracker
@@ -180,6 +181,9 @@ private fun AppNavigation(
                     }
                     entry<Screen.SupplierDetail> { key ->
                         SupplierDetailRoute(supplierId = key.supplierId, navigator = navigator)
+                    }
+                    entry<Screen.SupplierCreate> {
+                        SupplierCreateRoute(navigator = navigator)
                     }
                     entry<Screen.Scan> {
                         ScanRoute(navigator = navigator)
