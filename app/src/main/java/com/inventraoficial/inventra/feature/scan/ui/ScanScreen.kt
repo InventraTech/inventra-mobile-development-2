@@ -21,7 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
-import androidx.compose.material.icons.filled.SearchOff
+import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -59,6 +59,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraDanger
+import com.inventraoficial.inventra.ui.theme.InventraGold
 import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.InventraSuccess
@@ -90,7 +91,7 @@ fun ScanScreen(
     LaunchedEffect(uiState.result) {
         when (uiState.result) {
             is ScanResult.Found -> haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-            is ScanResult.NotRegistered -> haptic.performHapticFeedback(HapticFeedbackType.Reject)
+            is ScanResult.NotRegistered -> haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
             null -> Unit
         }
     }
@@ -129,7 +130,8 @@ fun ScanScreen(
             )
             val frameColor =
                 when {
-                    uiState.errorMessage != null || uiState.result is ScanResult.NotRegistered -> InventraDanger
+                    uiState.errorMessage != null -> InventraDanger
+                    uiState.result is ScanResult.NotRegistered -> InventraGold
                     uiState.result is ScanResult.Found -> InventraSuccess
                     else -> InventraPurple
                 }
@@ -240,22 +242,22 @@ private fun NotRegisteredPanel(
         modifier =
             Modifier
                 .size(64.dp)
-                .background(InventraDanger.copy(alpha = 0.12f), CircleShape),
+                .background(InventraGold.copy(alpha = 0.16f), CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = Icons.Default.SearchOff,
+            imageVector = Icons.Default.Inventory2,
             contentDescription = null,
-            tint = InventraDanger,
+            tint = InventraGold,
             modifier = Modifier.size(32.dp),
         )
     }
     Text(
-        "Código não encontrado",
+        "Produto novo por aqui",
         fontFamily = Montserrat,
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
-        color = InventraDanger,
+        color = InventraPurple,
     )
     Text(
         result.barcode,
@@ -265,10 +267,10 @@ private fun NotRegisteredPanel(
         letterSpacing = 2.sp,
         modifier =
             Modifier
-                .border(1.dp, InventraDanger.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                .border(1.dp, InventraMuted.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
                 .padding(horizontal = 16.dp, vertical = 8.dp),
     )
-    PanelText("Esse produto ainda não está no catálogo da cozinha.")
+    PanelText("Esse código ainda não foi cadastrado no catálogo desta cozinha.")
     result.suggestion?.let {
         Text("Parece ser: $it", fontFamily = Montserrat, fontSize = 14.sp, color = InventraMuted)
     }
