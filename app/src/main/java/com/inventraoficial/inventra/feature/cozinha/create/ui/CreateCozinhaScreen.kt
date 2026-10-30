@@ -28,6 +28,9 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.data.event.UiClick
+import com.inventraoficial.inventra.ui.event.LocalClickTracker
+import com.inventraoficial.inventra.ui.event.tracked
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -133,6 +136,7 @@ fun CreateCozinhaRoute(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val clickTracker = LocalClickTracker.current
     LaunchedEffect(uiState.isCreated) {
         if (uiState.isCreated) navigator.navigateHome()
     }
@@ -145,8 +149,8 @@ fun CreateCozinhaRoute(
         onNameChange = viewModel::onNameChange,
         address = uiState.address,
         onAddressChange = viewModel::onAddressChange,
-        onCreateClick = viewModel::onCreateClick,
-        onCloseClick = viewModel::onCloseClick,
+        onCreateClick = clickTracker.tracked(UiClick.KitchenCreateCreate, viewModel::onCreateClick),
+        onCloseClick = clickTracker.tracked(UiClick.KitchenCreateClose, viewModel::onCloseClick),
         errorMessage = uiState.errorMessage,
         isLoading = uiState.isLoading,
         modifier = modifier,

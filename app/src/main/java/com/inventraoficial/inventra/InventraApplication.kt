@@ -12,6 +12,7 @@ class InventraApplication : Application() {
         super.onCreate()
         container = DefaultAppContainer(this)
         container.alertNotifier.createChannels()
+        container.clickTracker.sendOnLogin()
         // Sem sessão ou sem cozinha, cada rodada só termina sem fazer nada.
         AlertCheckWorker.schedule(this)
     }

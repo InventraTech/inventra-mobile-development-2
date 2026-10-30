@@ -35,10 +35,13 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraRoleSelector
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUserRole
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
+import com.inventraoficial.inventra.data.event.UiClick
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInButton
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInHost
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInViewModel
 import com.inventraoficial.inventra.feature.auth.google.ui.rememberGoogleSignInClick
+import com.inventraoficial.inventra.ui.event.LocalClickTracker
+import com.inventraoficial.inventra.ui.event.tracked
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -171,6 +174,7 @@ fun RegisterRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val googleState by googleViewModel.uiState.collectAsState()
+    val clickTracker = LocalClickTracker.current
     GoogleSignInHost(uiState = googleState, viewModel = googleViewModel, navigator = navigator)
 
     LaunchedEffect(uiState.isRegistered) {
@@ -187,7 +191,14 @@ fun RegisterRoute(
 
     RegisterScreen(
         role = uiState.role,
-        onRoleSelect = viewModel::onRoleSelect,
+        onRoleSelect = { role ->
+            when (role) {
+                InventraUserRole.Supervisor -> clickTracker.track(UiClick.SignupRoleSupervisor)
+                InventraUserRole.Estoquista -> clickTracker.track(UiClick.SignupRoleStockist)
+                InventraUserRole.Comprador -> Unit
+            }
+            viewModel.onRoleSelect(role)
+        },
         name = uiState.name,
         onNameChange = viewModel::onNameChange,
         login = uiState.login,
@@ -196,8 +207,8 @@ fun RegisterRoute(
         onPasswordChange = viewModel::onPasswordChange,
         confirmarSenha = uiState.confirmPassword,
         onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
-        onRegisterClick = viewModel::onRegisterClick,
-        onBackToLoginClick = { navigator.back() },
+        onRegisterClick = clickTracker.tracked(UiClick.SignupCreate, viewModel::onRegisterClick),
+        onBackToLoginClick = clickTracker.tracked(UiClick.SignupHaveAccount) { navigator.back() },
         onGoogleClick = rememberGoogleSignInClick(googleViewModel),
         errorMessage = uiState.errorMessage ?: googleState.screenErrorMessage,
         isLoading = uiState.isLoading,
