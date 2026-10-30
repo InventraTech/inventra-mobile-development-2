@@ -37,6 +37,7 @@ import com.inventraoficial.inventra.feature.cozinha.requestsent.ui.RequestSentRo
 import com.inventraoficial.inventra.feature.cozinha.select.ui.SelectCozinhaRoute
 import com.inventraoficial.inventra.feature.home.ui.HomeRoute
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
+import com.inventraoficial.inventra.feature.prelist.detail.ui.PreListDetailRoute
 import com.inventraoficial.inventra.feature.profile.details.ui.ProfileDetailsRoute
 import com.inventraoficial.inventra.feature.profile.members.ui.ManageMembersRoute
 import com.inventraoficial.inventra.feature.profile.preferences.ui.AccountPreferencesRoute
@@ -236,6 +237,9 @@ private fun AppNavigation(
                     }
                     entry<Screen.RequisitionEditor> { key ->
                         RequisitionEditorRoute(requisitionId = key.requisitionId, navigator = navigator)
+                    }
+                    entry<Screen.PreListDetail> { key ->
+                        PreListDetailRoute(preListId = key.preListId, navigator = navigator)
                     }
                 },
         )

@@ -97,6 +97,11 @@ sealed interface Screen : NavKey {
     data class RequisitionEditor(
         val requisitionId: Int? = null,
     ) : Screen
+
+    @Serializable
+    data class PreListDetail(
+        val preListId: Int,
+    ) : Screen
 }
 
 fun Screen.isFullBleed(): Boolean =

@@ -28,6 +28,7 @@ class FakeRequisitionRepository(
     var addedItems = mutableListOf<Pair<Int, AddRequisitionItemRequest>>()
         private set
     var nextId = 100
+    var addItemErrorAfter: Int? = null
 
     override suspend fun requisitions(
         kitchenId: Int,
@@ -68,7 +69,11 @@ class FakeRequisitionRepository(
         request: AddRequisitionItemRequest,
     ): Result<RequisitionResponse> {
         addedItems += id to request
-        actionError?.let { return Result.failure(it) }
+        val failure =
+            actionError ?: addItemErrorAfter
+                ?.takeIf { okItems -> addedItems.size > okItems }
+                ?.let { IllegalStateException("Produto inativo.") }
+        failure?.let { return Result.failure(it) }
         val current = itemsById[id].orEmpty()
         val newItem =
             RequisitionItemResponse(

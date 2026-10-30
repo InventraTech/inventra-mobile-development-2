@@ -17,6 +17,7 @@ import com.inventraoficial.inventra.data.remote.api.AlertApi
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.api.KitchenAccessApi
 import com.inventraoficial.inventra.data.remote.api.KitchenApi
+import com.inventraoficial.inventra.data.remote.api.PreListApi
 import com.inventraoficial.inventra.data.remote.api.ProductApi
 import com.inventraoficial.inventra.data.remote.api.RequisitionApi
 import com.inventraoficial.inventra.data.remote.api.StockApi
@@ -35,10 +36,12 @@ import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenAccessRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenRepository
 import com.inventraoficial.inventra.data.repository.NetworkMembersRepository
+import com.inventraoficial.inventra.data.repository.NetworkPreListRepository
 import com.inventraoficial.inventra.data.repository.NetworkProductRepository
 import com.inventraoficial.inventra.data.repository.NetworkRequisitionRepository
 import com.inventraoficial.inventra.data.repository.NetworkStockRepository
 import com.inventraoficial.inventra.data.repository.NetworkSupplierRepository
+import com.inventraoficial.inventra.data.repository.PreListRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
 import com.inventraoficial.inventra.data.repository.RequisitionRepository
 import com.inventraoficial.inventra.data.repository.StockRepository
@@ -67,6 +70,7 @@ interface AppContainer {
     val supplierRepository: SupplierRepository
     val productRepository: ProductRepository
     val requisitionRepository: RequisitionRepository
+    val preListRepository: PreListRepository
     val sessionManager: SessionManager
     val appPreferences: AppPreferences
     val googleAuthClient: GoogleAuthClient
@@ -143,6 +147,7 @@ class DefaultAppContainer(
     private val supplierApi: SupplierApi by lazy { retrofit.create(SupplierApi::class.java) }
     private val productApi: ProductApi by lazy { retrofit.create(ProductApi::class.java) }
     private val requisitionApi: RequisitionApi by lazy { retrofit.create(RequisitionApi::class.java) }
+    private val preListApi: PreListApi by lazy { retrofit.create(PreListApi::class.java) }
 
     override val authRepository: AuthRepository by lazy {
         NetworkAuthRepository(
@@ -183,6 +188,8 @@ class DefaultAppContainer(
     override val requisitionRepository: RequisitionRepository by lazy {
         NetworkRequisitionRepository(requisitionApi, json)
     }
+
+    override val preListRepository: PreListRepository by lazy { NetworkPreListRepository(preListApi, json) }
 
     override val alertNotifier: SystemAlertNotifier by lazy { SystemAlertNotifier(context) }
 
