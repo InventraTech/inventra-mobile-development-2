@@ -38,8 +38,8 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
 import com.inventraoficial.inventra.data.event.UiClick
 import com.inventraoficial.inventra.feature.auth.AuthContentMaxWidth
-import com.inventraoficial.inventra.feature.auth.WideBottomShapeHeight
-import com.inventraoficial.inventra.feature.auth.WideScreenMinWidth
+import com.inventraoficial.inventra.feature.auth.BOTTOM_SHAPE_HEIGHT_FRACTION
+import com.inventraoficial.inventra.feature.auth.MaxBottomShapeHeight
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInButton
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInHost
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInViewModel
@@ -75,7 +75,7 @@ fun LoginScreen(
                 .fillMaxSize()
                 .background(InventraBackground),
     ) {
-        val isWide = maxWidth >= WideScreenMinWidth
+        val bottomShapeHeight = (maxHeight * BOTTOM_SHAPE_HEIGHT_FRACTION).coerceAtMost(MaxBottomShapeHeight)
         Image(
             painter = painterResource(id = R.drawable.bg_shape_yellow_top),
             contentDescription = "Background shape yellow top",
@@ -91,15 +91,8 @@ fun LoginScreen(
             modifier =
                 Modifier
                     .align(Alignment.BottomStart)
-                    .then(
-                        if (isWide) {
-                            Modifier
-                                .height(WideBottomShapeHeight)
-                                .wrapContentWidth(Alignment.Start, unbounded = true)
-                        } else {
-                            Modifier
-                        },
-                    ),
+                    .height(bottomShapeHeight)
+                    .wrapContentWidth(Alignment.Start, unbounded = true),
         )
         Column(
             modifier =
