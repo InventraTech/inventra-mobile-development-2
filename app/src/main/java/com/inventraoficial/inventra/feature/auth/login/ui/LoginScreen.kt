@@ -3,16 +3,19 @@ package com.inventraoficial.inventra.feature.auth.login.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -34,6 +37,9 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButto
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
 import com.inventraoficial.inventra.data.event.UiClick
+import com.inventraoficial.inventra.feature.auth.AuthContentMaxWidth
+import com.inventraoficial.inventra.feature.auth.WideBottomShapeHeight
+import com.inventraoficial.inventra.feature.auth.WideScreenMinWidth
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInButton
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInHost
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInViewModel
@@ -63,12 +69,13 @@ fun LoginScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    Box(
+    BoxWithConstraints(
         modifier =
             Modifier
                 .fillMaxSize()
                 .background(InventraBackground),
     ) {
+        val isWide = maxWidth >= WideScreenMinWidth
         Image(
             painter = painterResource(id = R.drawable.bg_shape_yellow_top),
             contentDescription = "Background shape yellow top",
@@ -83,11 +90,22 @@ fun LoginScreen(
             contentDescription = "Background shape yellow bottom",
             modifier =
                 Modifier
-                    .align(Alignment.BottomStart),
+                    .align(Alignment.BottomStart)
+                    .then(
+                        if (isWide) {
+                            Modifier
+                                .height(WideBottomShapeHeight)
+                                .wrapContentWidth(Alignment.Start, unbounded = true)
+                        } else {
+                            Modifier
+                        },
+                    ),
         )
         Column(
             modifier =
                 modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = AuthContentMaxWidth)
                     .navigationBarsPadding()
                     .imePadding()
                     .verticalScroll(rememberScrollState())

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
+import com.inventraoficial.inventra.feature.auth.AuthContentMaxWidth
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraMuted
@@ -63,6 +65,8 @@ fun PasswordResetLayout(
         Column(
             modifier =
                 modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = AuthContentMaxWidth)
                     .navigationBarsPadding()
                     .imePadding()
                     .verticalScroll(rememberScrollState())

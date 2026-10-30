@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -36,6 +37,7 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraRoleSele
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUserRole
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
 import com.inventraoficial.inventra.data.event.UiClick
+import com.inventraoficial.inventra.feature.auth.AuthContentMaxWidth
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInButton
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInHost
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInViewModel
@@ -88,6 +90,8 @@ fun RegisterScreen(
         Column(
             modifier =
                 modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = AuthContentMaxWidth)
                     .navigationBarsPadding()
                     .imePadding()
                     .verticalScroll(rememberScrollState())
