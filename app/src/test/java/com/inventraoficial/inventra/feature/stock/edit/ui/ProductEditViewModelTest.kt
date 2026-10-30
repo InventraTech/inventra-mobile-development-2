@@ -365,6 +365,6 @@ class ProductEditViewModelTest {
             val form = viewModel.uiState.value.form
             assertEquals(9, form.supplierId)
             assertEquals("Heinz Distribuidora", form.supplierName)
-            assertEquals(listOf("Atacadão", "Heinz Distribuidora", "Seara Alimentos"), form.suppliers.map { it.title })
+            assertEquals(listOf("Atacadão", "Seara Alimentos", "Heinz Distribuidora"), form.suppliers.map { it.title })
         }
 }

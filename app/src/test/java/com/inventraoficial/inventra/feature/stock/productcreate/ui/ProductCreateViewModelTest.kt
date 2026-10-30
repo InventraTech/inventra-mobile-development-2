@@ -330,18 +330,37 @@ class ProductCreateViewModelTest {
         }
 
     @Test
-    fun `fornecedores vem so os da cozinha em ordem de nome`() =
+    fun `fornecedores da cozinha vem primeiro e depois os outros do sistema`() =
         runTest(testDispatcher) {
+            supplierRepository.otherSuppliers =
+                listOf(
+                    FakeSupplierRepository.supplier(9, "Ambev"),
+                    FakeSupplierRepository.supplier(8, "Camil Alimentos"),
+                )
             val viewModel = createViewModel()
             advanceUntilIdle()
 
-            assertEquals(
-                listOf("Atacadão", "Seara Alimentos"),
-                viewModel.uiState.value.form.suppliers
-                    .map { it.title },
-            )
+            val options = viewModel.uiState.value.form.suppliers
+            assertEquals(listOf("Atacadão", "Seara Alimentos", "Ambev", "Camil Alimentos"), options.map { it.title })
+            assertEquals("Desta cozinha · 00.000.000/0001-01", options[0].subtitle)
+            assertEquals("00.000.000/0001-09", options[2].subtitle)
             assertEquals(listOf(7), supplierRepository.kitchenCalls)
-            assertEquals(0, supplierRepository.allCalls)
+        }
+
+    @Test
+    fun `da para escolher um fornecedor do sistema que nao e da cozinha`() =
+        runTest(testDispatcher) {
+            supplierRepository.otherSuppliers = listOf(FakeSupplierRepository.supplier(9, "Ambev"))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.formActions.onNameChange("Guaraná")
+            viewModel.formActions.onUnitSelect(4)
+            viewModel.formActions.onSupplierSelect(9)
+            viewModel.onSaveClick()
+            advanceUntilIdle()
+
+            assertEquals(9, productRepository.createRequests.single().supplierId)
         }
 
     @Test
@@ -528,6 +547,6 @@ class ProductCreateViewModelTest {
             val form = viewModel.uiState.value.form
             assertEquals(77, form.supplierId)
             assertEquals("Distribuidora Nova", form.supplierName)
-            assertEquals(listOf("Atacadão", "Distribuidora Nova", "Seara Alimentos"), form.suppliers.map { it.title })
+            assertEquals(listOf("Distribuidora Nova", "Atacadão", "Seara Alimentos"), form.suppliers.map { it.title })
         }
 }

@@ -20,11 +20,12 @@ class FakeSupplierRepository(
 
     var allCalls = 0
         private set
+    var otherSuppliers: List<SupplierResponse> = emptyList()
 
     override suspend fun allSuppliers(): Result<List<SupplierResponse>> {
         allCalls++
         error?.let { return Result.failure(it) }
-        return Result.success(suppliers)
+        return Result.success(suppliers + otherSuppliers)
     }
 
     override suspend fun supplier(id: Int): Result<SupplierResponse> {
