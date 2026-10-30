@@ -17,6 +17,7 @@ sealed interface ScanResult {
     data class NotRegistered(
         override val barcode: String,
         val suggestion: String?,
+        val photoUrl: String? = null,
         val isReporting: Boolean = false,
         val isReported: Boolean = false,
         val reportError: String? = null,

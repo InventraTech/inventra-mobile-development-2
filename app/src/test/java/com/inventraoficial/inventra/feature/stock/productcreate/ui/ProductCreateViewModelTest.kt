@@ -8,6 +8,7 @@ import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.OpenFoodFactsSuggestion
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
+import com.inventraoficial.inventra.data.repository.FakeProductPhotoRepository
 import com.inventraoficial.inventra.data.repository.FakeProductRepository
 import com.inventraoficial.inventra.data.repository.FakeSupplierRepository
 import kotlinx.coroutines.Dispatchers
@@ -29,13 +30,16 @@ import org.junit.Test
 class ProductCreateViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val barcode = "7894900011517"
+    private val offPhoto = "https://images.openfoodfacts.org/coca.jpg"
     private lateinit var productRepository: FakeProductRepository
     private lateinit var supplierRepository: FakeSupplierRepository
+    private lateinit var photoRepository: FakeProductPhotoRepository
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         productRepository = FakeProductRepository()
+        photoRepository = FakeProductPhotoRepository()
         supplierRepository =
             FakeSupplierRepository(
                 suppliers =
@@ -61,6 +65,7 @@ class ProductCreateViewModelTest {
             productRepository = productRepository,
             authRepository = FakeAuthRepository(initialUser = user),
             supplierRepository = supplierRepository,
+            productPhotoRepository = photoRepository,
         )
     }
 
@@ -68,11 +73,19 @@ class ProductCreateViewModelTest {
         name: String? = "Coca-Cola",
         brand: String? = "Coca-Cola",
         quantity: String? = "2 L",
+        imageUrl: String? = null,
     ) = BarcodeLookupResponse(
         source = BarcodeSource.OPEN_FOOD_FACTS,
         barcode = barcode,
-        suggestion = OpenFoodFactsSuggestion(name = name, brand = brand, quantity = quantity),
+        suggestion = OpenFoodFactsSuggestion(name = name, brand = brand, imageUrl = imageUrl, quantity = quantity),
     )
+
+    private fun ProductCreateViewModel.fillAndSave() {
+        formActions.onNameChange("Coca-Cola 2L")
+        formActions.onUnitSelect(4)
+        formActions.onSupplierSelect(2)
+        onSaveClick()
+    }
 
     @Test
     fun `comeca carregando com o codigo escaneado`() {
@@ -431,5 +444,76 @@ class ProductCreateViewModelTest {
 
             assertEquals("Já existe um produto com esse código de barras.", viewModel.uiState.value.submitError)
             assertNull(viewModel.uiState.value.createdProduct)
+        }
+
+    @Test
+    fun `foto do Open Food Facts vem como foto sugerida do produto`() =
+        runTest(testDispatcher) {
+            productRepository.barcodeResult = Result.success(suggestion(imageUrl = offPhoto))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.isPrefilled)
+            assertEquals(offPhoto, viewModel.uiState.value.photo.url)
+        }
+
+    @Test
+    fun `foto sugerida e enviada depois de cadastrar o produto`() =
+        runTest(testDispatcher) {
+            productRepository.barcodeResult = Result.success(suggestion(imageUrl = offPhoto))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.fillAndSave()
+            advanceUntilIdle()
+
+            assertEquals(listOf(99 to offPhoto), photoRepository.uploads)
+            assertFalse(viewModel.uiState.value.photoUploadFailed)
+        }
+
+    @Test
+    fun `foto escolhida na galeria substitui a sugerida`() =
+        runTest(testDispatcher) {
+            productRepository.barcodeResult = Result.success(suggestion(imageUrl = offPhoto))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onPhotoClick()
+            viewModel.onPhotoPicked("content://galeria/3")
+            viewModel.fillAndSave()
+            advanceUntilIdle()
+
+            assertFalse(viewModel.uiState.value.photo.isSheetVisible)
+            assertEquals(listOf(99 to "content://galeria/3"), photoRepository.uploads)
+        }
+
+    @Test
+    fun `tirar a foto sugerida cadastra sem foto`() =
+        runTest(testDispatcher) {
+            productRepository.barcodeResult = Result.success(suggestion(imageUrl = offPhoto))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onRemovePhotoClick()
+            viewModel.fillAndSave()
+            advanceUntilIdle()
+
+            assertNull(viewModel.uiState.value.photo.url)
+            assertTrue(photoRepository.uploads.isEmpty())
+        }
+
+    @Test
+    fun `falha ao enviar a foto ainda mostra o produto cadastrado`() =
+        runTest(testDispatcher) {
+            productRepository.barcodeResult = Result.success(suggestion(imageUrl = offPhoto))
+            photoRepository.error = Exception("Falha no upload")
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.fillAndSave()
+            advanceUntilIdle()
+
+            assertEquals(SavedProduct(99, "Coca-Cola 2L"), viewModel.uiState.value.createdProduct)
+            assertTrue(viewModel.uiState.value.photoUploadFailed)
         }
 }

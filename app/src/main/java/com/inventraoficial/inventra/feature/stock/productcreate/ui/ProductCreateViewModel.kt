@@ -14,11 +14,13 @@ import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import com.inventraoficial.inventra.data.repository.AuthRepository
+import com.inventraoficial.inventra.data.repository.ProductPhotoRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
 import com.inventraoficial.inventra.data.repository.SupplierRepository
 import com.inventraoficial.inventra.feature.stock.productform.MAX_BRAND_LENGTH
 import com.inventraoficial.inventra.feature.stock.productform.MAX_NAME_LENGTH
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
+import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoState
 import com.inventraoficial.inventra.feature.stock.productform.productFormActions
 import com.inventraoficial.inventra.feature.stock.productform.toCategoryOptions
 import com.inventraoficial.inventra.feature.stock.productform.toDecimal
@@ -40,6 +42,7 @@ class ProductCreateViewModel(
     private val productRepository: ProductRepository,
     private val authRepository: AuthRepository,
     private val supplierRepository: SupplierRepository,
+    private val productPhotoRepository: ProductPhotoRepository,
 ) : ViewModel() {
     private val _uiState =
         MutableStateFlow(
@@ -57,6 +60,25 @@ class ProductCreateViewModel(
     }
 
     fun onRetryClick() = load()
+
+    fun onPhotoClick() {
+        if (_uiState.value.isSubmitting) return
+        updatePhoto { it.copy(isSheetVisible = true, errorMessage = null) }
+    }
+
+    fun onPhotoSheetDismiss() = updatePhoto { it.copy(isSheetVisible = false) }
+
+    fun onPhotoPicked(uri: String?) {
+        updatePhoto { if (uri == null) it.copy(isSheetVisible = false) else it.copy(url = uri, isSheetVisible = false) }
+    }
+
+    fun onRemovePhotoClick() = updatePhoto { it.copy(url = null, isSheetVisible = false) }
+
+    fun onCameraDenied() = updatePhoto { it.copy(isSheetVisible = false, errorMessage = CAMERA_DENIED) }
+
+    private fun updatePhoto(transform: (ProductPhotoState) -> ProductPhotoState) {
+        _uiState.update { it.copy(photo = transform(it.photo)) }
+    }
 
     fun onSaveClick() {
         val state = _uiState.value
@@ -86,11 +108,13 @@ class ProductCreateViewModel(
                 .create(request)
                 .onSuccess { product ->
                     val kitchenLinked = linkToKitchen(product.id, form.minStock.toDecimal())
+                    val photoSent = state.photo.url?.let { productPhotoRepository.update(product.id, it).isSuccess }
                     _uiState.update {
                         it.copy(
                             isSubmitting = false,
                             createdProduct = SavedProduct(product.id, product.name),
                             kitchenLinkFailed = !kitchenLinked,
+                            photoUploadFailed = photoSent == false,
                         )
                     }
                 }.onFailure { failure ->
@@ -151,6 +175,7 @@ class ProductCreateViewModel(
 
     companion object {
         private const val ONLY_SUPERVISOR = "Só o supervisor da cozinha pode cadastrar produtos."
+        private const val CAMERA_DENIED = "Permita o uso da câmera para tirar a foto, ou escolha uma da galeria."
 
         fun factory(barcode: String?): ViewModelProvider.Factory =
             viewModelFactory {
@@ -161,6 +186,7 @@ class ProductCreateViewModel(
                         productRepository = application.container.productRepository,
                         authRepository = application.container.authRepository,
                         supplierRepository = application.container.supplierRepository,
+                        productPhotoRepository = application.container.productPhotoRepository,
                     )
                 }
             }
@@ -178,7 +204,8 @@ private fun ProductCreateUiState.prefilledWith(
             copy(existingProduct = SavedProduct(product.id, product.name))
         suggestion != null ->
             copy(
-                isPrefilled = suggestion.name != null || suggestion.brand != null,
+                isPrefilled = suggestion.name != null || suggestion.brand != null || suggestion.imageUrl != null,
+                photo = photo.copy(url = suggestion.imageUrl),
                 form =
                     form.copy(
                         name = suggestion.name.orEmpty().take(MAX_NAME_LENGTH),

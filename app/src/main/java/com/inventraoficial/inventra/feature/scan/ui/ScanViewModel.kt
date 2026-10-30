@@ -152,7 +152,11 @@ private fun BarcodeLookupResponse?.toResult(barcode: String): ScanResult {
     val product = this?.product
     if (this == null || source != BarcodeSource.CATALOG || product == null) {
         val suggestion = this?.suggestion?.let { listOfNotNull(it.name, it.brand, it.quantity).joinToString(" · ") }
-        return ScanResult.NotRegistered(barcode = barcode, suggestion = suggestion?.ifEmpty { null })
+        return ScanResult.NotRegistered(
+            barcode = barcode,
+            suggestion = suggestion?.ifEmpty { null },
+            photoUrl = this?.suggestion?.imageUrl,
+        )
     }
     val total = kitchenStock?.totalQuantity ?: 0.0
     val batches = kitchenStock?.activeBatches ?: 0
