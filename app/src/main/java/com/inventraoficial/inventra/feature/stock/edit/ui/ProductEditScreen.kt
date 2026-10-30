@@ -28,6 +28,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
+import com.inventraoficial.inventra.core.designsystem.molecules.InventraConfirmDialog
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPickerOption
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
@@ -51,6 +53,7 @@ fun ProductEditScreen(
     uiState: ProductEditUiState,
     actions: ProductEditActions,
     modifier: Modifier = Modifier,
+    deactivate: ProductDeactivateUiState = ProductDeactivateUiState(),
 ) {
     Column(
         modifier =
@@ -110,12 +113,46 @@ fun ProductEditScreen(
                                 modifier = Modifier.weight(1f),
                             )
                         }
+                    DeactivateSection(state = deactivate, onClick = actions.deactivate.onDeactivateClick)
                     }
             }
         }
     }
 
     ProductPhotoOptions(photo = uiState.photo, actions = actions.photo)
+    if (deactivate.isConfirmVisible) {
+        InventraConfirmDialog(
+            title = "Desativar ${uiState.form.name}?",
+            message =
+                "O produto sai do estoque e do catálogo de todas as cozinhas. " +
+                    "O histórico de entradas e saídas continua guardado.",
+            confirmText = "Desativar",
+            onConfirm = actions.deactivate.onConfirm,
+            onDismiss = actions.deactivate.onDismiss,
+            isDestructive = true,
+        )
+    }
+}
+
+@Composable
+private fun DeactivateSection(
+    state: ProductDeactivateUiState,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        if (state.isDeactivating) {
+            CircularProgressIndicator(color = InventraDanger)
+        } else {
+            InventraTextLink(text = "Desativar produto", onClick = onClick, color = InventraDanger)
+        }
+        state.errorMessage?.let {
+            Text(it, fontFamily = Montserrat, fontSize = 14.sp, color = InventraDanger)
+        }
+    }
 }
 
 @Composable
@@ -125,8 +162,18 @@ fun ProductEditRoute(
     viewModel: ProductEditViewModel =
         viewModel(key = "product-edit-$productId", factory = ProductEditViewModel.factory(productId)),
     modifier: Modifier = Modifier,
+    deactivateViewModel: ProductDeactivateViewModel =
+        viewModel(key = "product-deactivate-$productId", factory = ProductDeactivateViewModel.factory(productId)),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val deactivate by deactivateViewModel.uiState.collectAsState()
+
+    LaunchedEffect(deactivate.isDeactivated) {
+        if (deactivate.isDeactivated) {
+            navigator.back()
+            if (navigator.currentBackStack.lastOrNull() == Screen.StockDetail(productId)) navigator.back()
+        }
+    }
 
     val photoActions =
         productPhotoActions(
@@ -152,8 +199,15 @@ fun ProductEditRoute(
                 onSaveClick = viewModel::onSaveClick,
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },
+                deactivate =
+                    ProductDeactivateActions(
+                        onDeactivateClick = deactivateViewModel::onDeactivateClick,
+                        onConfirm = deactivateViewModel::onConfirm,
+                        onDismiss = deactivateViewModel::onDismiss,
+                    ),
             ),
         modifier = modifier,
+        deactivate = deactivate,
     )
 }
 

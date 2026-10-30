@@ -21,4 +21,11 @@ data class ProductEditActions(
     val onSaveClick: () -> Unit,
     val onRetryClick: () -> Unit,
     val onBackClick: () -> Unit,
+    val deactivate: ProductDeactivateActions = ProductDeactivateActions(),
+)
+
+data class ProductDeactivateActions(
+    val onDeactivateClick: () -> Unit = {},
+    val onConfirm: () -> Unit = {},
+    val onDismiss: () -> Unit = {},
 )

@@ -28,6 +28,7 @@ import com.inventraoficial.inventra.data.remote.api.KitchenApi
 import com.inventraoficial.inventra.data.remote.api.PreListApi
 import com.inventraoficial.inventra.data.remote.api.ProductApi
 import com.inventraoficial.inventra.data.remote.api.ProductPhotoApi
+import com.inventraoficial.inventra.data.remote.api.ProductStatusApi
 import com.inventraoficial.inventra.data.remote.api.ProductSupplierApi
 import com.inventraoficial.inventra.data.remote.api.RequisitionApi
 import com.inventraoficial.inventra.data.remote.api.StockApi
@@ -180,6 +181,7 @@ class DefaultAppContainer(
     private val productApi: ProductApi by lazy { retrofit.create(ProductApi::class.java) }
     private val productSupplierApi: ProductSupplierApi by lazy { retrofit.create(ProductSupplierApi::class.java) }
     private val productPhotoApi: ProductPhotoApi by lazy { retrofit.create(ProductPhotoApi::class.java) }
+    private val productStatusApi: ProductStatusApi by lazy { retrofit.create(ProductStatusApi::class.java) }
     private val requisitionApi: RequisitionApi by lazy { retrofit.create(RequisitionApi::class.java) }
     private val preListApi: PreListApi by lazy { retrofit.create(PreListApi::class.java) }
     private val clickEventApi: ClickEventApi by lazy { retrofit.create(ClickEventApi::class.java) }
@@ -236,7 +238,9 @@ class DefaultAppContainer(
         NetworkSupplierPhotoRepository(supplierPhotoApi, imageCompressor, json)
     }
 
-    override val productRepository: ProductRepository by lazy { NetworkProductRepository(productApi, json) }
+    override val productRepository: ProductRepository by lazy {
+        NetworkProductRepository(productApi, json, productStatusApi)
+    }
     override val productSupplierRepository: ProductSupplierRepository by lazy {
         NetworkProductSupplierRepository(productSupplierApi, json)
     }
