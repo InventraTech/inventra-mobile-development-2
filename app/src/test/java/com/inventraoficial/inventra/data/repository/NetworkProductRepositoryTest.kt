@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.ProductApi
+import com.inventraoficial.inventra.data.remote.api.ProductStatusApi
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeSource
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
@@ -26,6 +27,15 @@ class NetworkProductRepositoryTest {
     private val json = Json { ignoreUnknownKeys = true }
     private val leite = FakeProductRepository.product(5013, "Leite Integral")
     private val lookup = BarcodeLookupResponse(BarcodeSource.CATALOG, "7891234567890", product = leite)
+    private val statusApi = FakeProductStatusApi()
+
+    private class FakeProductStatusApi : ProductStatusApi {
+        val deactivated = mutableListOf<Int>()
+
+        override suspend fun deactivate(productId: Int) {
+            deactivated += productId
+        }
+    }
 
     private class FakeProductApi(
         private val lookup: BarcodeLookupResponse,
@@ -103,7 +113,7 @@ class NetworkProductRepositoryTest {
     fun `findByBarcode envia o codigo sem espacos e a cozinha`() =
         runTest {
             val api = FakeProductApi(lookup)
-            val repository = NetworkProductRepository(api, json)
+            val repository = NetworkProductRepository(api, json, statusApi)
 
             val result = repository.findByBarcode(" 7891234567890 ", kitchenId = 7)
 
@@ -114,7 +124,7 @@ class NetworkProductRepositoryTest {
     @Test
     fun `findByBarcode com 404 significa codigo desconhecido`() =
         runTest {
-            val repository = NetworkProductRepository(FakeProductApi(lookup, httpError(404)), json)
+            val repository = NetworkProductRepository(FakeProductApi(lookup, httpError(404)), json, statusApi)
 
             val result = repository.findByBarcode("0000000000000", kitchenId = 7)
 
@@ -125,7 +135,7 @@ class NetworkProductRepositoryTest {
     @Test
     fun `findByBarcode com outro erro devolve falha`() =
         runTest {
-            val repository = NetworkProductRepository(FakeProductApi(lookup, httpError(500)), json)
+            val repository = NetworkProductRepository(FakeProductApi(lookup, httpError(500)), json, statusApi)
 
             assertTrue(repository.findByBarcode("7891234567890", kitchenId = 7).isFailure)
         }
@@ -134,7 +144,7 @@ class NetworkProductRepositoryTest {
     fun `create envia o pedido e devolve o produto criado`() =
         runTest {
             val api = FakeProductApi(lookup)
-            val repository = NetworkProductRepository(api, json)
+            val repository = NetworkProductRepository(api, json, statusApi)
             val request =
                 CreateProductRequest(name = "Coca-Cola 2L", unitId = 4, barcode = "7894900011517", supplierId = 2)
 
@@ -148,7 +158,7 @@ class NetworkProductRepositoryTest {
     fun `setKitchenParameters liga o produto a cozinha`() =
         runTest {
             val api = FakeProductApi(lookup)
-            val repository = NetworkProductRepository(api, json)
+            val repository = NetworkProductRepository(api, json, statusApi)
             val request = KitchenParametersRequest(kitchenId = 7, minStock = 10.0)
 
             val result = repository.setKitchenParameters(77, request)
@@ -161,7 +171,7 @@ class NetworkProductRepositoryTest {
     fun `update envia o produto editado`() =
         runTest {
             val api = FakeProductApi(lookup)
-            val repository = NetworkProductRepository(api, json)
+            val repository = NetworkProductRepository(api, json, statusApi)
             val request = UpdateProductRequest(name = "Ketchup Heinz", unitId = 6)
 
             val result = repository.update(77, request)
@@ -176,7 +186,7 @@ class NetworkProductRepositoryTest {
             val daCozinha = KitchenParametersResponse(KitchenParametersKitchen(7), minStock = 4.0)
             val deOutra = KitchenParametersResponse(KitchenParametersKitchen(3), minStock = 1.0)
             val api = FakeProductApi(lookup).apply { parameters = listOf(deOutra, daCozinha) }
-            val repository = NetworkProductRepository(api, json)
+            val repository = NetworkProductRepository(api, json, statusApi)
 
             assertEquals(daCozinha, repository.kitchenParameters(77, kitchenId = 7).getOrNull())
             assertNull(repository.kitchenParameters(77, kitchenId = 9).getOrNull())
@@ -186,7 +196,7 @@ class NetworkProductRepositoryTest {
     fun `units guarda a lista e nao busca de novo`() =
         runTest {
             val api = FakeProductApi(lookup)
-            val repository = NetworkProductRepository(api, json)
+            val repository = NetworkProductRepository(api, json, statusApi)
 
             repository.units()
             val second = repository.units()
@@ -199,12 +209,23 @@ class NetworkProductRepositoryTest {
     fun `units que falha tenta de novo na proxima vez`() =
         runTest {
             val api = FakeProductApi(lookup).apply { unitsError = httpError(500) }
-            val repository = NetworkProductRepository(api, json)
+            val repository = NetworkProductRepository(api, json, statusApi)
 
             assertTrue(repository.units().isFailure)
             api.unitsError = null
 
             assertTrue(repository.units().isSuccess)
             assertEquals(2, api.unitsCalls)
+        }
+
+    @Test
+    fun `desativar chama o endpoint do produto`() =
+        runTest {
+            val repository = NetworkProductRepository(FakeProductApi(lookup), json, statusApi)
+
+            val result = repository.deactivate(5013)
+
+            assertTrue(result.isSuccess)
+            assertEquals(listOf(5013), statusApi.deactivated)
         }
 }

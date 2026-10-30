@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.data.repository
 
 import com.inventraoficial.inventra.data.remote.api.ProductApi
+import com.inventraoficial.inventra.data.remote.api.ProductStatusApi
 import com.inventraoficial.inventra.data.remote.apiCall
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
@@ -44,11 +45,14 @@ interface ProductRepository {
     suspend fun units(): Result<List<UnitResponse>>
 
     suspend fun categories(): Result<List<CategoryResponse>>
+
+    suspend fun deactivate(id: Int): Result<Unit>
 }
 
 class NetworkProductRepository(
     private val productApi: ProductApi,
     private val json: Json,
+    private val productStatusApi: ProductStatusApi,
 ) : ProductRepository {
     // As listas são grandes e quase nunca mudam: ficam em memória depois da primeira busca que der certo.
     private var cachedUnits: List<UnitResponse>? = null
@@ -101,6 +105,11 @@ class NetworkProductRepository(
     override suspend fun categories(): Result<List<CategoryResponse>> =
         cachedCategories?.let { Result.success(it) }
             ?: apiCall(json) { productApi.categories() }.onSuccess { cachedCategories = it }
+
+    override suspend fun deactivate(id: Int): Result<Unit> =
+        apiCall(json) {
+            productStatusApi.deactivate(id)
+        }
 
     private companion object {
         const val SEARCH_SIZE = 20
