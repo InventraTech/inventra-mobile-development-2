@@ -20,6 +20,7 @@ import com.inventraoficial.inventra.data.repository.ProductRepository
 import com.inventraoficial.inventra.data.repository.ProductSupplierRepository
 import com.inventraoficial.inventra.data.repository.SupplierRepository
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
+import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoState
 import com.inventraoficial.inventra.feature.stock.productform.productFormActions
 import com.inventraoficial.inventra.feature.stock.productform.toCategoryOptions
 import com.inventraoficial.inventra.feature.stock.productform.toDecimal

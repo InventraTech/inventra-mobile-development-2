@@ -238,19 +238,28 @@ private fun NotRegisteredPanel(
     uiState: ScanUiState,
     actions: ScanActions,
 ) {
-    Box(
-        modifier =
-            Modifier
-                .size(64.dp)
-                .background(InventraGold.copy(alpha = 0.16f), CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            imageVector = Icons.Default.Inventory2,
-            contentDescription = null,
-            tint = InventraGold,
-            modifier = Modifier.size(32.dp),
+    val photoUrl = result.photoUrl
+    if (photoUrl != null) {
+        InventraProductImage(
+            photoUrl = photoUrl,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.size(96.dp),
         )
+    } else {
+        Box(
+            modifier =
+                Modifier
+                    .size(64.dp)
+                    .background(InventraGold.copy(alpha = 0.16f), CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = Icons.Default.Inventory2,
+                contentDescription = null,
+                tint = InventraGold,
+                modifier = Modifier.size(32.dp),
+            )
+        }
     }
     Text(
         "Produto novo por aqui",

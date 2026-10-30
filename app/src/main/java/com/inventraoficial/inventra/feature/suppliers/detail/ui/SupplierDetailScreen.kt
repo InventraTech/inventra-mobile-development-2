@@ -47,7 +47,7 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraSupplier
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.feature.profile.photo.ui.ProfilePhotoSheet
-import com.inventraoficial.inventra.feature.stock.edit.ui.rememberProductCamera
+import com.inventraoficial.inventra.feature.stock.productform.rememberProductCamera
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraDanger

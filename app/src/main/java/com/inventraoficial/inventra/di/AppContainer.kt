@@ -203,7 +203,15 @@ class DefaultAppContainer(
         GoogleAuthClient(context, context.getString(R.string.default_web_client_id), FirebaseAuth.getInstance())
     }
 
-    override val imageCompressor: ImageCompressor by lazy { AndroidImageCompressor(context) }
+    override val imageCompressor: ImageCompressor by lazy {
+        val imageClient =
+            OkHttpClient
+                .Builder()
+                .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .build()
+        AndroidImageCompressor(context, imageClient)
+    }
     override val profilePhotoPreview = ProfilePhotoPreview()
     override val locationProvider: LocationProvider by lazy { FusedLocationProvider(context) }
 

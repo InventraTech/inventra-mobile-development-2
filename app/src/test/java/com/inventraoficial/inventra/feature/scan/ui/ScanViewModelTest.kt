@@ -135,7 +135,13 @@ class ScanViewModelTest {
     @Test
     fun `codigo so do Open Food Facts vira nao cadastrado com sugestao`() =
         runTest(testDispatcher) {
-            val suggestion = OpenFoodFactsSuggestion(name = "Coca-Cola", brand = "Coca-Cola", quantity = "2 L")
+            val suggestion =
+                OpenFoodFactsSuggestion(
+                    name = "Coca-Cola",
+                    brand = "Coca-Cola",
+                    imageUrl = "https://images.openfoodfacts.org/coca.jpg",
+                    quantity = "2 L",
+                )
             productRepository.barcodeResult =
                 Result.success(BarcodeLookupResponse(BarcodeSource.OPEN_FOOD_FACTS, barcode, suggestion = suggestion))
             val viewModel = createViewModel()
@@ -145,6 +151,7 @@ class ScanViewModelTest {
 
             val result = viewModel.uiState.value.result as ScanResult.NotRegistered
             assertEquals("Coca-Cola · Coca-Cola · 2 L", result.suggestion)
+            assertEquals("https://images.openfoodfacts.org/coca.jpg", result.photoUrl)
         }
 
     @Test
@@ -158,6 +165,7 @@ class ScanViewModelTest {
             val result = viewModel.uiState.value.result as ScanResult.NotRegistered
             assertEquals(barcode, result.barcode)
             assertNull(result.suggestion)
+            assertNull(result.photoUrl)
         }
 
     @Test
