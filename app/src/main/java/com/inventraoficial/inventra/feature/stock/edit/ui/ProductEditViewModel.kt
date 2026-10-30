@@ -23,11 +23,11 @@ import com.inventraoficial.inventra.data.repository.SupplierRepository
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
 import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoState
 import com.inventraoficial.inventra.feature.stock.productform.productFormActions
+import com.inventraoficial.inventra.feature.stock.productform.supplierOptions
 import com.inventraoficial.inventra.feature.stock.productform.toCategoryOptions
 import com.inventraoficial.inventra.feature.stock.productform.toDecimal
 import com.inventraoficial.inventra.feature.stock.productform.toMinStockText
 import com.inventraoficial.inventra.feature.stock.productform.toPriceText
-import com.inventraoficial.inventra.feature.stock.productform.toSupplierOptions
 import com.inventraoficial.inventra.feature.stock.productform.toUnitOptions
 import com.inventraoficial.inventra.feature.stock.productform.validationError
 import kotlinx.coroutines.async
@@ -156,7 +156,9 @@ class ProductEditViewModel(
             val product = async { productRepository.product(productId) }
             val units = async { productRepository.units() }
             val categories = async { productRepository.categories().getOrDefault(emptyList()) }
-            val suppliers = async { user.kitchenId?.let { supplierRepository.suppliers(it).getOrNull() }.orEmpty() }
+            val kitchenSuppliers =
+                async { user.kitchenId?.let { supplierRepository.suppliers(it).getOrNull() }.orEmpty() }
+            val allSuppliers = async { supplierRepository.allSuppliers().getOrDefault(emptyList()) }
             val links = async { productSupplierRepository.suppliersOf(productId).getOrDefault(emptyList()) }
             val parameters =
                 async { user.kitchenId?.let { productRepository.kitchenParameters(productId, it).getOrNull() } }
@@ -175,7 +177,9 @@ class ProductEditViewModel(
                 loaded.toForm(savedParameters, savedLinks.firstOrNull()).copy(
                     units = unitsResult.getOrThrow().toUnitOptions(),
                     categories = categories.await().toCategoryOptions(),
-                    suppliers = suppliers.await().toSupplierOptions().withLinked(savedLinks.firstOrNull()),
+                    suppliers =
+                        supplierOptions(kitchenSuppliers.await(), allSuppliers.await())
+                            .withLinked(savedLinks.firstOrNull()),
                 )
             _uiState.update {
                 it.copy(isLoading = false, form = savedForm, photo = it.photo.copy(url = loaded.photoUrl))
@@ -244,6 +248,6 @@ private fun List<InventraPickerOption>.withLinked(link: ProductSupplierResponse?
     return if (linked == null || any { it.id == linked.id }) {
         this
     } else {
-        (this + InventraPickerOption(linked.id, linked.legalName)).sortedBy { it.title.lowercase() }
+        this + InventraPickerOption(linked.id, linked.legalName)
     }
 }

@@ -22,9 +22,9 @@ import com.inventraoficial.inventra.feature.stock.productform.MAX_NAME_LENGTH
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
 import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoState
 import com.inventraoficial.inventra.feature.stock.productform.productFormActions
+import com.inventraoficial.inventra.feature.stock.productform.supplierOptions
 import com.inventraoficial.inventra.feature.stock.productform.toCategoryOptions
 import com.inventraoficial.inventra.feature.stock.productform.toDecimal
-import com.inventraoficial.inventra.feature.stock.productform.toSupplierOptions
 import com.inventraoficial.inventra.feature.stock.productform.toUnitOptions
 import com.inventraoficial.inventra.feature.stock.productform.validationError
 import kotlinx.coroutines.async
@@ -144,7 +144,9 @@ class ProductCreateViewModel(
             val units = async { productRepository.units() }
             // Categoria é opcional: se a lista não vier, o formulário segue sem ela.
             val categories = async { productRepository.categories().getOrDefault(emptyList()) }
-            val suppliers = async { user.kitchenId?.let { supplierRepository.suppliers(it).getOrNull() }.orEmpty() }
+            val kitchenSuppliers =
+                async { user.kitchenId?.let { supplierRepository.suppliers(it).getOrNull() }.orEmpty() }
+            val allSuppliers = async { supplierRepository.allSuppliers().getOrDefault(emptyList()) }
             // Sem a consulta do código o cadastro continua, só não vem preenchido.
             val lookup = barcode?.let { code -> async { productRepository.findByBarcode(code, user.kitchenId) } }
 
@@ -156,7 +158,7 @@ class ProductCreateViewModel(
                 return@launch
             }
             val categoryOptions = categories.await()
-            val supplierOptions = suppliers.await()
+            val supplierList = supplierOptions(kitchenSuppliers.await(), allSuppliers.await())
             val found = lookup?.await()?.getOrNull()
             _uiState.update {
                 it
@@ -166,7 +168,7 @@ class ProductCreateViewModel(
                             it.form.copy(
                                 units = unitOptions.toUnitOptions(),
                                 categories = categoryOptions.toCategoryOptions(),
-                                suppliers = supplierOptions.toSupplierOptions(),
+                                suppliers = supplierList,
                             ),
                     ).prefilledWith(found, unitOptions)
             }

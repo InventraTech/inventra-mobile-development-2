@@ -87,8 +87,7 @@ fun productFormActions(update: ((ProductFormState) -> ProductFormState) -> Unit)
         onSupplierCreated = { id, name ->
             update { form ->
                 val others = form.suppliers.filterNot { it.id == id }
-                val options = (others + InventraPickerOption(id, name)).sortedBy { it.title.lowercase() }
-                form.copy(suppliers = options, supplierId = id)
+                form.copy(suppliers = listOf(InventraPickerOption(id, name, NEW_SUPPLIER)) + others, supplierId = id)
             }
         },
     )
@@ -210,8 +209,9 @@ fun ProductFormFields(
 internal const val MAX_NAME_LENGTH = 150
 internal const val MAX_BRAND_LENGTH = 80
 internal const val MAX_BARCODE_LENGTH = 50
+private const val NEW_SUPPLIER = "Cadastrado agora"
 private const val NO_SUPPLIERS_MESSAGE =
-    "Nenhum fornecedor nesta cozinha ainda. Cadastre um novo para continuar."
+    "Nenhum fornecedor cadastrado ainda. Cadastre um novo para continuar."
 private val minStockInput = Regex("^\\d{0,9}([.,]\\d{0,3})?$")
 private val priceInput = Regex("^\\d{0,10}([.,]\\d{0,2})?$")
 private val brazilianSymbols = DecimalFormatSymbols(Locale.forLanguageTag("pt-BR"))
@@ -232,8 +232,22 @@ internal fun ProductFormState.validationError(): String? =
         else -> null
     }
 
-internal fun List<SupplierResponse>.toSupplierOptions(): List<InventraPickerOption> =
-    sortedBy { it.legalName.lowercase() }.map { InventraPickerOption(it.id, it.legalName) }
+internal fun supplierOptions(
+    kitchen: List<SupplierResponse>,
+    all: List<SupplierResponse>,
+): List<InventraPickerOption> {
+    val kitchenIds = kitchen.map { it.id }.toSet()
+    val fromKitchen =
+        kitchen
+            .sortedBy { it.legalName.lowercase() }
+            .map { InventraPickerOption(it.id, it.legalName, "Desta cozinha · ${it.cnpj}") }
+    val others =
+        all
+            .filterNot { it.id in kitchenIds }
+            .sortedBy { it.legalName.lowercase() }
+            .map { InventraPickerOption(it.id, it.legalName, it.cnpj) }
+    return fromKitchen + others
+}
 
 internal fun List<UnitResponse>.toUnitOptions(): List<InventraPickerOption> =
     sortedBy { unit -> unit.symbol.any { it.isDigit() } }
