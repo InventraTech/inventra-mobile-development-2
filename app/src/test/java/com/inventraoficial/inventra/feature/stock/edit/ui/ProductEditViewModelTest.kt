@@ -354,4 +354,17 @@ class ProductEditViewModelTest {
             assertEquals("Já existe um produto com esse código.", viewModel.uiState.value.submitError)
             assertFalse(viewModel.uiState.value.isSaved)
         }
+
+    @Test
+    fun `fornecedor vinculado fora da cozinha continua na lista`() =
+        runTest(testDispatcher) {
+            productSupplierRepository.links = listOf(FakeProductSupplierRepository.link(9, "Heinz Distribuidora"))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            val form = viewModel.uiState.value.form
+            assertEquals(9, form.supplierId)
+            assertEquals("Heinz Distribuidora", form.supplierName)
+            assertEquals(listOf("Atacadão", "Heinz Distribuidora", "Seara Alimentos"), form.suppliers.map { it.title })
+        }
 }

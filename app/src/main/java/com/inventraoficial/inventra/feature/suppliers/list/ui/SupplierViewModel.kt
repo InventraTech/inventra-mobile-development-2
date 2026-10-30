@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
-import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.supplier.SupplierResponse
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.SupplierRepository
@@ -81,9 +80,7 @@ class SupplierViewModel(
     private fun load() {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            val user = authRepository.currentUser.first()
-            val kitchenId = user?.kitchenId
-            _uiState.update { it.copy(canCreate = user?.accessType == AccessType.SUPERVISOR) }
+            val kitchenId = authRepository.currentUser.first()?.kitchenId
             if (kitchenId == null) {
                 allSuppliers = emptyList()
                 _uiState.update { it.copy(isLoading = false, suppliers = emptyList()) }

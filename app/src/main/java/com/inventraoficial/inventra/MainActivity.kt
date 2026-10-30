@@ -9,6 +9,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.inventraoficial.inventra.data.local.ThemeMode
+import com.inventraoficial.inventra.feature.suppliers.create.LocalSupplierSelection
 import com.inventraoficial.inventra.ui.event.LocalClickTracker
 import com.inventraoficial.inventra.ui.navigation.SetupNavigation
 import com.inventraoficial.inventra.ui.theme.InventraTheme
@@ -30,7 +31,10 @@ class MainActivity : ComponentActivity() {
                     ThemeMode.Dark -> true
                     ThemeMode.System -> isSystemInDarkTheme()
                 }
-            CompositionLocalProvider(LocalClickTracker provides container.clickTracker) {
+            CompositionLocalProvider(
+                LocalClickTracker provides container.clickTracker,
+                LocalSupplierSelection provides container.supplierSelection,
+            ) {
                 InventraTheme(darkTheme = darkTheme) {
                     SetupNavigation(openNotifications = openNotifications)
                 }

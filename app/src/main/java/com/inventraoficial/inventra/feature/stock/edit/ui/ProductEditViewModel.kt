@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraPickerOption
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersResponse
@@ -155,7 +156,7 @@ class ProductEditViewModel(
             val product = async { productRepository.product(productId) }
             val units = async { productRepository.units() }
             val categories = async { productRepository.categories().getOrDefault(emptyList()) }
-            val suppliers = async { supplierRepository.allSuppliers().getOrDefault(emptyList()) }
+            val suppliers = async { user.kitchenId?.let { supplierRepository.suppliers(it).getOrNull() }.orEmpty() }
             val links = async { productSupplierRepository.suppliersOf(productId).getOrDefault(emptyList()) }
             val parameters =
                 async { user.kitchenId?.let { productRepository.kitchenParameters(productId, it).getOrNull() } }
@@ -174,7 +175,7 @@ class ProductEditViewModel(
                 loaded.toForm(savedParameters, savedLinks.firstOrNull()).copy(
                     units = unitsResult.getOrThrow().toUnitOptions(),
                     categories = categories.await().toCategoryOptions(),
-                    suppliers = suppliers.await().toSupplierOptions(),
+                    suppliers = suppliers.await().toSupplierOptions().withLinked(savedLinks.firstOrNull()),
                 )
             _uiState.update {
                 it.copy(isLoading = false, form = savedForm, photo = it.photo.copy(url = loaded.photoUrl))
@@ -237,3 +238,12 @@ private fun ProductResponse.toForm(
     supplierId = link?.supplier?.id,
     referencePrice = link?.referencePrice?.toPriceText().orEmpty(),
 )
+
+private fun List<InventraPickerOption>.withLinked(link: ProductSupplierResponse?): List<InventraPickerOption> {
+    val linked = link?.supplier
+    return if (linked == null || any { it.id == linked.id }) {
+        this
+    } else {
+        (this + InventraPickerOption(linked.id, linked.legalName)).sortedBy { it.title.lowercase() }
+    }
+}

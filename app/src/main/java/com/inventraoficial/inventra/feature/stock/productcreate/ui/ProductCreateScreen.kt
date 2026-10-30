@@ -45,6 +45,7 @@ import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
 import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoField
 import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoOptions
 import com.inventraoficial.inventra.feature.stock.productform.productPhotoActions
+import com.inventraoficial.inventra.feature.suppliers.create.PickedSupplierEffect
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -236,6 +237,7 @@ fun ProductCreateRoute(
             onCameraDenied = viewModel::onCameraDenied,
             onRemoveClick = viewModel::onRemovePhotoClick,
         )
+    PickedSupplierEffect { viewModel.formActions.onSupplierCreated(it.id, it.name) }
 
     // Dar entrada e Ver produto tomam o lugar do cadastro: voltar dali leva para onde o cadastro começou.
     fun replaceWith(screen: Screen) {
@@ -247,7 +249,7 @@ fun ProductCreateRoute(
         uiState = uiState,
         actions =
             ProductCreateActions(
-                form = viewModel.formActions,
+                form = viewModel.formActions.copy(onNewSupplierClick = { navigator.navigate(Screen.SupplierCreate) }),
                 photo = photoActions,
                 onSaveClick = viewModel::onSaveClick,
                 onRetryClick = viewModel::onRetryClick,

@@ -60,13 +60,32 @@ class SupplierCreateViewModel(
                         it.copy(isSubmitting = false, created = CreatedSupplier(supplier.id, supplier.legalName))
                     }
                 }.onFailure { failure ->
-                    _uiState.update { it.copy(isSubmitting = false, submitError = failure.message) }
+                    val existing = findByCnpj(state.cnpj)
+                    _uiState.update {
+                        it.copy(
+                            isSubmitting = false,
+                            submitError = if (existing == null) failure.message else null,
+                            existing = existing,
+                        )
+                    }
                 }
         }
     }
 
+    fun onUseExistingClick() {
+        val existing = _uiState.value.existing ?: return
+        _uiState.update { it.copy(created = existing) }
+    }
+
+    private suspend fun findByCnpj(cnpj: String): CreatedSupplier? =
+        supplierRepository
+            .allSuppliers()
+            .getOrNull()
+            ?.firstOrNull { supplier -> supplier.cnpj.filter { it.isDigit() } == cnpj }
+            ?.let { CreatedSupplier(it.id, it.legalName) }
+
     private fun updateForm(transform: (SupplierCreateUiState) -> SupplierCreateUiState) {
-        _uiState.update { transform(it).copy(submitError = null) }
+        _uiState.update { transform(it).copy(submitError = null, existing = null) }
     }
 
     companion object {

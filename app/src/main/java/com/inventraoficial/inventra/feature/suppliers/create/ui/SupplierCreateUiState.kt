@@ -14,6 +14,7 @@ data class SupplierCreateUiState(
     val isSubmitting: Boolean = false,
     val submitError: String? = null,
     val created: CreatedSupplier? = null,
+    val existing: CreatedSupplier? = null,
 )
 
 data class SupplierCreateActions(
@@ -24,5 +25,5 @@ data class SupplierCreateActions(
     val onRatingSelect: (Int) -> Unit = {},
     val onSaveClick: () -> Unit = {},
     val onBackClick: () -> Unit = {},
-    val onSeeSupplierClick: (Int) -> Unit = {},
+    val onUseExistingClick: () -> Unit = {},
 )

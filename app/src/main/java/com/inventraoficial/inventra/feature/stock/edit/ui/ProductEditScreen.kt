@@ -38,7 +38,9 @@ import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoField
 import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoOptions
 import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoState
 import com.inventraoficial.inventra.feature.stock.productform.productPhotoActions
+import com.inventraoficial.inventra.feature.suppliers.create.PickedSupplierEffect
 import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraPurple
@@ -135,6 +137,8 @@ fun ProductEditRoute(
             onRemoveClick = viewModel::onRemovePhotoClick,
         )
 
+    PickedSupplierEffect { viewModel.formActions.onSupplierCreated(it.id, it.name) }
+
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) navigator.back()
     }
@@ -143,7 +147,7 @@ fun ProductEditRoute(
         uiState = uiState,
         actions =
             ProductEditActions(
-                form = viewModel.formActions,
+                form = viewModel.formActions.copy(onNewSupplierClick = { navigator.navigate(Screen.SupplierCreate) }),
                 photo = photoActions,
                 onSaveClick = viewModel::onSaveClick,
                 onRetryClick = viewModel::onRetryClick,
