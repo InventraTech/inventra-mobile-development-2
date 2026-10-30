@@ -1,7 +1,6 @@
 package com.inventraoficial.inventra.feature.suppliers.list.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,10 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -51,8 +47,6 @@ fun SupplierScreen(
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
     activeFilterCount: Int = 0,
-    canCreate: Boolean = false,
-    onCreateClick: () -> Unit = {},
 ) {
     Column(
         modifier =
@@ -68,16 +62,6 @@ fun SupplierScreen(
                     fontFamily = Montserrat,
                     fontSize = 17.sp,
                 )
-            },
-            actions = {
-                if (canCreate) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Cadastrar fornecedor",
-                        tint = Color.White,
-                        modifier = Modifier.clickable(onClick = onCreateClick),
-                    )
-                }
             },
         )
         InventraScreenContent {
@@ -177,8 +161,6 @@ fun SupplierRoute(
         onRetryClick = viewModel::onRetryClick,
         activeFilterCount = uiState.filters.activeCount,
         modifier = modifier,
-        canCreate = uiState.canCreate,
-        onCreateClick = { navigator.navigate(Screen.SupplierCreate) },
     )
 
     uiState.draftFilters?.let { draft ->

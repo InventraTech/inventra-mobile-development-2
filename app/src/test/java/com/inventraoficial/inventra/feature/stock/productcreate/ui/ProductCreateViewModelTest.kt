@@ -330,7 +330,7 @@ class ProductCreateViewModelTest {
         }
 
     @Test
-    fun `fornecedores vem todos os ativos em ordem de nome`() =
+    fun `fornecedores vem so os da cozinha em ordem de nome`() =
         runTest(testDispatcher) {
             val viewModel = createViewModel()
             advanceUntilIdle()
@@ -340,8 +340,8 @@ class ProductCreateViewModelTest {
                 viewModel.uiState.value.form.suppliers
                     .map { it.title },
             )
-            assertEquals(1, supplierRepository.allCalls)
-            assertTrue(supplierRepository.kitchenCalls.isEmpty())
+            assertEquals(listOf(7), supplierRepository.kitchenCalls)
+            assertEquals(0, supplierRepository.allCalls)
         }
 
     @Test
@@ -515,5 +515,19 @@ class ProductCreateViewModelTest {
 
             assertEquals(SavedProduct(99, "Coca-Cola 2L"), viewModel.uiState.value.createdProduct)
             assertTrue(viewModel.uiState.value.photoUploadFailed)
+        }
+
+    @Test
+    fun `fornecedor cadastrado pelo produto entra na lista ja escolhido`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.formActions.onSupplierCreated(77, "Distribuidora Nova")
+
+            val form = viewModel.uiState.value.form
+            assertEquals(77, form.supplierId)
+            assertEquals("Distribuidora Nova", form.supplierName)
+            assertEquals(listOf("Atacadão", "Distribuidora Nova", "Seara Alimentos"), form.suppliers.map { it.title })
         }
 }

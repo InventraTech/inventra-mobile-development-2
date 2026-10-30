@@ -22,6 +22,7 @@ class SupplierCreateViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: FakeSupplierRepository
     private lateinit var viewModel: SupplierCreateViewModel
+    private val atacadao = FakeSupplierRepository.supplier(5, "Atacadão").copy(cnpj = "12.345.678/0001-90")
 
     @Before
     fun setUp() {
@@ -142,5 +143,37 @@ class SupplierCreateViewModelTest {
 
             assertEquals("Já existe um fornecedor com esse CNPJ.", viewModel.uiState.value.submitError)
             assertNull(viewModel.uiState.value.created)
+        }
+
+    @Test
+    fun `CNPJ que ja existe oferece usar o fornecedor cadastrado`() =
+        runTest(testDispatcher) {
+            repository.suppliers = listOf(atacadao)
+            repository.createResult = Result.failure(Exception("Já existe um fornecedor com esse CNPJ."))
+            fillRequired()
+
+            viewModel.onSaveClick()
+            advanceUntilIdle()
+
+            assertNull(viewModel.uiState.value.submitError)
+            assertEquals(CreatedSupplier(5, "Atacadão"), viewModel.uiState.value.existing)
+
+            viewModel.onUseExistingClick()
+
+            assertEquals(CreatedSupplier(5, "Atacadão"), viewModel.uiState.value.created)
+        }
+
+    @Test
+    fun `mudar o CNPJ tira a sugestao do fornecedor existente`() =
+        runTest(testDispatcher) {
+            repository.suppliers = listOf(atacadao)
+            repository.createResult = Result.failure(Exception("Já existe um fornecedor com esse CNPJ."))
+            fillRequired()
+            viewModel.onSaveClick()
+            advanceUntilIdle()
+
+            viewModel.onCnpjChange("1234567800019")
+
+            assertNull(viewModel.uiState.value.existing)
         }
 }

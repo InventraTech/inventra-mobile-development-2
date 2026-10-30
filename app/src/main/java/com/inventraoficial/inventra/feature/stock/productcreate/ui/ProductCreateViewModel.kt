@@ -144,7 +144,7 @@ class ProductCreateViewModel(
             val units = async { productRepository.units() }
             // Categoria é opcional: se a lista não vier, o formulário segue sem ela.
             val categories = async { productRepository.categories().getOrDefault(emptyList()) }
-            val suppliers = async { supplierRepository.allSuppliers().getOrDefault(emptyList()) }
+            val suppliers = async { user.kitchenId?.let { supplierRepository.suppliers(it).getOrNull() }.orEmpty() }
             // Sem a consulta do código o cadastro continua, só não vem preenchido.
             val lookup = barcode?.let { code -> async { productRepository.findByBarcode(code, user.kitchenId) } }
 

@@ -71,6 +71,7 @@ import com.inventraoficial.inventra.feature.notifications.background.DataStoreKn
 import com.inventraoficial.inventra.feature.notifications.background.DataStoreLastNotifiedAlertStore
 import com.inventraoficial.inventra.feature.notifications.background.NewAlertsChecker
 import com.inventraoficial.inventra.feature.notifications.background.SystemAlertNotifier
+import com.inventraoficial.inventra.feature.suppliers.create.SupplierSelection
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -108,6 +109,7 @@ interface AppContainer {
     val newAlertsChecker: NewAlertsChecker
     val accessRequestChecker: AccessRequestChecker
     val clickTracker: ClickTracker
+    val supplierSelection: SupplierSelection
     val stockCache: StockCache
 }
 
@@ -269,6 +271,8 @@ class DefaultAppContainer(
             notifier = alertNotifier,
         )
     }
+
+    override val supplierSelection = SupplierSelection()
 
     override val stockCache: StockCache by lazy { SqliteStockCache(InventraDatabase(context), json) }
 

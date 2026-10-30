@@ -15,7 +15,6 @@ data class SupplierUiState(
     val errorMessage: String? = null,
     val filters: SupplierFilters = SupplierFilters(),
     val draftFilters: SupplierFilters? = null,
-    val canCreate: Boolean = false,
 )
 
 data class SupplierFilters(
