@@ -3,7 +3,7 @@ package com.inventraoficial.inventra.feature.auth.passwordreset
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
 import com.inventraoficial.inventra.feature.auth.AuthContentMaxWidth
+import com.inventraoficial.inventra.feature.auth.topShapeSize
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraMuted
@@ -47,7 +48,7 @@ fun PasswordResetLayout(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Box(
+    BoxWithConstraints(
         modifier =
             Modifier
                 .fillMaxSize()
@@ -59,7 +60,7 @@ fun PasswordResetLayout(
             modifier =
                 Modifier
                     .align(Alignment.TopEnd)
-                    .size(200.dp)
+                    .size(topShapeSize(maxWidth))
                     .offset(0.dp, -30.dp),
         )
         Column(
