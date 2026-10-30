@@ -30,6 +30,9 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraBottomDe
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraMascotFab
 import com.inventraoficial.inventra.feature.assistant.ui.ChatRoute
 import com.inventraoficial.inventra.feature.auth.login.ui.LoginRoute
+import com.inventraoficial.inventra.feature.auth.passwordreset.code.ui.ResetCodeRoute
+import com.inventraoficial.inventra.feature.auth.passwordreset.forgot.ui.ForgotPasswordRoute
+import com.inventraoficial.inventra.feature.auth.passwordreset.newpassword.ui.NewPasswordRoute
 import com.inventraoficial.inventra.feature.auth.register.ui.RegisterRoute
 import com.inventraoficial.inventra.feature.cozinha.create.ui.CreateCozinhaRoute
 import com.inventraoficial.inventra.feature.cozinha.info.ui.CozinhaInfoRoute
@@ -204,6 +207,15 @@ private fun AppNavigation(
                     }
                     entry<Screen.Register> {
                         RegisterRoute(navigator = navigator)
+                    }
+                    entry<Screen.ForgotPassword> { key ->
+                        ForgotPasswordRoute(email = key.email, navigator = navigator)
+                    }
+                    entry<Screen.ResetCode> { key ->
+                        ResetCodeRoute(email = key.email, navigator = navigator)
+                    }
+                    entry<Screen.NewPassword> { key ->
+                        NewPasswordRoute(email = key.email, resetToken = key.resetToken, navigator = navigator)
                     }
                     entry<Screen.CreateCozinha> {
                         CreateCozinhaRoute(navigator = navigator)

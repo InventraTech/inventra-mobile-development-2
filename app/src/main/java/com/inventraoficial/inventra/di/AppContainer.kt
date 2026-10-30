@@ -43,6 +43,7 @@ import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenAccessRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenRepository
 import com.inventraoficial.inventra.data.repository.NetworkMembersRepository
+import com.inventraoficial.inventra.data.repository.NetworkPasswordResetRepository
 import com.inventraoficial.inventra.data.repository.NetworkPreListRepository
 import com.inventraoficial.inventra.data.repository.NetworkProductPhotoRepository
 import com.inventraoficial.inventra.data.repository.NetworkProductRepository
@@ -50,6 +51,7 @@ import com.inventraoficial.inventra.data.repository.NetworkProductSupplierReposi
 import com.inventraoficial.inventra.data.repository.NetworkRequisitionRepository
 import com.inventraoficial.inventra.data.repository.NetworkStockRepository
 import com.inventraoficial.inventra.data.repository.NetworkSupplierRepository
+import com.inventraoficial.inventra.data.repository.PasswordResetRepository
 import com.inventraoficial.inventra.data.repository.PreListRepository
 import com.inventraoficial.inventra.data.repository.ProductPhotoRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
@@ -77,6 +79,7 @@ import java.util.concurrent.TimeUnit
 
 interface AppContainer {
     val authRepository: AuthRepository
+    val passwordResetRepository: PasswordResetRepository
     val kitchenRepository: KitchenRepository
     val kitchenAccessRepository: KitchenAccessRepository
     val membersRepository: MembersRepository
@@ -181,6 +184,10 @@ class DefaultAppContainer(
             sessionStorage,
             clearExternalSession = { googleAuthClient.signOut() },
         )
+    }
+
+    override val passwordResetRepository: PasswordResetRepository by lazy {
+        NetworkPasswordResetRepository(authApi, json)
     }
 
     override val googleAuthClient: GoogleAuthClient by lazy {

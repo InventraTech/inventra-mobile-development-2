@@ -57,9 +57,6 @@ class LoginViewModel(
         }
     }
 
-    fun onForgotPasswordClick() {
-    }
-
     companion object {
         val Factory: ViewModelProvider.Factory =
             viewModelFactory {

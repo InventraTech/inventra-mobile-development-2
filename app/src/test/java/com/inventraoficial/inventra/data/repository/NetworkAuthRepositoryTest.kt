@@ -5,12 +5,16 @@ import com.inventraoficial.inventra.data.local.toSessionUser
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
+import com.inventraoficial.inventra.data.remote.dto.auth.ForgotPasswordRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.GoogleLoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.KitchenSummary
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.LoginResponse
 import com.inventraoficial.inventra.data.remote.dto.auth.RefreshTokenRequest
 import com.inventraoficial.inventra.data.remote.dto.auth.RegisterRequest
+import com.inventraoficial.inventra.data.remote.dto.auth.ResetPasswordRequest
+import com.inventraoficial.inventra.data.remote.dto.auth.ResetTokenResponse
+import com.inventraoficial.inventra.data.remote.dto.auth.VerifyResetCodeRequest
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -117,6 +121,14 @@ class NetworkAuthRepositoryTest {
             lastLogoutRequest = refreshRequest
             logoutError?.let { throw it }
         }
+
+        override suspend fun forgotPassword(forgotPasswordRequest: ForgotPasswordRequest) = Unit
+
+        override suspend fun verifyResetCode(verifyResetCodeRequest: VerifyResetCodeRequest): ResetTokenResponse {
+            error("nao usado")
+        }
+
+        override suspend fun resetPassword(resetPasswordRequest: ResetPasswordRequest) = Unit
     }
 
     private fun httpError(
