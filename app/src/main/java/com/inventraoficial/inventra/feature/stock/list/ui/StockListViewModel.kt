@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
 import com.inventraoficial.inventra.R
+import com.inventraoficial.inventra.data.local.StockCache
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.StockRepository
@@ -19,7 +20,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit.DAYS
 import java.util.Locale
 
@@ -27,7 +31,9 @@ import java.util.Locale
 class StockListViewModel(
     private val authRepository: AuthRepository,
     private val stockRepository: StockRepository,
+    private val stockCache: StockCache,
     private val today: () -> LocalDate = { LocalDate.now() },
+    private val clock: () -> Long = { System.currentTimeMillis() },
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StockListUiState())
     val uiState: StateFlow<StockListUiState> = _uiState.asStateFlow()
@@ -95,12 +101,24 @@ class StockListViewModel(
                 showItems(emptyList())
                 return@launch
             }
-            stockRepository
-                .kitchenStock(kitchenId)
-                .onSuccess { showItems(it) }
-                .onFailure { error ->
-                    _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
+            val result = stockRepository.kitchenStock(kitchenId)
+            val fresh = result.getOrNull()
+            val cached = if (fresh == null) stockCache.load(kitchenId) else null
+            when {
+                fresh != null -> {
+                    runCatching { stockCache.save(kitchenId, fresh, clock()) }
+                    _uiState.update { it.copy(offlineMessage = null) }
+                    showItems(fresh)
                 }
+                cached != null -> {
+                    _uiState.update { it.copy(offlineMessage = cached.savedAt.toOfflineMessage()) }
+                    showItems(cached.items)
+                }
+                else ->
+                    _uiState.update {
+                        it.copy(isLoading = false, errorMessage = result.exceptionOrNull()?.message)
+                    }
+            }
         }
     }
 
@@ -151,6 +169,7 @@ class StockListViewModel(
                     StockListViewModel(
                         authRepository = application.container.authRepository,
                         stockRepository = application.container.stockRepository,
+                        stockCache = application.container.stockCache,
                     )
                 }
             }
@@ -158,6 +177,13 @@ class StockListViewModel(
 }
 
 private const val NO_CATEGORY = "Sem categoria"
+private val savedAtFormatter = DateTimeFormatter.ofPattern("dd/MM 'às' HH:mm")
+
+private fun Long.toOfflineMessage(): String {
+    val savedAt = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault())
+    return "Sem conexão. Mostrando o estoque salvo em ${savedAt.format(savedAtFormatter)}."
+}
+
 private const val EXPIRING_SOON_DAYS = 7
 
 private val quantityFormat = DecimalFormat("#,##0.###", DecimalFormatSymbols(Locale.forLanguageTag("pt-BR")))
