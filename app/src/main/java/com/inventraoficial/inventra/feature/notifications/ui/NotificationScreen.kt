@@ -196,7 +196,7 @@ private fun NotificationTarget.toScreen(): Screen =
     when (this) {
         is NotificationTarget.Product -> Screen.StockDetail(productId)
         is NotificationTarget.Requisition -> Screen.RequisitionDetail(requisitionId)
-        NotificationTarget.Members -> Screen.ManageMembers
+        NotificationTarget.Members -> Screen.Team
         is NotificationTarget.NewProduct -> Screen.ProductCreate(barcode)
     }
 

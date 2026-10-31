@@ -25,7 +25,12 @@ class FakeMembersRepository(
     override suspend fun pendingRequests(): Result<List<KitchenAccessRequestResponse>> =
         pendingError?.let { Result.failure(it) } ?: Result.success(pending.toList())
 
-    override suspend fun members(): Result<List<UserResponse>> = Result.success(members.toList())
+    var membersError: Exception? = null
+
+    override suspend fun members(): Result<List<UserResponse>> {
+        membersError?.let { return Result.failure(it) }
+        return Result.success(members.toList())
+    }
 
     override suspend fun approve(requestId: String): Result<KitchenAccessRequestResponse> {
         approveError?.let { return Result.failure(it) }

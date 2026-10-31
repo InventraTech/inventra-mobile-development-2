@@ -42,8 +42,8 @@ import com.inventraoficial.inventra.feature.home.ui.HomeRoute
 import com.inventraoficial.inventra.feature.notifications.ui.NotificationRoute
 import com.inventraoficial.inventra.feature.prelist.detail.ui.PreListDetailRoute
 import com.inventraoficial.inventra.feature.profile.details.ui.ProfileDetailsRoute
-import com.inventraoficial.inventra.feature.profile.members.ui.ManageMembersRoute
 import com.inventraoficial.inventra.feature.profile.preferences.ui.AccountPreferencesRoute
+import com.inventraoficial.inventra.feature.profile.team.ui.TeamRoute
 import com.inventraoficial.inventra.feature.profile.ui.ProfileRoute
 import com.inventraoficial.inventra.feature.requirements.detail.ui.RequisitionDetailRoute
 import com.inventraoficial.inventra.feature.requirements.editor.ui.RequisitionEditorRoute
@@ -56,6 +56,7 @@ import com.inventraoficial.inventra.feature.stock.list.ui.StockListRoute
 import com.inventraoficial.inventra.feature.stock.productcreate.ui.ProductCreateRoute
 import com.inventraoficial.inventra.feature.stock.stockentry.ui.StockEntryRoute
 import com.inventraoficial.inventra.feature.stock.stockout.ui.StockOutRoute
+import com.inventraoficial.inventra.feature.suppliers.create.ui.SupplierCreateRoute
 import com.inventraoficial.inventra.feature.suppliers.detail.ui.SupplierDetailRoute
 import com.inventraoficial.inventra.feature.suppliers.list.ui.SupplierRoute
 import com.inventraoficial.inventra.ui.event.LocalClickTracker
@@ -181,6 +182,9 @@ private fun AppNavigation(
                     entry<Screen.SupplierDetail> { key ->
                         SupplierDetailRoute(supplierId = key.supplierId, navigator = navigator)
                     }
+                    entry<Screen.SupplierCreate> {
+                        SupplierCreateRoute(navigator = navigator)
+                    }
                     entry<Screen.Scan> {
                         ScanRoute(navigator = navigator)
                     }
@@ -232,8 +236,8 @@ private fun AppNavigation(
                     entry<Screen.ProfileDetails> {
                         ProfileDetailsRoute(navigator = navigator)
                     }
-                    entry<Screen.ManageMembers> {
-                        ManageMembersRoute(navigator = navigator)
+                    entry<Screen.Team> {
+                        TeamRoute(navigator = navigator)
                     }
                     entry<Screen.AccountPreferences> {
                         AccountPreferencesRoute(navigator = navigator)

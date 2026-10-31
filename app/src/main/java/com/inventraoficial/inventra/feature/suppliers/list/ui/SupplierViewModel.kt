@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.data.remote.dto.supplier.SupplierResponse
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.SupplierRepository
@@ -145,7 +144,7 @@ private fun SupplierSort.comparator(): Comparator<SupplierResponse> {
 private fun SupplierResponse.toSupplier() =
     Supplier(
         id = id,
-        imageRes = R.drawable.ic_inventra_logo,
+        photoUrl = photoUrl,
         name = legalName,
         rating = rating ?: 0,
         badgeText = cnpj,

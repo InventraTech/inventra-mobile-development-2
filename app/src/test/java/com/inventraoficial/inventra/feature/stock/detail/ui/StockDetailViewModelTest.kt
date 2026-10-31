@@ -144,6 +144,22 @@ class StockDetailViewModelTest {
             assertEquals("Italac · Laticínios", state.productDetails)
             assertEquals(listOf(leiteId), productRepository.calls)
             assertEquals(listOf<Int?>(leiteId), stockRepository.batchesProductIds)
+            assertNull(state.productPhotoUrl)
+        }
+
+    @Test
+    fun `mostra a foto do produto quando a API manda`() =
+        runTest(testDispatcher) {
+            val foto = "https://images.openfoodfacts.org/images/products/789/808/064/0017/front_pt.jpg"
+            productRepository =
+                FakeProductRepository(
+                    products = listOf(FakeProductRepository.product(leiteId, "Leite Integral").copy(photoUrl = foto)),
+                )
+
+            val viewModel = createVisibleViewModel()
+            advanceUntilIdle()
+
+            assertEquals(foto, viewModel.uiState.value.productPhotoUrl)
         }
 
     @Test
@@ -198,6 +214,7 @@ class StockDetailViewModelTest {
             advanceUntilIdle()
 
             assertEquals("Italac Distribuidora", viewModel.uiState.value.supplier)
+            assertEquals(2, viewModel.uiState.value.supplierId)
         }
 
     @Test
@@ -208,6 +225,7 @@ class StockDetailViewModelTest {
             advanceUntilIdle()
 
             assertEquals("Atacadão", viewModel.uiState.value.supplier)
+            assertEquals(9, viewModel.uiState.value.supplierId)
         }
 
     @Test
@@ -234,6 +252,7 @@ class StockDetailViewModelTest {
             assertTrue(state.batches.isEmpty())
             assertNull(state.seeAllBatchesText)
             assertEquals("Sem fornecedor informado", state.supplier)
+            assertNull(state.supplierId)
         }
 
     @Test
@@ -262,8 +281,8 @@ class StockDetailViewModelTest {
             assertEquals(listOf(StockMovementType.WRITE_OFF), stockRepository.movementsCalls)
             assertEquals(
                 listOf(
-                    HistoryEntry("12/10/2026 14:30", "Mauro Rosa · Uso", "−6 L · lote QA-01"),
-                    HistoryEntry("12/10/2026 14:30", "Sistema · Requisição", "−1,5 L · lote QA-01"),
+                    HistoryEntry("Mauro Rosa · Uso", "12/10/2026 14:30 · lote QA-01", "−6 L"),
+                    HistoryEntry("Sistema · Requisição", "12/10/2026 14:30 · lote QA-01", "−1,5 L"),
                 ),
                 history.entries,
             )
@@ -280,7 +299,7 @@ class StockDetailViewModelTest {
             viewModel.onEntriesClick()
             advanceUntilIdle()
             assertEquals(
-                listOf(HistoryEntry("12/10/2026 14:30", "Mauro Rosa", "+12 L · lote QA-01")),
+                listOf(HistoryEntry("Mauro Rosa", "12/10/2026 14:30 · lote QA-01", "+12 L")),
                 viewModel.uiState.value.history
                     ?.entries,
             )

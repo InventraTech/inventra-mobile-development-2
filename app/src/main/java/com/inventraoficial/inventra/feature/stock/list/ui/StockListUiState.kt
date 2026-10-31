@@ -2,7 +2,7 @@ package com.inventraoficial.inventra.feature.stock.list.ui
 
 data class Product(
     val id: Int,
-    val imageRes: Int,
+    val photoUrl: String?,
     val title: String,
     val quantity: String,
     val batchInfo: String,

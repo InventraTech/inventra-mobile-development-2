@@ -23,13 +23,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraProductRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWithFilter
@@ -129,7 +127,7 @@ fun StockListScreen(
                         ) {
                             items(products, key = { it.id }) { product ->
                                 InventraProductRow(
-                                    painter = painterResource(product.imageRes),
+                                    photoUrl = product.photoUrl,
                                     title = product.title,
                                     quantity = product.quantity,
                                     batchInfo = product.batchInfo,
@@ -253,8 +251,8 @@ private fun StockListScreenPreview() {
         onFilterSelect = {},
         products =
             listOf(
-                Product(1, R.drawable.ic_inventra_logo, "Leite Integral", "18 L", "3 lotes", "Laticínios"),
-                Product(2, R.drawable.ic_inventra_logo, "Arroz Camil", "2 kg", "1 lote · abaixo do mínimo", "Grãos"),
+                Product(1, null, "Leite Integral", "18 L", "3 lotes", "Laticínios"),
+                Product(2, null, "Arroz Camil", "2 kg", "1 lote · abaixo do mínimo", "Grãos"),
             ),
         isLoading = false,
         errorMessage = null,

@@ -1,6 +1,5 @@
 package com.inventraoficial.inventra.feature.stock.detail.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -23,27 +23,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraProductImage
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraDeliveryHistoryRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatch
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatchesCard
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraHistorySection
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraImageViewer
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTotalCard
@@ -54,6 +55,7 @@ import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraInk
 import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
+import com.inventraoficial.inventra.ui.theme.InventraSuccess
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
@@ -116,16 +118,21 @@ private fun DetailContent(
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        Image(
-            painter = painterResource(id = uiState.productImageRes),
-            contentDescription = uiState.productName,
-            contentScale = ContentScale.Crop,
+        var isPhotoExpanded by rememberSaveable { mutableStateOf(false) }
+        val photoUrl = uiState.productPhotoUrl
+        InventraProductImage(
+            photoUrl = photoUrl,
+            shape = RoundedCornerShape(16.dp),
+            iconSize = 56.dp,
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
-                    .clip(RoundedCornerShape(16.dp)),
+                    .height(220.dp)
+                    .clickable(enabled = photoUrl != null) { isPhotoExpanded = true },
         )
+        if (isPhotoExpanded && photoUrl != null) {
+            InventraImageViewer(photoUrl = photoUrl, onDismiss = { isPhotoExpanded = false })
+        }
         uiState.productDetails?.let {
             Text(text = it, fontFamily = Montserrat, fontSize = 14.sp, color = InventraMuted)
         }
@@ -142,13 +149,10 @@ private fun DetailContent(
                 seeAllText = uiState.seeAllBatchesText,
             )
         }
-        InventraLabeledField(
-            label = "Fornecedor",
-            value = uiState.supplier,
-            onValueChange = {},
-            readOnly = true,
-            placeholder = "",
-            modifier = Modifier.fillMaxWidth(),
+        SupplierField(
+            name = uiState.supplier,
+            supplierId = uiState.supplierId,
+            onClick = actions.onSupplierClick,
         )
         InventraHistorySection(
             onEntriesClick = actions.onEntriesClick,
@@ -174,6 +178,40 @@ private fun DetailContent(
 }
 
 @Composable
+private fun SupplierField(
+    name: String,
+    supplierId: Int?,
+    onClick: (Int) -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        InventraLabeledField(
+            label = "Fornecedor",
+            value = name,
+            onValueChange = {},
+            readOnly = true,
+            placeholder = "",
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (supplierId != null) {
+            Box(
+                modifier =
+                    Modifier
+                        .matchParentSize()
+                        .clickable { onClick(supplierId) },
+                contentAlignment = Alignment.BottomEnd,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "Ver fornecedor",
+                    tint = InventraPurple,
+                    modifier = Modifier.padding(end = 12.dp, bottom = 16.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun HistoryList(history: HistoryState) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -193,9 +231,10 @@ private fun HistoryList(history: HistoryState) {
             else ->
                 history.entries.forEach { entry ->
                     InventraDeliveryHistoryRow(
-                        date = entry.date,
-                        productName = entry.title,
+                        title = entry.title,
+                        subtitle = entry.detail,
                         quantityLabel = entry.quantityLabel,
+                        quantityColor = if (history.type == HistoryType.Entries) InventraSuccess else InventraDanger,
                     )
                 }
         }
@@ -261,6 +300,7 @@ fun StockDetailRoute(
                 onStockEntryClick = { navigator.navigate(Screen.StockEntry(productId)) },
                 onStockOutClick = { navigator.navigate(Screen.StockOut(productId)) },
                 onEditClick = { navigator.navigate(Screen.ProductEdit(productId)) },
+                onSupplierClick = { supplierId -> navigator.navigate(Screen.SupplierDetail(supplierId)) },
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },
             ),
@@ -275,7 +315,7 @@ private fun StockDetailScreenPreview() {
     StockDetailScreen(
         uiState =
             StockDetailUiState(
-                productImageRes = R.drawable.ic_inventra_logo,
+                productPhotoUrl = null,
                 productName = "Leite Integral",
                 canEdit = true,
                 productDetails = "Italac · Laticínios",
@@ -291,7 +331,7 @@ private fun StockDetailScreenPreview() {
                 history =
                     HistoryState(
                         type = HistoryType.Exits,
-                        entries = listOf(HistoryEntry("12/10/2026 14:30", "Mauro Rosa · Uso", "−6 L · lote QA-01")),
+                        entries = listOf(HistoryEntry("Mauro Rosa · Uso", "12/10/2026 14:30 · lote QA-01", "−6 L")),
                     ),
             ),
         actions = StockDetailActions(),

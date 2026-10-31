@@ -2,6 +2,8 @@ package com.inventraoficial.inventra.feature.stock.edit.ui
 
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormActions
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
+import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoActions
+import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoState
 
 data class ProductEditUiState(
     val isLoading: Boolean = true,
@@ -13,25 +15,17 @@ data class ProductEditUiState(
     val photo: ProductPhotoState = ProductPhotoState(),
 )
 
-data class ProductPhotoState(
-    val url: String? = null,
-    val isSheetVisible: Boolean = false,
-    val isUploading: Boolean = false,
-    val errorMessage: String? = null,
-)
-
 data class ProductEditActions(
     val form: ProductFormActions,
     val photo: ProductPhotoActions = ProductPhotoActions(),
     val onSaveClick: () -> Unit,
     val onRetryClick: () -> Unit,
     val onBackClick: () -> Unit,
+    val deactivate: ProductDeactivateActions = ProductDeactivateActions(),
 )
 
-data class ProductPhotoActions(
-    val onPhotoClick: () -> Unit = {},
-    val onSheetDismiss: () -> Unit = {},
-    val onPickClick: () -> Unit = {},
-    val onCameraClick: () -> Unit = {},
-    val onRemoveClick: () -> Unit = {},
+data class ProductDeactivateActions(
+    val onDeactivateClick: () -> Unit = {},
+    val onConfirm: () -> Unit = {},
+    val onDismiss: () -> Unit = {},
 )

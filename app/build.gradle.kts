@@ -20,7 +20,7 @@ val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: System.g
 val apiBaseUrl: String =
     localProperties.getProperty("API_BASE_URL")
         ?: System.getenv("API_BASE_URL")
-        ?: "https://ms-inventra-api.onrender.com/api/"
+        ?: "http://34.201.182.193/api/"
 
 android {
     namespace = "com.inventraoficial.inventra"

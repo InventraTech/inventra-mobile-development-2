@@ -6,8 +6,11 @@ import android.graphics.ImageDecoder
 import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.nio.ByteBuffer
 
 fun interface ImageCompressor {
     suspend fun compress(uri: String): Result<ByteArray>
@@ -15,6 +18,7 @@ fun interface ImageCompressor {
 
 class AndroidImageCompressor(
     private val context: Context,
+    private val httpClient: OkHttpClient,
 ) : ImageCompressor {
     override suspend fun compress(uri: String): Result<ByteArray> =
         withContext(Dispatchers.IO) {
@@ -28,7 +32,12 @@ class AndroidImageCompressor(
         }
 
     private fun decodeAndCompress(uri: String): ByteArray {
-        val source = ImageDecoder.createSource(context.contentResolver, uri.toUri())
+        val source =
+            if (uri.startsWith(HTTPS)) {
+                ImageDecoder.createSource(ByteBuffer.wrap(download(uri)))
+            } else {
+                ImageDecoder.createSource(context.contentResolver, uri.toUri())
+            }
         val bitmap =
             ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
                 val largestSide = maxOf(info.size.width, info.size.height)
@@ -45,7 +54,18 @@ class AndroidImageCompressor(
         }
     }
 
+    private fun download(url: String): ByteArray =
+        httpClient.newCall(Request.Builder().url(url).build()).execute().use { response ->
+            val body = response.body
+            if (!response.isSuccessful || body.contentLength() > MAX_DOWNLOAD_BYTES) {
+                throw IOException("Download da imagem falhou: HTTP ${response.code}")
+            }
+            body.bytes()
+        }
+
     private companion object {
+        const val HTTPS = "https://"
+        const val MAX_DOWNLOAD_BYTES = 10L * 1024 * 1024
         const val MAX_SIDE = 1024
         const val JPEG_QUALITY = 85
         const val READ_ERROR = "Não foi possível ler a imagem escolhida."

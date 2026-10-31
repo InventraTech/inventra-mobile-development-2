@@ -1,10 +1,9 @@
 package com.inventraoficial.inventra.feature.stock.detail.ui
 
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatch
 
 data class StockDetailUiState(
-    val productImageRes: Int = R.drawable.ic_inventra_logo,
+    val productPhotoUrl: String? = null,
     val productName: String = "",
     val productDetails: String? = null,
     val totalValue: String = "",
@@ -12,6 +11,7 @@ data class StockDetailUiState(
     val batches: List<InventraBatch> = emptyList(),
     val seeAllBatchesText: String? = null,
     val supplier: String = "",
+    val supplierId: Int? = null,
     val history: HistoryState? = null,
     val canEdit: Boolean = false,
     val isLoading: Boolean = false,
@@ -34,8 +34,8 @@ enum class HistoryType(
 }
 
 data class HistoryEntry(
-    val date: String,
     val title: String,
+    val detail: String,
     val quantityLabel: String,
 )
 
@@ -46,6 +46,7 @@ data class StockDetailActions(
     val onStockEntryClick: () -> Unit = {},
     val onStockOutClick: () -> Unit = {},
     val onEditClick: () -> Unit = {},
+    val onSupplierClick: (Int) -> Unit = {},
     val onRetryClick: () -> Unit = {},
     val onBackClick: () -> Unit = {},
 )

@@ -1,27 +1,17 @@
 package com.inventraoficial.inventra.feature.stock.edit.ui
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,16 +27,22 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
-import com.inventraoficial.inventra.core.designsystem.atoms.InventraProductImage
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
+import com.inventraoficial.inventra.core.designsystem.molecules.InventraConfirmDialog
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPickerOption
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
-import com.inventraoficial.inventra.feature.profile.photo.ui.ProfilePhotoSheet
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormActions
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormFields
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
+import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoField
+import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoOptions
+import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoState
+import com.inventraoficial.inventra.feature.stock.productform.productPhotoActions
+import com.inventraoficial.inventra.feature.suppliers.create.PickedSupplierEffect
 import com.inventraoficial.inventra.ui.navigation.Navigator
+import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraPurple
@@ -57,6 +53,7 @@ fun ProductEditScreen(
     uiState: ProductEditUiState,
     actions: ProductEditActions,
     modifier: Modifier = Modifier,
+    deactivate: ProductDeactivateUiState = ProductDeactivateUiState(),
 ) {
     Column(
         modifier =
@@ -116,71 +113,44 @@ fun ProductEditScreen(
                                 modifier = Modifier.weight(1f),
                             )
                         }
+                        DeactivateSection(state = deactivate, onClick = actions.deactivate.onDeactivateClick)
                     }
             }
         }
     }
 
-    if (uiState.photo.isSheetVisible) {
-        ProfilePhotoSheet(
-            hasPhoto = uiState.photo.url != null,
-            onPickClick = actions.photo.onPickClick,
-            onRemoveClick = actions.photo.onRemoveClick,
-            onDismiss = actions.photo.onSheetDismiss,
-            onCameraClick = actions.photo.onCameraClick,
+    ProductPhotoOptions(photo = uiState.photo, actions = actions.photo)
+    if (deactivate.isConfirmVisible) {
+        InventraConfirmDialog(
+            title = "Desativar ${uiState.form.name}?",
+            message =
+                "O produto sai do estoque e do catálogo de todas as cozinhas. " +
+                    "O histórico de entradas e saídas continua guardado.",
+            confirmText = "Desativar",
+            onConfirm = actions.deactivate.onConfirm,
+            onDismiss = actions.deactivate.onDismiss,
+            isDestructive = true,
         )
     }
 }
 
 @Composable
-private fun ProductPhotoField(
-    photo: ProductPhotoState,
+private fun DeactivateSection(
+    state: ProductDeactivateUiState,
     onClick: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(160.dp)
-                    .clickable(enabled = !photo.isUploading, onClick = onClick),
-            contentAlignment = Alignment.BottomEnd,
-        ) {
-            InventraProductImage(
-                photoUrl = photo.url,
-                shape = RoundedCornerShape(16.dp),
-                iconSize = 48.dp,
-                modifier = Modifier.fillMaxSize(),
-            )
-            Row(
-                modifier =
-                    Modifier
-                        .padding(10.dp)
-                        .background(InventraPurple, RoundedCornerShape(percent = 50))
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                if (photo.isUploading) {
-                    CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(14.dp))
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.PhotoCamera,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp),
-                    )
-                }
-                Text(
-                    text = if (photo.isUploading) "Enviando…" else "Trocar foto",
-                    color = Color.White,
-                    fontFamily = Montserrat,
-                    fontSize = 13.sp,
-                )
-            }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        if (state.isDeactivating) {
+            CircularProgressIndicator(color = InventraDanger)
+        } else {
+            InventraTextLink(text = "Desativar produto", onClick = onClick, color = InventraDanger)
         }
-        photo.errorMessage?.let {
-            Text(it, fontFamily = Montserrat, fontSize = 13.sp, color = InventraDanger)
+        state.errorMessage?.let {
+            Text(it, fontFamily = Montserrat, fontSize = 14.sp, color = InventraDanger)
         }
     }
 }
@@ -192,18 +162,29 @@ fun ProductEditRoute(
     viewModel: ProductEditViewModel =
         viewModel(key = "product-edit-$productId", factory = ProductEditViewModel.factory(productId)),
     modifier: Modifier = Modifier,
+    deactivateViewModel: ProductDeactivateViewModel =
+        viewModel(key = "product-deactivate-$productId", factory = ProductDeactivateViewModel.factory(productId)),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val deactivate by deactivateViewModel.uiState.collectAsState()
 
-    val photoPicker =
-        rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
-            viewModel.onPhotoPicked(uri?.toString())
+    LaunchedEffect(deactivate.isDeactivated) {
+        if (deactivate.isDeactivated) {
+            navigator.back()
+            if (navigator.currentBackStack.lastOrNull() == Screen.StockDetail(productId)) navigator.back()
         }
-    val openCamera =
-        rememberProductCamera(
-            onPhotoTaken = viewModel::onPhotoPicked,
-            onPermissionDenied = viewModel::onCameraDenied,
+    }
+
+    val photoActions =
+        productPhotoActions(
+            onPhotoClick = viewModel::onPhotoClick,
+            onSheetDismiss = viewModel::onPhotoSheetDismiss,
+            onPhotoPicked = viewModel::onPhotoPicked,
+            onCameraDenied = viewModel::onCameraDenied,
+            onRemoveClick = viewModel::onRemovePhotoClick,
         )
+
+    PickedSupplierEffect { viewModel.formActions.onSupplierCreated(it.id, it.name) }
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) navigator.back()
@@ -213,26 +194,20 @@ fun ProductEditRoute(
         uiState = uiState,
         actions =
             ProductEditActions(
-                form = viewModel.formActions,
-                photo =
-                    ProductPhotoActions(
-                        onPhotoClick = viewModel::onPhotoClick,
-                        onSheetDismiss = viewModel::onPhotoSheetDismiss,
-                        onPickClick = {
-                            viewModel.onPhotoSheetDismiss()
-                            photoPicker.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
-                        },
-                        onCameraClick = {
-                            viewModel.onPhotoSheetDismiss()
-                            openCamera()
-                        },
-                        onRemoveClick = viewModel::onRemovePhotoClick,
-                    ),
+                form = viewModel.formActions.copy(onNewSupplierClick = { navigator.navigate(Screen.SupplierCreate) }),
+                photo = photoActions,
                 onSaveClick = viewModel::onSaveClick,
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },
+                deactivate =
+                    ProductDeactivateActions(
+                        onDeactivateClick = deactivateViewModel::onDeactivateClick,
+                        onConfirm = deactivateViewModel::onConfirm,
+                        onDismiss = deactivateViewModel::onDismiss,
+                    ),
             ),
         modifier = modifier,
+        deactivate = deactivate,
     )
 }
 

@@ -42,6 +42,10 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormActions
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormFields
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
+import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoField
+import com.inventraoficial.inventra.feature.stock.productform.ProductPhotoOptions
+import com.inventraoficial.inventra.feature.stock.productform.productPhotoActions
+import com.inventraoficial.inventra.feature.suppliers.create.PickedSupplierEffect
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -114,6 +118,7 @@ fun ProductCreateScreen(
             }
         }
     }
+    ProductPhotoOptions(photo = uiState.photo, actions = actions.photo)
 }
 
 @Composable
@@ -143,6 +148,7 @@ private fun ProductForm(
                         .padding(12.dp),
             )
         }
+        ProductPhotoField(photo = uiState.photo, onClick = actions.photo.onPhotoClick)
         ProductFormFields(form = uiState.form, actions = actions.form)
         uiState.submitError?.let {
             Text(it, fontFamily = Montserrat, fontSize = 14.sp, color = InventraDanger)
@@ -163,7 +169,8 @@ private fun ProductCreateUiState.createdText(name: String): String {
         } else {
             "$name já está no catálogo e na lista do estoque."
         }
-    return "$stock Quer dar entrada agora?"
+    val photo = if (photoUploadFailed) " A foto não foi enviada; dá para colocar pelo Editar produto." else ""
+    return "$stock$photo Quer dar entrada agora?"
 }
 
 // Fim do fluxo: produto recém-cadastrado ou código que já estava no catálogo.
@@ -222,6 +229,15 @@ fun ProductCreateRoute(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val photoActions =
+        productPhotoActions(
+            onPhotoClick = viewModel::onPhotoClick,
+            onSheetDismiss = viewModel::onPhotoSheetDismiss,
+            onPhotoPicked = viewModel::onPhotoPicked,
+            onCameraDenied = viewModel::onCameraDenied,
+            onRemoveClick = viewModel::onRemovePhotoClick,
+        )
+    PickedSupplierEffect { viewModel.formActions.onSupplierCreated(it.id, it.name) }
 
     // Dar entrada e Ver produto tomam o lugar do cadastro: voltar dali leva para onde o cadastro começou.
     fun replaceWith(screen: Screen) {
@@ -233,7 +249,8 @@ fun ProductCreateRoute(
         uiState = uiState,
         actions =
             ProductCreateActions(
-                form = viewModel.formActions,
+                form = viewModel.formActions.copy(onNewSupplierClick = { navigator.navigate(Screen.SupplierCreate) }),
+                photo = photoActions,
                 onSaveClick = viewModel::onSaveClick,
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },

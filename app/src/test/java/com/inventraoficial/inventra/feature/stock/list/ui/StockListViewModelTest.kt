@@ -90,6 +90,25 @@ class StockListViewModelTest {
     }
 
     @Test
+    fun `mostra a foto do produto quando a API manda`() =
+        runTest(testDispatcher) {
+            val foto = "https://images.openfoodfacts.org/images/products/789/600/671/6112/front_pt.jpg"
+            stockRepository.kitchenStock =
+                listOf(
+                    stockItem(1, "Arroz Camil", "Grãos", totalQuantity = 24.0, activeBatches = 2).let {
+                        it.copy(product = it.product.copy(photoUrl = foto))
+                    },
+                    stockItem(2, "Sal Refinado", null, totalQuantity = 1.0, activeBatches = 1),
+                )
+
+            val viewModel = loadedViewModel()
+
+            val products = viewModel.uiState.value.products
+            assertEquals(foto, products.first { it.title == "Arroz Camil" }.photoUrl)
+            assertNull(products.first { it.title == "Sal Refinado" }.photoUrl)
+        }
+
+    @Test
     fun `carrega o estoque da cozinha do usuario em ordem alfabetica`() =
         runTest(testDispatcher) {
             val viewModel = createVisibleViewModel()
