@@ -13,6 +13,7 @@ import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupRespons
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeSource
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
+import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
@@ -62,14 +63,22 @@ class ProductCreateViewModel(
         _uiState.update { it.copy(categoryId = categoryId) }
     }
 
+    fun onMinStockChange(minStock: String) {
+        if (minStock.matches(decimalInput)) {
+            _uiState.update { it.copy(minStock = minStock, submitError = null) }
+        }
+    }
+
     fun onSaveClick() {
         val state = _uiState.value
         if (state.isSubmitting) return
         val unitId = state.unitId
+        val minStock = state.minStock.toDecimal()
         val error =
             when {
                 state.name.isBlank() -> "Informe o nome do produto"
                 unitId == null -> "Escolha a unidade de medida"
+                state.minStock.isNotBlank() && minStock == null -> "Informe o estoque mínimo só com números"
                 else -> null
             }
         if (error != null || unitId == null) {
@@ -90,13 +99,28 @@ class ProductCreateViewModel(
             productRepository
                 .create(request)
                 .onSuccess { product ->
+                    val linked = linkToKitchen(product.id, minStock)
                     _uiState.update {
-                        it.copy(isSubmitting = false, createdProduct = SavedProduct(product.id, product.name))
+                        it.copy(
+                            isSubmitting = false,
+                            createdProduct = SavedProduct(product.id, product.name),
+                            kitchenLinkFailed = !linked,
+                        )
                     }
                 }.onFailure { failure ->
                     _uiState.update { it.copy(isSubmitting = false, submitError = failure.message) }
                 }
         }
+    }
+
+    private suspend fun linkToKitchen(
+        productId: Int,
+        minStock: Double?,
+    ): Boolean {
+        val kitchenId = authRepository.currentUser.first()?.kitchenId ?: return false
+        return productRepository
+            .setKitchenParameters(productId, KitchenParametersRequest(kitchenId, minStock))
+            .isSuccess
     }
 
     private fun load() {
@@ -154,6 +178,10 @@ class ProductCreateViewModel(
 private const val MAX_NAME_LENGTH = 150
 private const val MAX_BRAND_LENGTH = 80
 private const val MAX_BARCODE_LENGTH = 50
+
+private val decimalInput = Regex("^\\d{0,9}([.,]\\d{0,3})?$")
+
+private fun String.toDecimal(): Double? = trim().replace(',', '.').toDoubleOrNull()
 
 // Unidades simples (KG, L, UN...) primeiro; as embalagens com tamanho no código (CX500G...) depois.
 private fun List<UnitResponse>.toUnitOptions(): List<InventraPickerOption> =

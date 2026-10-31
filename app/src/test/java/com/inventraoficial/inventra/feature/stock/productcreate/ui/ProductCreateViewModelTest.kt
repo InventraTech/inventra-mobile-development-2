@@ -5,6 +5,7 @@ import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupResponse
 import com.inventraoficial.inventra.data.remote.dto.product.BarcodeSource
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
+import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.OpenFoodFactsSuggestion
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.FakeProductRepository
@@ -231,6 +232,81 @@ class ProductCreateViewModelTest {
             )
             assertEquals(SavedProduct(99, "Coca-Cola 2L"), viewModel.uiState.value.createdProduct)
             assertFalse(viewModel.uiState.value.isSubmitting)
+        }
+
+    @Test
+    fun `produto cadastrado fica ligado a cozinha com o estoque minimo`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onNameChange("Ketchup")
+            viewModel.onUnitSelect(6)
+            viewModel.onMinStockChange("2,5")
+            viewModel.onSaveClick()
+            advanceUntilIdle()
+
+            assertEquals(listOf(99 to KitchenParametersRequest(7, 2.5)), productRepository.kitchenParametersCalls)
+            assertFalse(viewModel.uiState.value.kitchenLinkFailed)
+        }
+
+    @Test
+    fun `sem estoque minimo liga a cozinha mesmo assim`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onNameChange("Ketchup")
+            viewModel.onUnitSelect(6)
+            viewModel.onSaveClick()
+            advanceUntilIdle()
+
+            assertEquals(listOf(99 to KitchenParametersRequest(7, null)), productRepository.kitchenParametersCalls)
+        }
+
+    @Test
+    fun `estoque minimo so aceita numero com ate tres casas`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onMinStockChange("10a")
+            viewModel.onMinStockChange("1,2345")
+            assertEquals("", viewModel.uiState.value.minStock)
+
+            viewModel.onMinStockChange("1,234")
+            assertEquals("1,234", viewModel.uiState.value.minStock)
+        }
+
+    @Test
+    fun `estoque minimo so com a virgula nao deixa salvar`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onNameChange("Ketchup")
+            viewModel.onUnitSelect(6)
+            viewModel.onMinStockChange(",")
+            viewModel.onSaveClick()
+
+            assertEquals("Informe o estoque mínimo só com números", viewModel.uiState.value.submitError)
+            assertTrue(productRepository.createRequests.isEmpty())
+        }
+
+    @Test
+    fun `falha ao ligar a cozinha ainda mostra o produto cadastrado`() =
+        runTest(testDispatcher) {
+            productRepository.kitchenParametersResult = Result.failure(Exception("Erro"))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onNameChange("Ketchup")
+            viewModel.onUnitSelect(6)
+            viewModel.onSaveClick()
+            advanceUntilIdle()
+
+            assertEquals(SavedProduct(99, "Ketchup"), viewModel.uiState.value.createdProduct)
+            assertTrue(viewModel.uiState.value.kitchenLinkFailed)
         }
 
     @Test
