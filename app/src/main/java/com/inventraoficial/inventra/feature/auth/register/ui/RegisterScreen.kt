@@ -3,7 +3,7 @@ package com.inventraoficial.inventra.feature.auth.register.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -36,10 +37,12 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraRoleSele
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUserRole
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraAuthHeader
 import com.inventraoficial.inventra.data.event.UiClick
+import com.inventraoficial.inventra.feature.auth.AuthContentMaxWidth
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInButton
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInHost
 import com.inventraoficial.inventra.feature.auth.google.ui.GoogleSignInViewModel
 import com.inventraoficial.inventra.feature.auth.google.ui.rememberGoogleSignInClick
+import com.inventraoficial.inventra.feature.auth.topShapeSize
 import com.inventraoficial.inventra.ui.event.LocalClickTracker
 import com.inventraoficial.inventra.ui.event.tracked
 import com.inventraoficial.inventra.ui.navigation.Navigator
@@ -70,7 +73,7 @@ fun RegisterScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    Box(
+    BoxWithConstraints(
         modifier =
             Modifier
                 .fillMaxSize()
@@ -82,12 +85,14 @@ fun RegisterScreen(
             modifier =
                 Modifier
                     .align(Alignment.TopEnd)
-                    .size(200.dp)
+                    .size(topShapeSize(maxWidth))
                     .offset(0.dp, -30.dp),
         )
         Column(
             modifier =
                 modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = AuthContentMaxWidth)
                     .navigationBarsPadding()
                     .imePadding()
                     .verticalScroll(rememberScrollState())

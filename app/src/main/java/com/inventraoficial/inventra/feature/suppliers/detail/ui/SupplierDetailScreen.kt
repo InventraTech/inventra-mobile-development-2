@@ -38,6 +38,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraThumbnail
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraContactRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraDeliveryHistoryRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSupplierProductRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -83,78 +84,80 @@ fun SupplierDetailScreen(
                 )
             },
         )
-        when {
-            isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
-            errorMessage != null ->
-                ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
-            else ->
-                Column(
-                    modifier =
-                        Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                            .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        InventraScreenContent {
+            when {
+                isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
+                errorMessage != null ->
+                    ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
+                else ->
+                    Column(
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState())
+                                .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(24.dp),
                     ) {
-                        InventraThumbnail(
-                            painter = painterResource(imageRes),
-                            size = 64.dp,
-                            contentScale = ContentScale.Fit,
-                        )
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(
-                                text = name,
-                                fontFamily = Montserrat,
-                                fontWeight = FontWeight.Bold,
-                                color = InventraPurple,
-                                fontSize = 18.sp,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            InventraThumbnail(
+                                painter = painterResource(imageRes),
+                                size = 64.dp,
+                                contentScale = ContentScale.Fit,
                             )
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            ) {
-                                InventraStarRating(rating = rating)
-                                InventraBadge(text = badgeText)
-                            }
-                        }
-                    }
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        SectionTitle(text = "Contato")
-                        if (phone == null && email == null) EmptyText(text = "Nenhum contato cadastrado.")
-                        phone?.let { InventraContactRow(icon = Icons.Default.Call, text = it) }
-                        email?.let { InventraContactRow(icon = Icons.Default.Email, text = it) }
-                    }
-                    if (showsDeliveries) {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            SectionTitle(text = "Produtos fornecidos")
-                            if (products.isEmpty()) EmptyText(text = "Nenhum produto entregue nesta cozinha.")
-                            products.forEach { product ->
-                                InventraSupplierProductRow(
-                                    name = product.name,
-                                    infoText = product.infoText,
-                                    modifier = Modifier.fillMaxWidth(),
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    text = name,
+                                    fontFamily = Montserrat,
+                                    fontWeight = FontWeight.Bold,
+                                    color = InventraPurple,
+                                    fontSize = 18.sp,
                                 )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                ) {
+                                    InventraStarRating(rating = rating)
+                                    InventraBadge(text = badgeText)
+                                }
                             }
                         }
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            SectionTitle(text = "Histórico de entregas")
-                            if (deliveryHistory.isEmpty()) EmptyText(text = "Nenhuma entrega registrada.")
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                deliveryHistory.forEach { entry ->
-                                    InventraDeliveryHistoryRow(
-                                        date = entry.date,
-                                        productName = entry.productName,
-                                        quantityLabel = entry.quantityLabel,
+                            SectionTitle(text = "Contato")
+                            if (phone == null && email == null) EmptyText(text = "Nenhum contato cadastrado.")
+                            phone?.let { InventraContactRow(icon = Icons.Default.Call, text = it) }
+                            email?.let { InventraContactRow(icon = Icons.Default.Email, text = it) }
+                        }
+                        if (showsDeliveries) {
+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                SectionTitle(text = "Produtos fornecidos")
+                                if (products.isEmpty()) EmptyText(text = "Nenhum produto entregue nesta cozinha.")
+                                products.forEach { product ->
+                                    InventraSupplierProductRow(
+                                        name = product.name,
+                                        infoText = product.infoText,
+                                        modifier = Modifier.fillMaxWidth(),
                                     )
+                                }
+                            }
+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                SectionTitle(text = "Histórico de entregas")
+                                if (deliveryHistory.isEmpty()) EmptyText(text = "Nenhuma entrega registrada.")
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    deliveryHistory.forEach { entry ->
+                                        InventraDeliveryHistoryRow(
+                                            date = entry.date,
+                                            productName = entry.productName,
+                                            quantityLabel = entry.quantityLabel,
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                }
+            }
         }
     }
 }

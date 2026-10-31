@@ -27,6 +27,7 @@ import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWithFilter
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSupplierRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
@@ -65,45 +66,47 @@ fun SupplierScreen(
                 )
             },
         )
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(16.dp),
-        ) {
-            InventraSearchWithFilter(
-                query = searchQuery,
-                onQueryChange = onSearchQueryChange,
-                onFilterClick = onFilterIconClick,
-                placeholder = "Buscar fornecedor...",
-                activeFilterCount = activeFilterCount,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
-            when {
-                isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
-                errorMessage != null ->
-                    ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
-                suppliers.isEmpty() ->
-                    Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Nenhum fornecedor encontrado.",
-                            fontFamily = Montserrat,
-                            fontSize = 14.sp,
-                            color = InventraMuted,
-                        )
-                    }
-                else ->
-                    LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        items(suppliers, key = { it.id }) { supplier ->
-                            InventraSupplierRow(
-                                painter = painterResource(supplier.imageRes),
-                                name = supplier.name,
-                                rating = supplier.rating,
-                                badgeText = supplier.badgeText,
-                                onClick = { onSupplierClick(supplier) },
+        InventraScreenContent {
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .padding(16.dp),
+            ) {
+                InventraSearchWithFilter(
+                    query = searchQuery,
+                    onQueryChange = onSearchQueryChange,
+                    onFilterClick = onFilterIconClick,
+                    placeholder = "Buscar fornecedor...",
+                    activeFilterCount = activeFilterCount,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+                when {
+                    isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
+                    errorMessage != null ->
+                        ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
+                    suppliers.isEmpty() ->
+                        Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "Nenhum fornecedor encontrado.",
+                                fontFamily = Montserrat,
+                                fontSize = 14.sp,
+                                color = InventraMuted,
                             )
                         }
-                    }
+                    else ->
+                        LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            items(suppliers, key = { it.id }) { supplier ->
+                                InventraSupplierRow(
+                                    painter = painterResource(supplier.imageRes),
+                                    name = supplier.name,
+                                    rating = supplier.rating,
+                                    badgeText = supplier.badgeText,
+                                    onClick = { onSupplierClick(supplier) },
+                                )
+                            }
+                        }
+                }
             }
         }
     }

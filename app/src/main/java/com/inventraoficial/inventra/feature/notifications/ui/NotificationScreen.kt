@@ -30,6 +30,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraFilterChipRow
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraGroupedNotifications
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraNotification
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
@@ -74,56 +75,61 @@ fun NotificationScreen(
                 )
             },
         )
-        when {
-            isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
-            errorMessage != null ->
-                ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
-            else ->
-                Column(
-                    modifier =
-                        Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                            .padding(16.dp),
-                ) {
-                    InventraFilterChipRow(
-                        options = NotificationFilter.entries.map { it.label },
-                        selected = selectedFilter.label,
-                        onSelect = { label -> onFilterSelect(NotificationFilter.entries.first { it.label == label }) },
-                    )
-                    if (hasUnread) {
+        InventraScreenContent {
+            when {
+                isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
+                errorMessage != null ->
+                    ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
+                else ->
+                    Column(
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState())
+                                .padding(16.dp),
+                    ) {
+                        InventraFilterChipRow(
+                            options = NotificationFilter.entries.map { it.label },
+                            selected = selectedFilter.label,
+                            onSelect = { label ->
+                                onFilterSelect(NotificationFilter.entries.first { it.label == label })
+                            },
+                        )
+                        if (hasUnread) {
+                            InventraTextLink(
+                                text = "Marcar todas como lidas",
+                                onClick = onMarkAllReadClick,
+                                modifier =
+                                    Modifier
+                                        .padding(top = 12.dp)
+                                        .align(Alignment.End),
+                            )
+                        }
+                        if (groupedNotifications.isEmpty()) {
+                            Text(
+                                text =
+                                    if (isHistoryExpanded) "Nenhuma notificação." else "Nenhuma notificação recente.",
+                                fontFamily = Montserrat,
+                                fontSize = 14.sp,
+                                color = InventraMuted,
+                                modifier = Modifier.padding(vertical = 12.dp),
+                            )
+                        }
+                        InventraGroupedNotifications(
+                            groups = groupedNotifications,
+                            onNotificationClick = onNotificationClick,
+                        )
                         InventraTextLink(
-                            text = "Marcar todas como lidas",
-                            onClick = onMarkAllReadClick,
+                            text = if (isHistoryExpanded) "Ver menos" else "Ver todas",
+                            onClick = onSeeAllClick,
+                            showArrow = !isHistoryExpanded,
                             modifier =
                                 Modifier
                                     .padding(top = 12.dp)
                                     .align(Alignment.End),
                         )
                     }
-                    if (groupedNotifications.isEmpty()) {
-                        Text(
-                            text = if (isHistoryExpanded) "Nenhuma notificação." else "Nenhuma notificação recente.",
-                            fontFamily = Montserrat,
-                            fontSize = 14.sp,
-                            color = InventraMuted,
-                            modifier = Modifier.padding(vertical = 12.dp),
-                        )
-                    }
-                    InventraGroupedNotifications(
-                        groups = groupedNotifications,
-                        onNotificationClick = onNotificationClick,
-                    )
-                    InventraTextLink(
-                        text = if (isHistoryExpanded) "Ver menos" else "Ver todas",
-                        onClick = onSeeAllClick,
-                        showArrow = !isHistoryExpanded,
-                        modifier =
-                            Modifier
-                                .padding(top = 12.dp)
-                                .align(Alignment.End),
-                    )
-                }
+            }
         }
     }
 }

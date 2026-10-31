@@ -27,6 +27,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraCloseButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.data.event.UiClick
 import com.inventraoficial.inventra.ui.event.LocalClickTracker
@@ -73,58 +74,60 @@ fun CreateCozinhaScreen(
                 )
             },
         )
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .imePadding()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-        ) {
-            InventraLabeledField(
-                label = "Nome da cozinha",
-                value = name,
-                onValueChange = onNameChange,
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = "Insira o nome da cozinha",
-            )
-            InventraLabeledField(
-                label = "Endereço",
-                value = address,
-                onValueChange = onAddressChange,
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = "Rua, número, bairro, cidade",
-            )
-            Text(
-                text =
-                    "Cadastre o estabelecimento que você vai gerenciar. " +
-                        "Você poderá convidar sua equipe assim que a cozinha for criada.",
-                fontFamily = Montserrat,
-                fontSize = 13.sp,
-                color = InventraMuted,
-            )
-            Text(
-                text = errorMessage.orEmpty(),
-                color = InventraDanger,
-                minLines = 1,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            InventraPrimaryButton(
-                text = "Criar cozinha",
-                onClick = {
-                    focusManager.clearFocus()
-                    keyboardController?.hide()
-                    onCreateClick()
-                },
-                isLoading = isLoading,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            InventraSecondaryButton(
-                text = "Cancelar",
-                onClick = onCloseClick,
-                modifier = Modifier.fillMaxWidth(),
-            )
+        InventraScreenContent {
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .imePadding()
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+            ) {
+                InventraLabeledField(
+                    label = "Nome da cozinha",
+                    value = name,
+                    onValueChange = onNameChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = "Insira o nome da cozinha",
+                )
+                InventraLabeledField(
+                    label = "Endereço",
+                    value = address,
+                    onValueChange = onAddressChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = "Rua, número, bairro, cidade",
+                )
+                Text(
+                    text =
+                        "Cadastre o estabelecimento que você vai gerenciar. " +
+                            "Você poderá convidar sua equipe assim que a cozinha for criada.",
+                    fontFamily = Montserrat,
+                    fontSize = 13.sp,
+                    color = InventraMuted,
+                )
+                Text(
+                    text = errorMessage.orEmpty(),
+                    color = InventraDanger,
+                    minLines = 1,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                InventraPrimaryButton(
+                    text = "Criar cozinha",
+                    onClick = {
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                        onCreateClick()
+                    },
+                    isLoading = isLoading,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                InventraSecondaryButton(
+                    text = "Cancelar",
+                    onClick = onCloseClick,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
     }
 }

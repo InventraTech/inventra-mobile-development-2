@@ -5,7 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -44,7 +44,7 @@ fun InventraChatInputBar(
             modifier =
                 Modifier
                     .weight(1f)
-                    .height(48.dp)
+                    .heightIn(min = 48.dp)
                     .border(1.5.dp, InventraPurple, RoundedCornerShape(12.dp)),
             decorationBox = { innerTextField ->
                 Box(

@@ -33,6 +33,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryBut
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraProductRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWithFilter
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraFilterChipRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
@@ -83,54 +84,56 @@ fun StockListScreen(
                 )
             },
         )
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(16.dp),
-        ) {
-            InventraSearchWithFilter(
-                query = searchQuery,
-                onQueryChange = onSearchQueryChange,
-                onFilterClick = onFilterIconClick,
-                placeholder = "Buscar produto...",
-                activeFilterCount = activeFilterCount,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
-            InventraFilterChipRow(
-                options = filterOptions,
-                selected = selectedFilter,
-                onSelect = onFilterSelect,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
-            when {
-                isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
-                errorMessage != null ->
-                    ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
-                products.isEmpty() ->
-                    Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Nenhum produto encontrado.",
-                            fontFamily = Montserrat,
-                            fontSize = 14.sp,
-                            color = InventraMuted,
-                        )
-                    }
-                else ->
-                    LazyColumn(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        items(products, key = { it.id }) { product ->
-                            InventraProductRow(
-                                painter = painterResource(product.imageRes),
-                                title = product.title,
-                                quantity = product.quantity,
-                                batchInfo = product.batchInfo,
-                                onClick = { onProductClick(product) },
+        InventraScreenContent {
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .padding(16.dp),
+            ) {
+                InventraSearchWithFilter(
+                    query = searchQuery,
+                    onQueryChange = onSearchQueryChange,
+                    onFilterClick = onFilterIconClick,
+                    placeholder = "Buscar produto...",
+                    activeFilterCount = activeFilterCount,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+                InventraFilterChipRow(
+                    options = filterOptions,
+                    selected = selectedFilter,
+                    onSelect = onFilterSelect,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+                when {
+                    isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
+                    errorMessage != null ->
+                        ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
+                    products.isEmpty() ->
+                        Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "Nenhum produto encontrado.",
+                                fontFamily = Montserrat,
+                                fontSize = 14.sp,
+                                color = InventraMuted,
                             )
                         }
-                    }
+                    else ->
+                        LazyColumn(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            items(products, key = { it.id }) { product ->
+                                InventraProductRow(
+                                    painter = painterResource(product.imageRes),
+                                    title = product.title,
+                                    quantity = product.quantity,
+                                    batchInfo = product.batchInfo,
+                                    onClick = { onProductClick(product) },
+                                )
+                            }
+                        }
+                }
             }
         }
     }
