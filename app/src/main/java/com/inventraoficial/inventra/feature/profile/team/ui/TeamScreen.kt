@@ -26,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraCloseButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraMemberRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -59,10 +60,12 @@ fun TeamScreen(
                 )
             },
         )
-        when {
-            uiState.isLoading -> CenteredLoading()
-            uiState.errorMessage != null -> ErrorState(message = uiState.errorMessage, onRetryClick = onRetryClick)
-            else -> TeamContent(members = uiState.members)
+        InventraScreenContent {
+            when {
+                uiState.isLoading -> CenteredLoading()
+                uiState.errorMessage != null -> ErrorState(message = uiState.errorMessage, onRetryClick = onRetryClick)
+                else -> TeamContent(members = uiState.members)
+            }
         }
     }
 }
