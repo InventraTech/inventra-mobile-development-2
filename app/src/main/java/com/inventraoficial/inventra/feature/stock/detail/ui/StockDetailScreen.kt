@@ -2,6 +2,7 @@ package com.inventraoficial.inventra.feature.stock.detail.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -74,6 +78,16 @@ fun StockDetailScreen(
                     fontFamily = Montserrat,
                     fontSize = 17.sp,
                 )
+            },
+            actions = {
+                if (uiState.canEdit) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Editar produto",
+                        tint = Color.White,
+                        modifier = Modifier.clickable(onClick = actions.onEditClick),
+                    )
+                }
             },
         )
         when {
@@ -243,6 +257,7 @@ fun StockDetailRoute(
                 onExitsClick = viewModel::onExitsClick,
                 onStockEntryClick = { navigator.navigate(Screen.StockEntry(productId)) },
                 onStockOutClick = { navigator.navigate(Screen.StockOut(productId)) },
+                onEditClick = { navigator.navigate(Screen.ProductEdit(productId)) },
                 onRetryClick = viewModel::onRetryClick,
                 onBackClick = { navigator.back() },
             ),
@@ -259,6 +274,7 @@ private fun StockDetailScreenPreview() {
             StockDetailUiState(
                 productImageRes = R.drawable.ic_inventra_logo,
                 productName = "Leite Integral",
+                canEdit = true,
                 productDetails = "Italac · Laticínios",
                 totalValue = "18 L",
                 totalCaption = "Em 3 lotes dentro da validade.",

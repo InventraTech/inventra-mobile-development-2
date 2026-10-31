@@ -4,8 +4,10 @@ import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupRespons
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
+import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersResponse
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
+import com.inventraoficial.inventra.data.remote.dto.product.UpdateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.stock.StockCategory
 import com.inventraoficial.inventra.data.remote.dto.stock.StockUnit
 
@@ -52,6 +54,25 @@ class FakeProductRepository(
         createRequests += request
         return createResult ?: Result.success(product(id = 99, name = request.name))
     }
+
+    var updateResult: Result<ProductResponse>? = null
+    var updateRequests = mutableListOf<Pair<Int, UpdateProductRequest>>()
+        private set
+
+    override suspend fun update(
+        productId: Int,
+        request: UpdateProductRequest,
+    ): Result<ProductResponse> {
+        updateRequests += productId to request
+        return updateResult ?: Result.success(product(id = productId, name = request.name))
+    }
+
+    var savedKitchenParameters: KitchenParametersResponse? = null
+
+    override suspend fun kitchenParameters(
+        productId: Int,
+        kitchenId: Int,
+    ): Result<KitchenParametersResponse?> = Result.success(savedKitchenParameters)
 
     var kitchenParametersResult: Result<Unit> = Result.success(Unit)
     var kitchenParametersCalls = mutableListOf<Pair<Int, KitchenParametersRequest>>()

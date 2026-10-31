@@ -4,9 +4,11 @@ import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupRespons
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
+import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersResponse
 import com.inventraoficial.inventra.data.remote.dto.product.PageProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
+import com.inventraoficial.inventra.data.remote.dto.product.UpdateProductRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -39,11 +41,22 @@ interface ProductApi {
         @Body request: CreateProductRequest,
     ): ProductResponse
 
+    @PUT("$PATH/{id}")
+    suspend fun update(
+        @Path("id") id: Int,
+        @Body request: UpdateProductRequest,
+    ): ProductResponse
+
     @PUT("$PATH/{id}/kitchen-parameters")
     suspend fun setKitchenParameters(
         @Path("id") id: Int,
         @Body request: KitchenParametersRequest,
     )
+
+    @GET("$PATH/{id}/kitchen-parameters")
+    suspend fun kitchenParameters(
+        @Path("id") id: Int,
+    ): List<KitchenParametersResponse>
 
     @GET("units")
     suspend fun units(): List<UnitResponse>

@@ -144,6 +144,17 @@ class StockDetailViewModelTest {
         }
 
     @Test
+    fun `so o supervisor ve o botao de editar`() =
+        runTest(testDispatcher) {
+            val estoquista = createVisibleViewModel()
+            val supervisor = createVisibleViewModel(user.copy(accessType = AccessType.SUPERVISOR))
+            advanceUntilIdle()
+
+            assertFalse(estoquista.uiState.value.canEdit)
+            assertTrue(supervisor.uiState.value.canEdit)
+        }
+
+    @Test
     fun `soma so os lotes ativos e dentro da validade`() =
         runTest(testDispatcher) {
             val viewModel = createVisibleViewModel()
