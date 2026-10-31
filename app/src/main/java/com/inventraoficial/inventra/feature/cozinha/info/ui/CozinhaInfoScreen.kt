@@ -41,6 +41,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSwitchRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.data.event.UiClick
 import com.inventraoficial.inventra.data.local.LOCATION_PERMISSIONS
@@ -89,22 +90,29 @@ fun CozinhaInfoScreen(
                 }
             },
         )
-        val contentModifier = Modifier.weight(1f).fillMaxWidth()
-        when {
-            uiState.isLoading ->
-                Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = InventraPurple)
-                }
-            uiState.errorMessage != null ->
-                Column(
-                    modifier = contentModifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(uiState.errorMessage, fontFamily = Montserrat, fontSize = 15.sp, textAlign = TextAlign.Center)
-                    InventraSecondaryButton(text = "Tentar novamente", onClick = actions.onRetryClick)
-                }
-            else -> CozinhaInfoForm(uiState = uiState, actions = actions, modifier = contentModifier)
+        InventraScreenContent {
+            val contentModifier = Modifier.weight(1f).fillMaxWidth()
+            when {
+                uiState.isLoading ->
+                    Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = InventraPurple)
+                    }
+                uiState.errorMessage != null ->
+                    Column(
+                        modifier = contentModifier.padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            uiState.errorMessage,
+                            fontFamily = Montserrat,
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center,
+                        )
+                        InventraSecondaryButton(text = "Tentar novamente", onClick = actions.onRetryClick)
+                    }
+                else -> CozinhaInfoForm(uiState = uiState, actions = actions, modifier = contentModifier)
+            }
         }
     }
 }

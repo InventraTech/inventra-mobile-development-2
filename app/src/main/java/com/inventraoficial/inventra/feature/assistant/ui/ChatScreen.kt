@@ -22,6 +22,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraChatInputBar
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSuggestionChip
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraChatEmptyHeader
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -66,36 +67,38 @@ fun ChatScreen(
                 )
             },
         )
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            InventraChatEmptyHeader(greeting = greeting)
+        InventraScreenContent {
             Column(
                 modifier =
                     Modifier
                         .weight(1f)
-                        .fillMaxWidth(),
+                        .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
             ) {
-                suggestions.forEach { suggestion ->
-                    InventraSuggestionChip(
-                        text = suggestion,
-                        onClick = { onSuggestionClick(suggestion) },
-                    )
+                InventraChatEmptyHeader(greeting = greeting)
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                ) {
+                    suggestions.forEach { suggestion ->
+                        InventraSuggestionChip(
+                            text = suggestion,
+                            onClick = { onSuggestionClick(suggestion) },
+                        )
+                    }
                 }
             }
+            InventraChatInputBar(
+                value = inputValue,
+                onValueChange = onInputChange,
+                onSend = onSend,
+                modifier = Modifier.padding(16.dp),
+            )
         }
-        InventraChatInputBar(
-            value = inputValue,
-            onValueChange = onInputChange,
-            onSend = onSend,
-            modifier = Modifier.padding(16.dp),
-        )
     }
 }
 

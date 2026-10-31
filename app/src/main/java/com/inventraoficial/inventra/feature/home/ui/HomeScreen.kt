@@ -36,6 +36,7 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraStatTone
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUrgency
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPriorityAlertsSection
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPriorityItem
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraStat
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraStatGrid
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
@@ -104,41 +105,43 @@ fun HomeScreen(
                 }
             },
         )
-        when {
-            isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
-            errorMessage != null ->
-                ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
-            else ->
-                Column(
-                    modifier =
-                        Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                            .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    InventraPriorityAlertsSection(items = priorityItems, onItemClick = onPriorityItemClick)
-                    if (priorityItems.isEmpty()) {
-                        Text(
-                            text = "Nenhum lote vence nos próximos ${HomeViewModel.EXPIRING_DAYS} dias.",
-                            fontFamily = Montserrat,
-                            fontSize = 14.sp,
-                            color = InventraPurple.copy(alpha = 0.6f),
-                            modifier = Modifier.padding(top = 12.dp),
-                        )
+        InventraScreenContent {
+            when {
+                isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
+                errorMessage != null ->
+                    ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
+                else ->
+                    Column(
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState())
+                                .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        InventraPriorityAlertsSection(items = priorityItems, onItemClick = onPriorityItemClick)
+                        if (priorityItems.isEmpty()) {
+                            Text(
+                                text = "Nenhum lote vence nos próximos ${HomeViewModel.EXPIRING_DAYS} dias.",
+                                fontFamily = Montserrat,
+                                fontSize = 14.sp,
+                                color = InventraPurple.copy(alpha = 0.6f),
+                                modifier = Modifier.padding(top = 12.dp),
+                            )
+                        }
+                        if (stats.isNotEmpty()) {
+                            Text(
+                                text = "Resumo do estoque",
+                                fontFamily = Montserrat,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(top = 20.dp),
+                                color = InventraPurple,
+                            )
+                            InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp))
+                        }
                     }
-                    if (stats.isNotEmpty()) {
-                        Text(
-                            text = "Resumo do estoque",
-                            fontFamily = Montserrat,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(top = 20.dp),
-                            color = InventraPurple,
-                        )
-                        InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp))
-                    }
-                }
+            }
         }
     }
 }

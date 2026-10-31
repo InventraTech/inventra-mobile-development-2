@@ -50,6 +50,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPickerField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -97,41 +98,48 @@ fun StockEntryScreen(
                 )
             },
         )
-        val contentModifier = Modifier.weight(1f).fillMaxWidth()
-        when {
-            uiState.isLoading ->
-                Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = InventraPurple)
-                }
-            uiState.errorMessage != null ->
-                Column(
-                    modifier = contentModifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(uiState.errorMessage, fontFamily = Montserrat, fontSize = 15.sp, textAlign = TextAlign.Center)
-                    InventraSecondaryButton(text = "Tentar novamente", onClick = onRetryClick)
-                }
-            uiState.registeredBatch != null ->
-                StockEntryDone(
-                    productName = uiState.productName,
-                    batch = uiState.registeredBatch,
-                    onDoneClick = onBackClick,
-                    modifier = contentModifier,
-                )
-            else ->
-                StockEntryForm(
-                    uiState = uiState,
-                    onQuantityChange = onQuantityChange,
-                    onBatchNumberChange = onBatchNumberChange,
-                    onExpirationDateSelect = onExpirationDateSelect,
-                    onEntryDateSelect = onEntryDateSelect,
-                    onSupplierSelect = onSupplierSelect,
-                    onInvoiceNumberChange = onInvoiceNumberChange,
-                    onUnitPriceChange = onUnitPriceChange,
-                    onConfirmClick = onConfirmClick,
-                    modifier = contentModifier,
-                )
+        InventraScreenContent {
+            val contentModifier = Modifier.weight(1f).fillMaxWidth()
+            when {
+                uiState.isLoading ->
+                    Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = InventraPurple)
+                    }
+                uiState.errorMessage != null ->
+                    Column(
+                        modifier = contentModifier.padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            uiState.errorMessage,
+                            fontFamily = Montserrat,
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center,
+                        )
+                        InventraSecondaryButton(text = "Tentar novamente", onClick = onRetryClick)
+                    }
+                uiState.registeredBatch != null ->
+                    StockEntryDone(
+                        productName = uiState.productName,
+                        batch = uiState.registeredBatch,
+                        onDoneClick = onBackClick,
+                        modifier = contentModifier,
+                    )
+                else ->
+                    StockEntryForm(
+                        uiState = uiState,
+                        onQuantityChange = onQuantityChange,
+                        onBatchNumberChange = onBatchNumberChange,
+                        onExpirationDateSelect = onExpirationDateSelect,
+                        onEntryDateSelect = onEntryDateSelect,
+                        onSupplierSelect = onSupplierSelect,
+                        onInvoiceNumberChange = onInvoiceNumberChange,
+                        onUnitPriceChange = onUnitPriceChange,
+                        onConfirmClick = onConfirmClick,
+                        modifier = contentModifier,
+                    )
+            }
         }
     }
 }

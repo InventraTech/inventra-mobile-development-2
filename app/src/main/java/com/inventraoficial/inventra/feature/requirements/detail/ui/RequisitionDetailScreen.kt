@@ -29,6 +29,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraDangerButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraConfirmDialog
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionType
@@ -74,22 +75,24 @@ fun RequisitionDetailScreen(
                 )
             },
         )
-        when {
-            uiState.isLoading -> RequisitionsLoading(modifier = Modifier.weight(1f))
-            uiState.errorMessage != null ->
-                RequisitionsError(
-                    message = uiState.errorMessage,
-                    onRetryClick = onRetryClick,
-                    modifier = Modifier.weight(1f),
-                )
-            else ->
-                RequisitionDetailContent(
-                    uiState = uiState,
-                    onApproveClick = onApproveClick,
-                    onRejectClick = onRejectClick,
-                    onCancelClick = onCancelClick,
-                    modifier = Modifier.weight(1f),
-                )
+        InventraScreenContent {
+            when {
+                uiState.isLoading -> RequisitionsLoading(modifier = Modifier.weight(1f))
+                uiState.errorMessage != null ->
+                    RequisitionsError(
+                        message = uiState.errorMessage,
+                        onRetryClick = onRetryClick,
+                        modifier = Modifier.weight(1f),
+                    )
+                else ->
+                    RequisitionDetailContent(
+                        uiState = uiState,
+                        onApproveClick = onApproveClick,
+                        onRejectClick = onRejectClick,
+                        onCancelClick = onCancelClick,
+                        modifier = Modifier.weight(1f),
+                    )
+            }
         }
     }
 
