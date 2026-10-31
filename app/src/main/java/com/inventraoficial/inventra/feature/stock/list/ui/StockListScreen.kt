@@ -127,7 +127,7 @@ fun StockListScreen(
                         ) {
                             items(products, key = { it.id }) { product ->
                                 InventraProductRow(
-                                photoUrl = product.photoUrl,
+                                    photoUrl = product.photoUrl,
                                     title = product.title,
                                     quantity = product.quantity,
                                     batchInfo = product.batchInfo,

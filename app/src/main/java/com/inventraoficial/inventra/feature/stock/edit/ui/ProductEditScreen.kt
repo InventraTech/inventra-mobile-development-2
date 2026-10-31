@@ -113,7 +113,7 @@ fun ProductEditScreen(
                                 modifier = Modifier.weight(1f),
                             )
                         }
-                    DeactivateSection(state = deactivate, onClick = actions.deactivate.onDeactivateClick)
+                        DeactivateSection(state = deactivate, onClick = actions.deactivate.onDeactivateClick)
                     }
             }
         }

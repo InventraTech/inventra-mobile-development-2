@@ -118,16 +118,16 @@ fun HomeScreen(
                                 .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                    if (stats.isNotEmpty()) {
-                        Text(
-                            text = "Resumo do estoque",
-                            fontFamily = Montserrat,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = InventraPurple,
-                        )
-                        InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp, bottom = 28.dp))
-                    }
+                        if (stats.isNotEmpty()) {
+                            Text(
+                                text = "Resumo do estoque",
+                                fontFamily = Montserrat,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = InventraPurple,
+                            )
+                            InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp, bottom = 28.dp))
+                        }
                         InventraPriorityAlertsSection(items = priorityItems, onItemClick = onPriorityItemClick)
                         if (priorityItems.isEmpty()) {
                             Text(

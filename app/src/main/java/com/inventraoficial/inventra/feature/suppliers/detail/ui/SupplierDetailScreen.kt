@@ -108,13 +108,13 @@ fun SupplierDetailScreen(
                                 .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(24.dp),
                     ) {
-                    SupplierHeader(
-                        photo = photo,
-                        name = name,
-                        rating = rating,
-                        badgeText = badgeText,
-                        onPhotoClick = photoActions.onPhotoClick,
-                                )
+                        SupplierHeader(
+                            photo = photo,
+                            name = name,
+                            rating = rating,
+                            badgeText = badgeText,
+                            onPhotoClick = photoActions.onPhotoClick,
+                        )
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             SectionTitle(text = "Contato")
                             if (phone == null && email == null) EmptyText(text = "Nenhum contato cadastrado.")
@@ -139,8 +139,8 @@ fun SupplierDetailScreen(
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     deliveryHistory.forEach { entry ->
                                         InventraDeliveryHistoryRow(
-                                        title = entry.productName,
-                                        subtitle = entry.date,
+                                            title = entry.productName,
+                                            subtitle = entry.date,
                                             quantityLabel = entry.quantityLabel,
                                         )
                                     }

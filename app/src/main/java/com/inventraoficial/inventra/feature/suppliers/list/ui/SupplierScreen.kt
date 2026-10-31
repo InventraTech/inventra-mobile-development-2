@@ -96,7 +96,7 @@ fun SupplierScreen(
                         LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             items(suppliers, key = { it.id }) { supplier ->
                                 InventraSupplierRow(
-                                photoUrl = supplier.photoUrl,
+                                    photoUrl = supplier.photoUrl,
                                     name = supplier.name,
                                     rating = supplier.rating,
                                     badgeText = supplier.badgeText,

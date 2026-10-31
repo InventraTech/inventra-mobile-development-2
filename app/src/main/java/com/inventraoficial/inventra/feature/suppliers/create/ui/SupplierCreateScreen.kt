@@ -28,6 +28,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.feature.suppliers.create.LocalSupplierSelection
 import com.inventraoficial.inventra.feature.suppliers.create.PickedSupplier
@@ -57,7 +58,9 @@ fun SupplierCreateScreen(
             navigationIcon = { InventraBackButton(onClick = actions.onBackClick) },
             title = { Text("Novo fornecedor", color = Color.White, fontFamily = Montserrat, fontSize = 17.sp) },
         )
-        FormContent(uiState = uiState, actions = actions, modifier = Modifier.weight(1f).fillMaxWidth())
+        InventraScreenContent {
+            FormContent(uiState = uiState, actions = actions, modifier = Modifier.weight(1f).fillMaxWidth())
+        }
     }
 }
 
