@@ -14,9 +14,12 @@ import com.inventraoficial.inventra.data.local.DataStoreAppPreferences
 import com.inventraoficial.inventra.data.local.DataStoreSessionStorage
 import com.inventraoficial.inventra.data.local.FusedLocationProvider
 import com.inventraoficial.inventra.data.local.ImageCompressor
+import com.inventraoficial.inventra.data.local.InventraDatabase
 import com.inventraoficial.inventra.data.local.LocationProvider
 import com.inventraoficial.inventra.data.local.ProfilePhotoPreview
 import com.inventraoficial.inventra.data.local.SessionStorage
+import com.inventraoficial.inventra.data.local.SqliteStockCache
+import com.inventraoficial.inventra.data.local.StockCache
 import com.inventraoficial.inventra.data.remote.api.AlertApi
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.api.ClickEventApi
@@ -101,6 +104,7 @@ interface AppContainer {
     val newAlertsChecker: NewAlertsChecker
     val accessRequestChecker: AccessRequestChecker
     val clickTracker: ClickTracker
+    val stockCache: StockCache
 }
 
 class DefaultAppContainer(
@@ -249,6 +253,8 @@ class DefaultAppContainer(
             notifier = alertNotifier,
         )
     }
+
+    override val stockCache: StockCache by lazy { SqliteStockCache(InventraDatabase(context), json) }
 
     override val clickTracker: ClickTracker by lazy {
         BufferedClickTracker(

@@ -16,6 +16,7 @@ data class StockListUiState(
     val products: List<Product> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val offlineMessage: String? = null,
     val filters: StockFilters = StockFilters(),
     val draftFilters: StockFilters? = null,
     val categoryOptions: List<String> = emptyList(),
