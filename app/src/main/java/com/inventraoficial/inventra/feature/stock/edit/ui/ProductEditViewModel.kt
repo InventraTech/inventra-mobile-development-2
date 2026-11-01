@@ -10,18 +10,21 @@ import com.inventraoficial.inventra.InventraApplication
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersResponse
+import com.inventraoficial.inventra.data.remote.dto.product.LinkSupplierRequest
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
+import com.inventraoficial.inventra.data.remote.dto.product.ProductSupplierResponse
 import com.inventraoficial.inventra.data.remote.dto.product.UpdateProductRequest
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
-import com.inventraoficial.inventra.feature.stock.productform.MAX_BARCODE_LENGTH
-import com.inventraoficial.inventra.feature.stock.productform.MAX_BRAND_LENGTH
-import com.inventraoficial.inventra.feature.stock.productform.MAX_NAME_LENGTH
+import com.inventraoficial.inventra.data.repository.ProductSupplierRepository
+import com.inventraoficial.inventra.data.repository.SupplierRepository
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
-import com.inventraoficial.inventra.feature.stock.productform.isMinStockInput
+import com.inventraoficial.inventra.feature.stock.productform.productFormActions
 import com.inventraoficial.inventra.feature.stock.productform.toCategoryOptions
 import com.inventraoficial.inventra.feature.stock.productform.toDecimal
 import com.inventraoficial.inventra.feature.stock.productform.toMinStockText
+import com.inventraoficial.inventra.feature.stock.productform.toPriceText
+import com.inventraoficial.inventra.feature.stock.productform.toSupplierOptions
 import com.inventraoficial.inventra.feature.stock.productform.toUnitOptions
 import com.inventraoficial.inventra.feature.stock.productform.validationError
 import kotlinx.coroutines.async
@@ -36,35 +39,27 @@ class ProductEditViewModel(
     private val productId: Int,
     private val productRepository: ProductRepository,
     private val authRepository: AuthRepository,
+    private val supplierRepository: SupplierRepository,
+    private val productSupplierRepository: ProductSupplierRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductEditUiState())
     val uiState: StateFlow<ProductEditUiState> = _uiState.asStateFlow()
 
+    val formActions =
+        productFormActions { transform ->
+            _uiState.update { it.copy(form = transform(it.form), submitError = null) }
+        }
+
     private var kitchenId: Int? = null
     private var savedParameters: KitchenParametersResponse? = null
-    private var savedMinStock = ""
+    private var savedLinks: List<ProductSupplierResponse> = emptyList()
+    private var savedForm = ProductFormState()
 
     init {
         load()
     }
 
     fun onRetryClick() = load()
-
-    fun onNameChange(name: String) = updateForm { it.copy(name = name.take(MAX_NAME_LENGTH)) }
-
-    fun onBrandChange(brand: String) = updateForm { it.copy(brand = brand.take(MAX_BRAND_LENGTH)) }
-
-    fun onBarcodeChange(barcode: String) {
-        if (barcode.all { it.isDigit() }) updateForm { it.copy(barcode = barcode.take(MAX_BARCODE_LENGTH)) }
-    }
-
-    fun onUnitSelect(unitId: Int?) = updateForm { it.copy(unitId = unitId) }
-
-    fun onCategorySelect(categoryId: Int?) = updateForm { it.copy(categoryId = categoryId) }
-
-    fun onMinStockChange(minStock: String) {
-        if (minStock.isMinStockInput()) updateForm { it.copy(minStock = minStock) }
-    }
 
     fun onSaveClick() {
         val state = _uiState.value
@@ -88,10 +83,17 @@ class ProductEditViewModel(
         viewModelScope.launch {
             val result =
                 productRepository.update(productId, request).mapCatching {
-                    if (form.minStock != savedMinStock) {
+                    if (form.minStock != savedForm.minStock) {
                         val kitchen = checkNotNull(kitchenId) { NO_KITCHEN }
                         val parameters = savedParameters.withMinStock(kitchen, form.minStock.toDecimal())
                         productRepository.setKitchenParameters(productId, parameters).getOrThrow()
+                    }
+                    val supplierId = form.supplierId
+                    val supplierChanged =
+                        supplierId != savedForm.supplierId || form.referencePrice != savedForm.referencePrice
+                    if (supplierId != null && supplierChanged) {
+                        val link = savedLinks.firstOrNull { it.supplier.id == supplierId }.withPrice(supplierId, form)
+                        productSupplierRepository.link(productId, link).getOrThrow()
                     }
                 }
             result
@@ -100,10 +102,6 @@ class ProductEditViewModel(
                     _uiState.update { it.copy(isSubmitting = false, submitError = failure.message) }
                 }
         }
-    }
-
-    private fun updateForm(transform: (ProductFormState) -> ProductFormState) {
-        _uiState.update { it.copy(form = transform(it.form), submitError = null) }
     }
 
     private fun load() {
@@ -118,6 +116,8 @@ class ProductEditViewModel(
             val product = async { productRepository.product(productId) }
             val units = async { productRepository.units() }
             val categories = async { productRepository.categories().getOrDefault(emptyList()) }
+            val suppliers = async { supplierRepository.allSuppliers().getOrDefault(emptyList()) }
+            val links = async { productSupplierRepository.suppliersOf(productId).getOrDefault(emptyList()) }
             val parameters =
                 async { user.kitchenId?.let { productRepository.kitchenParameters(productId, it).getOrNull() } }
 
@@ -129,13 +129,14 @@ class ProductEditViewModel(
                 return@launch
             }
             savedParameters = parameters.await()
-            savedMinStock = savedParameters?.minStock?.toMinStockText().orEmpty()
-            val form =
-                productResult.getOrThrow().toForm(savedMinStock).copy(
+            savedLinks = links.await()
+            savedForm =
+                productResult.getOrThrow().toForm(savedParameters, savedLinks.firstOrNull()).copy(
                     units = unitsResult.getOrThrow().toUnitOptions(),
                     categories = categories.await().toCategoryOptions(),
+                    suppliers = suppliers.await().toSupplierOptions(),
                 )
-            _uiState.update { it.copy(isLoading = false, form = form) }
+            _uiState.update { it.copy(isLoading = false, form = savedForm) }
         }
     }
 
@@ -151,6 +152,8 @@ class ProductEditViewModel(
                         productId = productId,
                         productRepository = application.container.productRepository,
                         authRepository = application.container.authRepository,
+                        supplierRepository = application.container.supplierRepository,
+                        productSupplierRepository = application.container.productSupplierRepository,
                     )
                 }
             }
@@ -167,12 +170,26 @@ private fun KitchenParametersResponse?.withMinStock(
     averageDailyConsumption = this?.averageDailyConsumption,
 )
 
-private fun ProductResponse.toForm(minStock: String) =
-    ProductFormState(
-        name = name,
-        brand = brand.orEmpty(),
-        barcode = barcode.orEmpty(),
-        unitId = unit.id,
-        categoryId = category?.id,
-        minStock = minStock,
-    )
+private fun ProductSupplierResponse?.withPrice(
+    supplierId: Int,
+    form: ProductFormState,
+) = LinkSupplierRequest(
+    supplierId = supplierId,
+    supplierCode = this?.supplierCode,
+    referencePrice = form.referencePrice.toDecimal(),
+    leadTimeDays = this?.leadTimeDays,
+)
+
+private fun ProductResponse.toForm(
+    parameters: KitchenParametersResponse?,
+    link: ProductSupplierResponse?,
+) = ProductFormState(
+    name = name,
+    brand = brand.orEmpty(),
+    barcode = barcode.orEmpty(),
+    unitId = unit.id,
+    categoryId = category?.id,
+    minStock = parameters?.minStock?.toMinStockText().orEmpty(),
+    supplierId = link?.supplier?.id,
+    referencePrice = link?.referencePrice?.toPriceText().orEmpty(),
+)

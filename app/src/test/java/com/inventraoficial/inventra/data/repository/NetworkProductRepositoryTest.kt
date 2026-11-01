@@ -135,7 +135,8 @@ class NetworkProductRepositoryTest {
         runTest {
             val api = FakeProductApi(lookup)
             val repository = NetworkProductRepository(api, json)
-            val request = CreateProductRequest(name = "Coca-Cola 2L", unitId = 4, barcode = "7894900011517")
+            val request =
+                CreateProductRequest(name = "Coca-Cola 2L", unitId = 4, barcode = "7894900011517", supplierId = 2)
 
             val result = repository.create(request)
 

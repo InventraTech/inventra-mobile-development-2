@@ -8,6 +8,8 @@ import kotlinx.serialization.json.Json
 interface SupplierRepository {
     suspend fun suppliers(kitchenId: Int): Result<List<SupplierResponse>>
 
+    suspend fun allSuppliers(): Result<List<SupplierResponse>>
+
     suspend fun supplier(id: Int): Result<SupplierResponse>
 }
 
@@ -16,6 +18,8 @@ class NetworkSupplierRepository(
     private val json: Json,
 ) : SupplierRepository {
     override suspend fun suppliers(kitchenId: Int) = apiCall(json) { supplierApi.list(kitchenId) }
+
+    override suspend fun allSuppliers() = apiCall(json) { supplierApi.listActive() }
 
     override suspend fun supplier(id: Int): Result<SupplierResponse> = apiCall(json) { supplierApi.find(id) }
 }

@@ -5,9 +5,12 @@ import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersKitchen
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersResponse
+import com.inventraoficial.inventra.data.remote.dto.product.LinkSupplierRequest
 import com.inventraoficial.inventra.data.remote.dto.product.UpdateProductRequest
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.FakeProductRepository
+import com.inventraoficial.inventra.data.repository.FakeProductSupplierRepository
+import com.inventraoficial.inventra.data.repository.FakeSupplierRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -27,6 +30,16 @@ class ProductEditViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val ketchupId = 42
     private lateinit var productRepository: FakeProductRepository
+    private val supplierRepository =
+        FakeSupplierRepository(
+            suppliers =
+                listOf(
+                    FakeSupplierRepository.supplier(1, "Atacadão"),
+                    FakeSupplierRepository.supplier(2, "Seara Alimentos"),
+                ),
+        )
+    private val productSupplierRepository = FakeProductSupplierRepository()
+    private val searaLink = FakeProductSupplierRepository.link(2, "Seara", referencePrice = 9.9)
 
     @Before
     fun setUp() {
@@ -49,7 +62,13 @@ class ProductEditViewModelTest {
 
     private fun createViewModel(accessType: AccessType = AccessType.SUPERVISOR): ProductEditViewModel {
         val user = SessionUser("1", "Ana", "ana@inventra.com", accessType, kitchenId = 7)
-        return ProductEditViewModel(ketchupId, productRepository, FakeAuthRepository(initialUser = user))
+        return ProductEditViewModel(
+            productId = ketchupId,
+            productRepository = productRepository,
+            authRepository = FakeAuthRepository(initialUser = user),
+            supplierRepository = supplierRepository,
+            productSupplierRepository = productSupplierRepository,
+        )
     }
 
     @Test
@@ -96,9 +115,9 @@ class ProductEditViewModelTest {
             val viewModel = createViewModel()
             advanceUntilIdle()
 
-            viewModel.onNameChange(" Ketchup Tradicional ")
-            viewModel.onBrandChange("")
-            viewModel.onUnitSelect(6)
+            viewModel.formActions.onNameChange(" Ketchup Tradicional ")
+            viewModel.formActions.onBrandChange("")
+            viewModel.formActions.onUnitSelect(6)
             viewModel.onSaveClick()
             advanceUntilIdle()
 
@@ -118,7 +137,7 @@ class ProductEditViewModelTest {
             val viewModel = createViewModel()
             advanceUntilIdle()
 
-            viewModel.onMinStockChange("5")
+            viewModel.formActions.onMinStockChange("5")
             viewModel.onSaveClick()
             advanceUntilIdle()
 
@@ -130,12 +149,86 @@ class ProductEditViewModelTest {
         }
 
     @Test
+    fun `carrega o fornecedor vinculado com o preco`() =
+        runTest(testDispatcher) {
+            productSupplierRepository.links = listOf(searaLink)
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            val form = viewModel.uiState.value.form
+            assertEquals(2, form.supplierId)
+            assertEquals("Seara Alimentos", form.supplierName)
+            assertEquals("9,90", form.referencePrice)
+        }
+
+    @Test
+    fun `sem mexer no fornecedor nao grava o vinculo de novo`() =
+        runTest(testDispatcher) {
+            productSupplierRepository.links = listOf(searaLink)
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.formActions.onNameChange("Ketchup Heinz")
+            viewModel.onSaveClick()
+            advanceUntilIdle()
+
+            assertTrue(productSupplierRepository.linkCalls.isEmpty())
+            assertTrue(viewModel.uiState.value.isSaved)
+        }
+
+    @Test
+    fun `mudar o preco grava o vinculo sem perder o codigo do fornecedor`() =
+        runTest(testDispatcher) {
+            productSupplierRepository.links =
+                listOf(FakeProductSupplierRepository.link(2, "Seara", referencePrice = 9.9, supplierCode = "KT-01"))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.formActions.onReferencePriceChange("11,50")
+            viewModel.onSaveClick()
+            advanceUntilIdle()
+
+            assertEquals(
+                listOf(ketchupId to LinkSupplierRequest(2, supplierCode = "KT-01", referencePrice = 11.5)),
+                productSupplierRepository.linkCalls,
+            )
+        }
+
+    @Test
+    fun `escolher fornecedor novo grava o vinculo`() =
+        runTest(testDispatcher) {
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.formActions.onSupplierSelect(1)
+            viewModel.onSaveClick()
+            advanceUntilIdle()
+
+            assertEquals(listOf(ketchupId to LinkSupplierRequest(1)), productSupplierRepository.linkCalls)
+        }
+
+    @Test
+    fun `falha ao gravar o fornecedor mostra o erro e nao volta`() =
+        runTest(testDispatcher) {
+            productSupplierRepository.linkResult = Result.failure(Exception("Fornecedor não encontrado."))
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.formActions.onSupplierSelect(1)
+            viewModel.onSaveClick()
+            advanceUntilIdle()
+
+            assertEquals("Fornecedor não encontrado.", viewModel.uiState.value.submitError)
+            assertFalse(viewModel.uiState.value.isSaved)
+        }
+
+    @Test
     fun `salvar exige nome`() =
         runTest(testDispatcher) {
             val viewModel = createViewModel()
             advanceUntilIdle()
 
-            viewModel.onNameChange("  ")
+            viewModel.formActions.onNameChange("  ")
             viewModel.onSaveClick()
 
             assertEquals("Informe o nome do produto", viewModel.uiState.value.submitError)

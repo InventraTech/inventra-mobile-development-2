@@ -11,6 +11,9 @@ interface SupplierApi {
         @Query("kitchenId") kitchenId: Int,
     ): List<SupplierResponse>
 
+    @GET(PATH)
+    suspend fun listActive(): List<SupplierResponse>
+
     @GET("$PATH/{id}")
     suspend fun find(
         @Path("id") id: Int,

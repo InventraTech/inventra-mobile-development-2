@@ -11,6 +11,7 @@ import com.inventraoficial.inventra.data.remote.dto.stock.StockMovementType
 import com.inventraoficial.inventra.data.remote.dto.stock.SupplierSummary
 import com.inventraoficial.inventra.data.repository.FakeAuthRepository
 import com.inventraoficial.inventra.data.repository.FakeProductRepository
+import com.inventraoficial.inventra.data.repository.FakeProductSupplierRepository
 import com.inventraoficial.inventra.data.repository.FakeStockRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,6 +46,7 @@ class StockDetailViewModelTest {
         )
     private lateinit var productRepository: FakeProductRepository
     private lateinit var stockRepository: FakeStockRepository
+    private val productSupplierRepository = FakeProductSupplierRepository()
 
     @Before
     fun setUp() {
@@ -121,6 +123,7 @@ class StockDetailViewModelTest {
                 productRepository = productRepository,
                 stockRepository = stockRepository,
                 authRepository = FakeAuthRepository(initialUser = sessionUser),
+                productSupplierRepository = productSupplierRepository,
                 zone = ZoneId.of("America/Sao_Paulo"),
                 today = { LocalDate.of(2026, 10, 12) },
             )
@@ -189,12 +192,33 @@ class StockDetailViewModelTest {
         }
 
     @Test
-    fun `fornecedor e o da entrega mais recente`() =
+    fun `sem fornecedor vinculado mostra o da entrega mais recente`() =
         runTest(testDispatcher) {
             val viewModel = createVisibleViewModel()
             advanceUntilIdle()
 
             assertEquals("Italac Distribuidora", viewModel.uiState.value.supplier)
+        }
+
+    @Test
+    fun `fornecedor vinculado na edicao aparece no lugar do da entrega`() =
+        runTest(testDispatcher) {
+            productSupplierRepository.links = listOf(FakeProductSupplierRepository.link(9, "Atacadão"))
+            val viewModel = createVisibleViewModel()
+            advanceUntilIdle()
+
+            assertEquals("Atacadão", viewModel.uiState.value.supplier)
+        }
+
+    @Test
+    fun `produto sem lote com fornecedor vinculado mostra o vinculado`() =
+        runTest(testDispatcher) {
+            stockRepository.batches = emptyList()
+            productSupplierRepository.links = listOf(FakeProductSupplierRepository.link(9, "Heinz Distribuidora"))
+            val viewModel = createVisibleViewModel()
+            advanceUntilIdle()
+
+            assertEquals("Heinz Distribuidora", viewModel.uiState.value.supplier)
         }
 
     @Test
