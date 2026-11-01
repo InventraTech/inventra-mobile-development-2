@@ -20,6 +20,8 @@ private val NUMERADO = Regex("""^(\s*)(\d+)[.)]\s+(.*)$""")
 private val LINK = Regex("""^\[([^\]]+)]\(([^)\s]+)\)""")
 private const val SEPARADOR_DE_CELULA = "  ·  "
 private const val RECUO = "    "
+private const val MARCA_TRIPLA = "***"
+private const val GRUPO_DO_TEXTO_NUMERADO = 3
 
 // Espaço que não quebra linha: sem ele, um nome de arquivo comprido (sem espaços) vai para a linha de
 // baixo e deixa a bolinha sozinha na linha de cima.
@@ -71,7 +73,7 @@ internal fun interpretarMarkdown(markdown: String): List<TrechoMarkdown> {
                             RECUO.repeat(numerado.groupValues[1].length / 2) +
                                 numerado.groupValues[2] + "." + ESPACO_FIXO,
                         ),
-                    ) + inline(numerado.groupValues[3])
+                    ) + inline(numerado.groupValues[GRUPO_DO_TEXTO_NUMERADO])
                 else -> inline(aparada)
             }
 
@@ -133,11 +135,11 @@ private fun inline(
                 pendente.append(texto[i + 1])
                 i += 2
             }
-            texto.startsWith("***", i) && texto.indexOf("***", i + 3) > i + 3 -> {
-                val fim = texto.indexOf("***", i + 3)
+            texto.startsWith(MARCA_TRIPLA, i) && fechaMarcaTripla(texto, i) -> {
+                val fim = texto.indexOf(MARCA_TRIPLA, i + MARCA_TRIPLA.length)
                 descarregar()
-                saida += inline(texto.substring(i + 3, fim), negrito = true, italico = true)
-                i = fim + 3
+                saida += inline(texto.substring(i + MARCA_TRIPLA.length, fim), negrito = true, italico = true)
+                i = fim + MARCA_TRIPLA.length
             }
             (texto.startsWith("**", i) || (texto.startsWith("__", i) && limiteEsquerdo)) &&
                 texto.indexOf(texto.substring(i, i + 2), i + 2) > i + 2 -> {
@@ -174,7 +176,13 @@ private fun inline(
     return saida
 }
 
+private fun fechaMarcaTripla(
+    texto: String,
+    inicio: Int,
+) = texto.indexOf(MARCA_TRIPLA, inicio + MARCA_TRIPLA.length) > inicio + MARCA_TRIPLA.length
+
 /** Posição do marcador que fecha o itálico aberto em [inicio], ou -1 se não houver um fechamento válido. */
+@Suppress("ReturnCount")
 private fun fechamentoDeItalico(
     texto: String,
     inicio: Int,
@@ -192,15 +200,14 @@ private fun fechamentoDeItalico(
     return -1
 }
 
+private fun TrechoMarkdown.mesmoEstilo(outro: TrechoMarkdown) =
+    negrito == outro.negrito && italico == outro.italico && codigo == outro.codigo
+
 private fun unirTrechosIguais(trechos: List<TrechoMarkdown>): List<TrechoMarkdown> {
     val saida = mutableListOf<TrechoMarkdown>()
     for (trecho in trechos) {
         val ultimo = saida.lastOrNull()
-        if (ultimo != null &&
-            ultimo.negrito == trecho.negrito &&
-            ultimo.italico == trecho.italico &&
-            ultimo.codigo == trecho.codigo
-        ) {
+        if (ultimo != null && ultimo.mesmoEstilo(trecho)) {
             saida[saida.size - 1] = ultimo.copy(texto = ultimo.texto + trecho.texto)
         } else {
             saida += trecho

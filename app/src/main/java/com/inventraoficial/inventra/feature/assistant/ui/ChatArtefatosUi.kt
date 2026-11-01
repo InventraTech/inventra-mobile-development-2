@@ -344,9 +344,19 @@ private fun LinhaDaLegenda(
 
 @Composable
 private fun paletaDoGrafico(): List<Color> =
-    listOf(InventraPurple, InventraGold, InventraSuccess, InventraDanger, COR_AZUL, COR_MARROM)
+    listOf(
+        InventraPurple,
+        InventraGold,
+        InventraSuccess,
+        InventraDanger,
+        COR_AZUL,
+        COR_MARROM,
+    )
 
+@Suppress("MagicNumber")
 private val COR_AZUL = Color(0xFF2E86AB)
+
+@Suppress("MagicNumber")
 private val COR_MARROM = Color(0xFF8D6E63)
 
 private const val LINHAS_INICIAIS = 8
@@ -362,7 +372,7 @@ private const val VOLTA_COMPLETA = 360.0
 private val LARGURA_DO_VALOR = 88.dp
 private val TAMANHO_DA_PIZZA = 150.dp
 
-@Suppress("UnusedPrivateMember")
+@Suppress("UnusedPrivateMember", "MagicNumber")
 @Preview(showBackground = true)
 @Composable
 private fun ArtefatoBarrasPreview() {

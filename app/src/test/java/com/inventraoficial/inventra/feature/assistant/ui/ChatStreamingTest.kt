@@ -50,7 +50,10 @@ class ChatStreamingTest {
     fun `cada tipo de linha vira o evento certo`() {
         assertEquals(
             EventoIa.Etapa("t1", concluida = false, texto = "Consultando o estoque…"),
-            interpretarEventoIa("""{"type":"etapa","id":"t1","status":"inicio","texto":"Consultando o estoque…"}""", json),
+            interpretarEventoIa(
+                """{"type":"etapa","id":"t1","status":"inicio","texto":"Consultando o estoque…"}""",
+                json,
+            ),
         )
         assertEquals(
             EventoIa.Etapa("t1", concluida = true, texto = null),
@@ -77,7 +80,8 @@ class ChatStreamingTest {
 
         val cartao =
             interpretarEventoIa(
-                """{"type":"cartao","approval_id":"a1","pending_action":{"id":"a1","proposal_hash":"h","operation":"CONSUME"}}""",
+                """{"type":"cartao","approval_id":"a1",""" +
+                    """"pending_action":{"id":"a1","proposal_hash":"h","operation":"CONSUME"}}""",
                 json,
             )
         assertEquals("a1", (cartao as EventoIa.AcaoProposta).acao.id)
@@ -140,7 +144,13 @@ class ChatStreamingTest {
 
         resposta.encerrarPassosPendentes()
 
-        assertTrue(resposta.paraMensagem("m").passos.single().concluido)
+        assertTrue(
+            resposta
+                .paraMensagem("m")
+                .passos
+                .single()
+                .concluido,
+        )
     }
 
     // ---------- ViewModel ----------
@@ -195,7 +205,13 @@ class ChatStreamingTest {
         assertEquals("A IA caiu no meio.", estado.erro)
         assertFalse(estado.carregando)
         // O passo que girava não fica girando depois da falha.
-        assertTrue(estado.mensagens.first { !it.ehDoUsuario && it.passos.isNotEmpty() }.passos.single().concluido)
+        assertTrue(
+            estado.mensagens
+                .first { !it.ehDoUsuario && it.passos.isNotEmpty() }
+                .passos
+                .single()
+                .concluido,
+        )
     }
 
     @Test
@@ -224,7 +240,8 @@ class ChatStreamingTest {
     fun `etapa de tool traz o pai e o comando que ela executou`() {
         val evento =
             interpretarEventoIa(
-                """{"type":"etapa","id":"t1","status":"inicio","texto":"Planejando a baixa por lote…","pai":"n2","detalhe":"planejar_baixa(product_name='chá', quantity='3')"}""",
+                """{"type":"etapa","id":"t1","status":"inicio","texto":"Planejando a baixa por lote…",""" +
+                    """"pai":"n2","detalhe":"planejar_baixa(product_name='chá', quantity='3')"}""",
                 json,
             )
 
@@ -243,7 +260,9 @@ class ChatStreamingTest {
     @Test
     fun `fim da etapa nao perde o pai nem o comando do inicio`() {
         val resposta = RespostaEmStream()
-        resposta.aplicar(EventoIa.Etapa("t1", concluida = false, texto = "Planejando…", pai = "n2", detalhe = "planejar_baixa()"))
+        resposta.aplicar(
+            EventoIa.Etapa("t1", concluida = false, texto = "Planejando…", pai = "n2", detalhe = "planejar_baixa()"),
+        )
 
         resposta.aplicar(EventoIa.Etapa("t1", concluida = true, texto = "Baixa planejada"))
 

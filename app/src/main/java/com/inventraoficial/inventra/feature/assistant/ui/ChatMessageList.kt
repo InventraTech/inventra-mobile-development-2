@@ -8,8 +8,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,13 +35,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -443,7 +442,10 @@ private fun PensamentoDaIa(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         SetinhaDoFluxo(visivel = true, aberta = aberta)
-        Row(modifier = Modifier.weight(1f).height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(
+            modifier = Modifier.weight(1f).height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
             Box(
                 modifier =
                     Modifier
@@ -496,12 +498,15 @@ private fun TempoDecorrido(desde: Long?) {
     )
 }
 
+private const val QUANTIDADE_DE_PONTINHOS = 3
+private const val DEFASAGEM_DO_PONTINHO_MS = 160
+
 /** Três bolinhas que pulsam: a IA ainda está trabalhando. */
 @Composable
 private fun PontinhosAnimados(cor: Color) {
     val transicao = rememberInfiniteTransition(label = "pontinhos")
     Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
-        repeat(3) { indice ->
+        repeat(QUANTIDADE_DE_PONTINHOS) { indice ->
             val alpha by transicao.animateFloat(
                 initialValue = 0.25f,
                 targetValue = 1f,
@@ -509,7 +514,7 @@ private fun PontinhosAnimados(cor: Color) {
                     infiniteRepeatable(
                         animation = tween(durationMillis = 500),
                         repeatMode = RepeatMode.Reverse,
-                        initialStartOffset = StartOffset(indice * 160),
+                        initialStartOffset = StartOffset(indice * DEFASAGEM_DO_PONTINHO_MS),
                     ),
                 label = "pontinho$indice",
             )
@@ -528,8 +533,8 @@ private fun BotaoIrParaOFim(
     Row(
         modifier =
             modifier
-                .shadow(4.dp, RoundedCornerShape(50))
-                .background(InventraPurple, RoundedCornerShape(50))
+                .shadow(4.dp, RoundedCornerShape(PILULA_PERCENTUAL))
+                .background(InventraPurple, RoundedCornerShape(PILULA_PERCENTUAL))
                 .clickable(onClick = onClick)
                 .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,

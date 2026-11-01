@@ -2,14 +2,10 @@ package com.inventraoficial.inventra.feature.assistant.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -50,9 +45,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -73,7 +68,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.inventraoficial.inventra.data.repository.AnexoParaEnvio
 import com.inventraoficial.inventra.ui.theme.InventraBackground
-import com.inventraoficial.inventra.ui.theme.InventraDanger
 import com.inventraoficial.inventra.ui.theme.InventraInk
 import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
@@ -82,6 +76,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
+private const val TAG = "ChatComposer"
+private const val UM_SEGUNDO_MS = 1_000L
 private const val SEGUNDOS_POR_MINUTO = 60
 private const val ALPHA_DESABILITADO = 0.38f
 private const val NIVEL_A_CADA_MS = 80L
@@ -90,6 +86,7 @@ private const val INTERVALO_DAS_BARRAS_MS = 70L
 private const val LARGURA_DA_BARRA_DP = 3
 private const val ALTURA_MINIMA_DA_BARRA_DP = 4f
 private const val ALTURA_MAXIMA_DA_BARRA_DP = 24f
+private const val VARIACAO_DA_BARRA_DP = ALTURA_MAXIMA_DA_BARRA_DP - ALTURA_MINIMA_DA_BARRA_DP
 
 /**
  * Campo de mensagem no estilo dos assistentes de IA: "+" para anexos, texto, e à direita
@@ -160,7 +157,7 @@ fun ChatComposer(
     LaunchedEffect(gravando) {
         segundos = 0
         while (gravando) {
-            delay(1_000)
+            delay(UM_SEGUNDO_MS)
             segundos++
         }
     }
@@ -176,6 +173,7 @@ fun ChatComposer(
             }
             gravando = true
         } catch (e: Exception) {
+            Log.w(TAG, "Falha ao iniciar a gravação", e)
             encerrarVoz()
             Toast.makeText(context, "Não foi possível gravar o áudio.", Toast.LENGTH_SHORT).show()
         }
@@ -237,7 +235,9 @@ fun ChatComposer(
                                 vozAoVivo.terminar { texto ->
                                     encerrarVoz()
                                     if (texto.isBlank()) {
-                                        Toast.makeText(context, "Não ouvi nada. Tente de novo.", Toast.LENGTH_SHORT).show()
+                                        Toast
+                                            .makeText(context, "Não ouvi nada. Tente de novo.", Toast.LENGTH_SHORT)
+                                            .show()
                                     } else {
                                         onValueChangeAtual(texto)
                                         onSendAtual()
@@ -518,8 +518,8 @@ private fun OndasDaVoz(
                 modifier =
                     Modifier
                         .width(LARGURA_DA_BARRA_DP.dp)
-                        .height((ALTURA_MINIMA_DA_BARRA_DP + (ALTURA_MAXIMA_DA_BARRA_DP - ALTURA_MINIMA_DA_BARRA_DP) * valor).dp)
-                        .background(InventraPurple, RoundedCornerShape(50)),
+                        .height((ALTURA_MINIMA_DA_BARRA_DP + VARIACAO_DA_BARRA_DP * valor).dp)
+                        .background(InventraPurple, RoundedCornerShape(PILULA_PERCENTUAL)),
             )
         }
     }
@@ -548,13 +548,11 @@ private class SeletoresDeAnexos(
 
 @Suppress("TooGenericExceptionCaught")
 @Composable
-private fun rememberSeletoresDeAnexos(
-    onAnexosEscolhidos: (List<AnexoParaEnvio>, List<String>) -> Unit,
-): SeletoresDeAnexos {
+private fun rememberSeletoresDeAnexos(onEscolhidos: (List<AnexoParaEnvio>, List<String>) -> Unit): SeletoresDeAnexos {
     val context = LocalContext.current.applicationContext
     val escopo = rememberCoroutineScope()
 
-    fun entregar(preparados: AnexosPreparados) = onAnexosEscolhidos(preparados.anexos, preparados.ignorados)
+    fun entregar(preparados: AnexosPreparados) = onEscolhidos(preparados.anexos, preparados.ignorados)
 
     val fotos =
         rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
@@ -586,6 +584,7 @@ private fun rememberSeletoresDeAnexos(
             fotoPendente = arquivo.path
             camera.launch(uriDoArquivo(context, arquivo))
         } catch (e: Exception) {
+            Log.w(TAG, "Falha ao abrir a câmera", e)
             Toast.makeText(context, "Não foi possível abrir a câmera.", Toast.LENGTH_SHORT).show()
         }
     }

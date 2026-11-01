@@ -1,8 +1,6 @@
 package com.inventraoficial.inventra.feature.assistant.ui
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -35,7 +33,8 @@ class ChatLogicaTest {
 
     @Test
     fun `titulo longo e cortado com reticencias`() {
-        val titulo = tituloDaConversa("Consulta detalhada sobre todos os produtos com validade próxima do vencimento neste mês")
+        val titulo =
+            tituloDaConversa("Consulta detalhada sobre todos os produtos com validade próxima do vencimento neste mês")
 
         assertTrue(titulo.length <= 48)
         assertTrue(titulo.endsWith("…"))
@@ -124,13 +123,10 @@ class ChatLogicaTest {
 
     @Test
     fun `previa do pensamento e a primeira linha sem marcas de markdown`() {
-        val pensamento = "**Calculando o total**
-
-Vou somar os lotes ativos."
+        val pensamento = "**Calculando o total**\n\nVou somar os lotes ativos."
 
         assertEquals("Calculando o total", previaDoPensamento(pensamento))
-        assertEquals("", previaDoPensamento("  
- "))
+        assertEquals("", previaDoPensamento("  \n "))
         assertTrue(previaDoPensamento("a".repeat(200)).length <= 70)
         assertTrue(previaDoPensamento("a".repeat(200)).endsWith("…"))
     }

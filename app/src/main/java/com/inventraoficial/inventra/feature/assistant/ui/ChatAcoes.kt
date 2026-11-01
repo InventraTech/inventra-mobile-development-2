@@ -188,8 +188,7 @@ internal fun AcaoPendente.expirou(agoraMillis: Long): Boolean =
     estado == EstadoDaAcao.AGUARDANDO && expiraEmMillis != null && agoraMillis > expiraEmMillis
 
 /** O usuário ainda pode aprovar ou recusar? */
-internal fun AcaoPendente.podeDecidir(agoraMillis: Long): Boolean =
-    estado == EstadoDaAcao.AGUARDANDO && !expirou(agoraMillis)
+internal fun AcaoPendente.podeDecidir(agoraMillis: Long) = estado == EstadoDaAcao.AGUARDANDO && !expirou(agoraMillis)
 
 /**
  * O texto da IA repete cada proposta (título, parâmetros, "Estado: aguardando") e diz que nada foi alterado.
@@ -229,6 +228,7 @@ internal fun resumoDasPropostas(quantidade: Int): String {
  * Saldo do lote antes e depois: saída tira a quantidade, entrada soma, ajuste define a nova quantidade.
  * Null quando a ação não mexe no saldo de um lote ou o snapshot não traz o saldo atual.
  */
+@Suppress("ReturnCount")
 internal fun mudancaDeSaldo(
     operacao: String,
     parametros: JsonObject,
@@ -289,8 +289,7 @@ private fun valorDoParametro(
 private fun textoDoValor(valor: JsonElement): String = formatarCelula(valor)
 
 /** Decimais da IA vêm com ponto ("2.5"); o usuário lê com vírgula. */
-private fun decimalBrasileiro(texto: String): String =
-    if (DECIMAL_COM_PONTO.matches(texto)) texto.replace('.', ',') else texto
+private fun decimalBrasileiro(texto: String) = if (DECIMAL_COM_PONTO.matches(texto)) texto.replace('.', ',') else texto
 
 private fun JsonElement?.textoOuNull(): String? = (this as? JsonPrimitive)?.contentOrNull
 

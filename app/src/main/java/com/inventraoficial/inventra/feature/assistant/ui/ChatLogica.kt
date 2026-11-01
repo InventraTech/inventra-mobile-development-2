@@ -12,6 +12,9 @@ import java.util.UUID
 // Regras do chat que não dependem de Android: ficam aqui para serem testadas direto.
 
 private const val TAMANHO_MAXIMO_DO_TITULO = 48
+
+/** Cantos totalmente arredondados (formato de pílula), em % do menor lado. */
+internal const val PILULA_PERCENTUAL = 50
 private const val DIAS_NA_SEMANA = 7L
 private const val DIAS_NO_MES = 30L
 private const val PASSO_MINIMO_DA_DIGITACAO = 3
@@ -108,14 +111,12 @@ private val ESPACOS = Regex("\\s+")
 /** Título curto para o menu, tirado da primeira frase do resumo que a IA gerou. */
 internal fun tituloDaConversa(resumo: String): String {
     val limpo = resumo.replace(MARCAS_DE_MARKDOWN, "").replace(ESPACOS, " ").trim()
-    if (limpo.isEmpty()) return "Conversa sem título"
     val primeiraFrase = limpo.substringBefore(". ").trimEnd('.').replace(PREFIXO_DO_RESUMO, "")
     val capitalizada = primeiraFrase.replaceFirstChar { it.uppercase() }
-    if (capitalizada.isEmpty()) return "Conversa sem título"
-    return if (capitalizada.length <= TAMANHO_MAXIMO_DO_TITULO) {
-        capitalizada
-    } else {
-        capitalizada.take(TAMANHO_MAXIMO_DO_TITULO - 1).trimEnd() + "…"
+    return when {
+        capitalizada.isEmpty() -> "Conversa sem título"
+        capitalizada.length <= TAMANHO_MAXIMO_DO_TITULO -> capitalizada
+        else -> capitalizada.take(TAMANHO_MAXIMO_DO_TITULO - 1).trimEnd() + "…"
     }
 }
 

@@ -27,6 +27,7 @@ internal class RespostaEmStream {
         private set
 
     /** Aplica o evento; devolve false para os que não mudam a bolha (fim e erro são do chamador). */
+    @Suppress("ReturnCount")
     fun aplicar(evento: EventoIa): Boolean {
         when (evento) {
             is EventoIa.Etapa -> aplicarEtapa(evento)

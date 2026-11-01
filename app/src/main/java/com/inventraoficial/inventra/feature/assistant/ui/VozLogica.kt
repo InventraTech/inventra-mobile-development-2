@@ -13,8 +13,7 @@ private const val TAMANHO_DO_TRECHO_VISIVEL = 90
 internal fun nivelDaVoz(rmsDb: Float): Float = ((rmsDb - RMS_MINIMO_DB) / FAIXA_DO_RMS_DB).coerceIn(0f, 1f)
 
 /** O gravador de arquivo informa a amplitude de 0 a 32767; a raiz deixa a voz baixa mais visível. */
-internal fun nivelDoMicrofone(amplitudeMaxima: Int): Float =
-    sqrt((amplitudeMaxima / AMPLITUDE_MAXIMA).coerceIn(0f, 1f))
+internal fun nivelDoMicrofone(amplitudeMaxima: Int): Float = sqrt((amplitudeMaxima / AMPLITUDE_MAXIMA).coerceIn(0f, 1f))
 
 /** Junta o que já foi entendido com o trecho novo, com um espaço só entre eles. */
 internal fun juntarTranscricao(

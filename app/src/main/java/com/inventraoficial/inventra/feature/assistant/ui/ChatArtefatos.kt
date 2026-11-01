@@ -99,6 +99,7 @@ private fun lerTabela(
     return if (colunas.isEmpty() || linhas.isEmpty()) null else Artefato.Tabela(colunas, linhas, simulado, nota)
 }
 
+@Suppress("ReturnCount")
 private fun lerGrafico(
     objeto: Map<String, JsonElement>,
     simulado: Boolean,
@@ -126,6 +127,7 @@ private fun lerGrafico(
 }
 
 /** Texto de uma célula: vazio vira "—", datas viram dd/MM/aaaa e números usam vírgula decimal. */
+@Suppress("ReturnCount")
 internal fun formatarCelula(valor: JsonElement?): String {
     if (valor == null || valor is JsonNull) return CELULA_VAZIA
     val primitivo = valor as? JsonPrimitive ?: return valor.toString()

@@ -44,7 +44,7 @@ class ChatViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun criarViewModel(store: ChatSessionStore = ChatSessionStore()) =
+    private fun criarViewModel(store: ChatSessionStore = ChatSessionStore()): ChatViewModel =
         ChatViewModel(chatRepository = fakeRepository, store = store)
 
     private fun aguardar() = dispatcher.scheduler.advanceUntilIdle()
@@ -101,7 +101,10 @@ class ChatViewModelTest {
         aguardar()
 
         assertTrue(fakeRepository.perguntasRecebidas.isEmpty())
-        assertTrue(viewModel.uiState.value.mensagens.isEmpty())
+        assertTrue(
+            viewModel.uiState.value.mensagens
+                .isEmpty(),
+        )
     }
 
     @Test
@@ -130,7 +133,9 @@ class ChatViewModelTest {
         viewModel.onSend()
         aguardar()
 
-        val ultima = viewModel.uiState.value.mensagens.last()
+        val ultima =
+            viewModel.uiState.value.mensagens
+                .last()
         assertEquals(false, ultima.ehDoUsuario)
         assertEquals("Não consegui falar com a IA: falhou", ultima.conteudo)
         assertNotNull(viewModel.uiState.value.erro)
@@ -160,7 +165,12 @@ class ChatViewModelTest {
         viewModel.onAudioGravado(File("audio_teste.m4a"))
         aguardar()
 
-        assertEquals("Mensagem de voz", viewModel.uiState.value.mensagens.first().conteudo)
+        assertEquals(
+            "Mensagem de voz",
+            viewModel.uiState.value.mensagens
+                .first()
+                .conteudo,
+        )
     }
 
     @Test
@@ -171,7 +181,12 @@ class ChatViewModelTest {
         viewModel.onAudioGravado(File("audio_teste.m4a"))
         aguardar()
 
-        assertEquals("Áudio não enviado", viewModel.uiState.value.mensagens.first().conteudo)
+        assertEquals(
+            "Áudio não enviado",
+            viewModel.uiState.value.mensagens
+                .first()
+                .conteudo,
+        )
     }
 
     @Test
@@ -182,7 +197,9 @@ class ChatViewModelTest {
         viewModel.onAudioGravado(File("audio_teste.m4a"))
         aguardar()
 
-        val ultima = viewModel.uiState.value.mensagens.last()
+        val ultima =
+            viewModel.uiState.value.mensagens
+                .last()
         assertEquals("Não consegui falar com a IA: falhou", ultima.conteudo)
         assertEquals(false, viewModel.uiState.value.carregando)
     }
@@ -266,7 +283,10 @@ class ChatViewModelTest {
         aguardar()
 
         assertTrue(fakeRepository.perguntasRecebidas.isEmpty())
-        val ultima = viewModel.uiState.value.mensagens.last().conteudo
+        val ultima =
+            viewModel.uiState.value.mensagens
+                .last()
+                .conteudo
         assertTrue(ultima.contains("- virus.exe: Arquivos executáveis ou de script não são aceitos."))
         assertFalse(viewModel.uiState.value.carregando)
     }
@@ -286,7 +306,10 @@ class ChatViewModelTest {
         assertTrue(mensagens[1].conteudo.contains("- contrato.pdf"))
         assertTrue(mensagens[1].conteudo.contains("Já pode me perguntar sobre eles."))
         assertTrue(fakeRepository.perguntasRecebidas.isEmpty())
-        assertTrue(viewModel.uiState.value.anexosPendentes.isEmpty())
+        assertTrue(
+            viewModel.uiState.value.anexosPendentes
+                .isEmpty(),
+        )
     }
 
     @Test
@@ -313,7 +336,10 @@ class ChatViewModelTest {
         aguardar()
 
         assertEquals(1, fakeRepository.lotesDeAnexos.size)
-        val resposta = viewModel.uiState.value.mensagens.last().conteudo
+        val resposta =
+            viewModel.uiState.value.mensagens
+                .last()
+                .conteudo
         assertTrue(resposta.contains("**Não consegui guardar:**"))
         assertTrue(resposta.contains("- a1.pdf: Não consegui falar com a IA: sem conexao"))
         assertTrue(resposta.contains("- a5.pdf: não enviado"))
@@ -332,7 +358,10 @@ class ChatViewModelTest {
         viewModel.onSend()
         aguardar()
 
-        val resposta = viewModel.uiState.value.mensagens.last().conteudo
+        val resposta =
+            viewModel.uiState.value.mensagens
+                .last()
+                .conteudo
         assertTrue(resposta.contains("- contrato.pdf: Recurso de documentos indisponível: Qdrant não configurado."))
     }
 
@@ -373,7 +402,10 @@ class ChatViewModelTest {
         viewModel.onAnexoRemovido(anexo)
         aguardar()
 
-        assertTrue(viewModel.uiState.value.anexosPendentes.isEmpty())
+        assertTrue(
+            viewModel.uiState.value.anexosPendentes
+                .isEmpty(),
+        )
         assertFalse(temporario.exists())
     }
 
@@ -399,7 +431,10 @@ class ChatViewModelTest {
         viewModel.onNovaSessao()
         aguardar()
 
-        assertTrue(viewModel.uiState.value.anexosPendentes.isEmpty())
+        assertTrue(
+            viewModel.uiState.value.anexosPendentes
+                .isEmpty(),
+        )
         assertFalse(temporario.exists())
     }
 
@@ -410,7 +445,10 @@ class ChatViewModelTest {
         viewModel.onAnexosEscolhidos(listOf(anexo("contrato.pdf")))
         aguardar()
 
-        assertTrue(viewModel.uiState.value.anexosPendentes.isEmpty())
+        assertTrue(
+            viewModel.uiState.value.anexosPendentes
+                .isEmpty(),
+        )
         assertTrue(fakeRepository.lotesDeAnexos.isEmpty())
     }
 
@@ -424,7 +462,9 @@ class ChatViewModelTest {
         viewModel.onAudioGravado(File("audio_teste.m4a"))
         aguardar()
 
-        val ultima = viewModel.uiState.value.mensagens.last()
+        val ultima =
+            viewModel.uiState.value.mensagens
+                .last()
         assertEquals("Não consegui entender o áudio. Tente de novo.", ultima.conteudo)
     }
 
@@ -440,7 +480,10 @@ class ChatViewModelTest {
         aguardar()
 
         assertEquals(listOf(sessaoAnterior), fakeRepository.sessoesEncerradas)
-        assertTrue(viewModel.uiState.value.mensagens.isEmpty())
+        assertTrue(
+            viewModel.uiState.value.mensagens
+                .isEmpty(),
+        )
         assertNotEquals(sessaoAnterior, viewModel.uiState.value.sessionId)
     }
 
@@ -456,7 +499,10 @@ class ChatViewModelTest {
         viewModel.onNovaSessao()
         aguardar()
 
-        assertTrue(viewModel.uiState.value.mensagens.isEmpty())
+        assertTrue(
+            viewModel.uiState.value.mensagens
+                .isEmpty(),
+        )
         assertNull(viewModel.uiState.value.erro)
         assertTrue(fakeRepository.sessoesEncerradas.isEmpty())
 
@@ -477,7 +523,10 @@ class ChatViewModelTest {
         viewModel.onNovaSessao()
 
         // Sem avançar o relógio do teste: o encerramento ainda não rodou, e a tela já está limpa.
-        assertTrue(viewModel.uiState.value.mensagens.isEmpty())
+        assertTrue(
+            viewModel.uiState.value.mensagens
+                .isEmpty(),
+        )
         assertFalse(viewModel.uiState.value.carregando)
     }
 
@@ -509,7 +558,10 @@ class ChatViewModelTest {
         viewModel.onVoltarAoInicio {}
         aguardar()
 
-        val ultima = criarViewModel(store).uiState.value.mensagens.last()
+        val ultima =
+            criarViewModel(store)
+                .uiState.value.mensagens
+                .last()
         assertFalse(ultima.ehDoUsuario)
         assertEquals("resposta da IA", ultima.conteudo)
     }
@@ -563,7 +615,9 @@ class ChatViewModelTest {
         viewModel.onConversaClick(ConversaResumo("c1", "Estoque"))
         aguardar()
 
-        val resposta = viewModel.uiState.value.mensagens.last()
+        val resposta =
+            viewModel.uiState.value.mensagens
+                .last()
         assertEquals("Somar os lotes.", resposta.pensamento)
         assertEquals(listOf(PassoIa("t1", "Estoque consultado", true)), resposta.passos)
     }
@@ -572,14 +626,23 @@ class ChatViewModelTest {
     fun `titulo da conversa vem da IA e cai no resumo quando falta`() {
         fakeRepository.sessoesDoHistorico =
             listOf(
-                SessaoResumoDto("1", "2026-10-30T10:00:00", "O usuário perguntou sobre arroz. Depois...", "Estoque de arroz"),
+                SessaoResumoDto(
+                    "1",
+                    "2026-10-30T10:00:00",
+                    "O usuário perguntou sobre arroz. Depois...",
+                    "Estoque de arroz",
+                ),
                 SessaoResumoDto("2", "2026-10-29T10:00:00", "O usuário pediu uma baixa. Depois...", null),
             )
 
         val viewModel = criarViewModel()
         aguardar()
 
-        assertEquals(listOf("Estoque de arroz", "Pediu uma baixa"), viewModel.uiState.value.conversas.map { it.titulo })
+        assertEquals(
+            listOf("Estoque de arroz", "Pediu uma baixa"),
+            viewModel.uiState.value.conversas
+                .map { it.titulo },
+        )
     }
 
     // ---------- persistência ----------
@@ -620,7 +683,10 @@ class ChatViewModelTest {
         criarViewModel(store)
         aguardar()
 
-        assertTrue(store.estado.value.mensagens.isEmpty())
+        assertTrue(
+            store.estado.value.mensagens
+                .isEmpty(),
+        )
         assertEquals("usuario-teste", store.donoId)
     }
 
@@ -632,7 +698,10 @@ class ChatViewModelTest {
 
         conversar(viewModel, 1)
 
-        val idDaResposta = viewModel.uiState.value.mensagens.last().id
+        val idDaResposta =
+            viewModel.uiState.value.mensagens
+                .last()
+                .id
         assertEquals(idDaResposta, viewModel.uiState.value.mensagemAnimandoId)
 
         viewModel.onDigitacaoTerminou(idDaResposta)
@@ -687,7 +756,12 @@ class ChatViewModelTest {
         aguardar()
 
         assertTrue(fakeRepository.consultasDeHistorico > consultasAntes)
-        assertEquals("doc9", viewModel.uiState.value.conversas.single().id)
+        assertEquals(
+            "doc9",
+            viewModel.uiState.value.conversas
+                .single()
+                .id,
+        )
     }
 
     private fun prepararConversaAntigaAberta(): ChatViewModel {
@@ -703,7 +777,10 @@ class ChatViewModelTest {
         val viewModel = criarViewModel()
         aguardar()
         conversar(viewModel, 1)
-        viewModel.onConversaClick(viewModel.uiState.value.conversas.single())
+        viewModel.onConversaClick(
+            viewModel.uiState.value.conversas
+                .single(),
+        )
         aguardar()
         return viewModel
     }
@@ -748,7 +825,9 @@ class ChatViewModelTest {
     @Test
     fun `nova conversa durante a leitura encerra a conversa ao vivo`() {
         val viewModel = prepararConversaAntigaAberta()
-        val sessaoAoVivo = viewModel.uiState.value.conversaEmAndamento!!.sessionId
+        val sessaoAoVivo =
+            viewModel.uiState.value.conversaEmAndamento!!
+                .sessionId
 
         viewModel.onNovaSessao()
         aguardar()
@@ -766,7 +845,10 @@ class ChatViewModelTest {
         val viewModel = criarViewModel()
         aguardar()
 
-        viewModel.onConversaClick(viewModel.uiState.value.conversas.single())
+        viewModel.onConversaClick(
+            viewModel.uiState.value.conversas
+                .single(),
+        )
         aguardar()
 
         val estado = viewModel.uiState.value
@@ -814,7 +896,9 @@ class ChatViewModelTest {
 
         val viewModel = conversaComAcaoProposta()
 
-        val resposta = viewModel.uiState.value.mensagens.last()
+        val resposta =
+            viewModel.uiState.value.mensagens
+                .last()
         assertFalse(resposta.ehDoUsuario)
         assertEquals(1, resposta.acoes.size)
         assertEquals(EstadoDaAcao.AGUARDANDO, viewModel.acao().estado)
@@ -869,7 +953,13 @@ class ChatViewModelTest {
         aguardar()
 
         assertEquals(EstadoDaAcao.AGUARDANDO, viewModel.acao().estado)
-        assertTrue(viewModel.acao().detalhe.orEmpty().contains("sem rede"))
+        assertTrue(
+            viewModel
+                .acao()
+                .detalhe
+                .orEmpty()
+                .contains("sem rede"),
+        )
     }
 
     @Test
@@ -924,7 +1014,13 @@ class ChatViewModelTest {
         aguardar()
 
         assertEquals(EstadoDaAcao.APROVADA, viewModel.acao().estado)
-        assertTrue(viewModel.acao().detalhe.orEmpty().contains("sem rede"))
+        assertTrue(
+            viewModel
+                .acao()
+                .detalhe
+                .orEmpty()
+                .contains("sem rede"),
+        )
     }
 
     @Test
@@ -984,7 +1080,10 @@ class ChatViewModelTest {
         viewModel.onSend()
         aguardar()
 
-        val tabela = viewModel.uiState.value.mensagens.last().artefato as Artefato.Tabela
+        val tabela =
+            viewModel.uiState.value.mensagens
+                .last()
+                .artefato as Artefato.Tabela
         assertEquals(2, tabela.linhas.size)
         assertEquals(listOf("Arroz", "12"), tabela.linhas.first())
     }
@@ -998,7 +1097,9 @@ class ChatViewModelTest {
         viewModel.onSend()
         aguardar()
 
-        val resposta = viewModel.uiState.value.mensagens.last()
+        val resposta =
+            viewModel.uiState.value.mensagens
+                .last()
         assertNull(resposta.artefato)
         assertEquals("resposta da IA", resposta.conteudo)
     }
@@ -1010,19 +1111,37 @@ class ChatViewModelTest {
         fakeRepository.sessoesDoHistorico =
             listOf(
                 SessaoResumoDto("d1", "2026-10-30T10:00:00", "", "Pergunta antiga", session_id = "outra", ativa = true),
-                SessaoResumoDto("d2", "2026-10-31T10:00:00", "", "Conversa de agora", session_id = daTela, ativa = true),
-                SessaoResumoDto("d3", "2026-10-29T10:00:00", "O usuário pediu arroz.", "Arroz", session_id = "encerrada"),
+                SessaoResumoDto(
+                    "d2",
+                    "2026-10-31T10:00:00",
+                    "",
+                    "Conversa de agora",
+                    session_id = daTela,
+                    ativa = true,
+                ),
+                SessaoResumoDto(
+                    "d3",
+                    "2026-10-29T10:00:00",
+                    "O usuário pediu arroz.",
+                    "Arroz",
+                    session_id = "encerrada",
+                ),
             )
 
         viewModel.carregarHistorico()
         aguardar()
 
-        assertEquals(listOf("Pergunta antiga", "Arroz"), viewModel.uiState.value.conversas.map { it.titulo })
+        assertEquals(
+            listOf("Pergunta antiga", "Arroz"),
+            viewModel.uiState.value.conversas
+                .map { it.titulo },
+        )
     }
 
     @Test
     fun `parar interrompe a resposta, libera o campo e deixa os passos sem girar`() {
-        fakeRepository.eventosDoStream = listOf(EventoIa.Etapa("t1", concluida = false, texto = "Consultando o estoque…"))
+        fakeRepository.eventosDoStream =
+            listOf(EventoIa.Etapa("t1", concluida = false, texto = "Consultando o estoque…"))
         fakeRepository.travarDepoisDosEventos = true
         val viewModel = criarViewModel()
         viewModel.onInputChange("quais produtos tem?")
@@ -1036,7 +1155,13 @@ class ChatViewModelTest {
         val estado = viewModel.uiState.value
         assertFalse(estado.carregando)
         assertNull(estado.iniciouEmMillis)
-        assertTrue(estado.mensagens.first { !it.ehDoUsuario && it.passos.isNotEmpty() }.passos.single().concluido)
+        assertTrue(
+            estado.mensagens
+                .first { !it.ehDoUsuario && it.passos.isNotEmpty() }
+                .passos
+                .single()
+                .concluido,
+        )
         assertEquals("Você interrompeu a resposta.", estado.mensagens.last().conteudo)
     }
 
@@ -1051,7 +1176,10 @@ class ChatViewModelTest {
 
         viewModel.onPararResposta()
 
-        assertEquals(listOf("oi", "Você interrompeu a resposta."), viewModel.uiState.value.mensagens.map { it.conteudo })
+        val conteudos =
+            viewModel.uiState.value.mensagens
+                .map { it.conteudo }
+        assertEquals(listOf("oi", "Você interrompeu a resposta."), conteudos)
         assertFalse(viewModel.uiState.value.carregando)
     }
 

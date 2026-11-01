@@ -47,7 +47,7 @@ data class ChatUiState(
     val sessionId: String = "sessao_${System.currentTimeMillis()}",
     /** Quantas respostas da IA a conversa atual já teve. */
     val respostasDaIa: Int = 0,
-    /** Quando a pergunta em andamento foi enviada (epoch ms); alimenta o contador de tempo. Null = nada em andamento. */
+    /** Quando a pergunta em andamento foi enviada (epoch ms), para o contador de tempo. Null = nada em andamento. */
     val iniciouEmMillis: Long? = null,
     /** Resposta da IA que ainda está sendo "digitada" na tela. */
     val mensagemAnimandoId: String? = null,

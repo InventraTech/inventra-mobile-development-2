@@ -51,7 +51,8 @@ class ChatViewModel(
         val atual = store.estado.value
         val pergunta = atual.inputValue.trim()
         val anexos = atual.anexosPendentes
-        if ((pergunta.isEmpty() && anexos.isEmpty()) || atual.carregando || atual.conversaVisualizadaId != null) return
+        val semConteudo = pergunta.isEmpty() && anexos.isEmpty()
+        if (semConteudo || atual.carregando || atual.conversaVisualizadaId != null) return
 
         atualizar { it.copy(inputValue = "", anexosPendentes = emptyList()) }
         when {
@@ -208,7 +209,8 @@ class ChatViewModel(
             val aviso = mensagemDaIa(TEXTO_RESPOSTA_PARADA)
             val mensagens =
                 if (ultima != null && !ultima.ehDoUsuario) {
-                    s.mensagens.dropLast(1) + ultima.copy(passos = ultima.passos.map { it.copy(concluido = true) }) + aviso
+                    val semGirar = ultima.copy(passos = ultima.passos.map { it.copy(concluido = true) })
+                    s.mensagens.dropLast(1) + semGirar + aviso
                 } else {
                     s.mensagens + aviso
                 }
@@ -381,8 +383,7 @@ class ChatViewModel(
     }
 
     /** As conversas que o usuário está vendo (a da tela e a guardada atrás do histórico) não entram no menu. */
-    private fun sessoesDaTela(estado: ChatUiState): Set<String> =
-        setOfNotNull(estado.sessionId, estado.conversaEmAndamento?.sessionId)
+    private fun sessoesDaTela(s: ChatUiState): Set<String> = setOfNotNull(s.sessionId, s.conversaEmAndamento?.sessionId)
 
     /** Encerra no servidor as conversas deixadas antes e que falharam na hora. */
     private suspend fun encerrarSessoesPendentes() {
@@ -428,39 +429,40 @@ class ChatViewModel(
             )
         }
 
-        val envio = store.escopo.launch {
-            tentar { chamada() }
-                .onSuccess { resposta ->
-                    val transcricao = resposta.transcricao?.takeIf { it.isNotBlank() }
-                    val iaMensagem =
-                        Mensagem(
-                            id = novoId("ia"),
-                            conteudo = resposta.resposta,
-                            ehDoUsuario = false,
-                            artefato = resposta.artefato,
-                            acoes = resposta.acoes,
-                        )
-                    atualizar { s ->
-                        val mensagensAtualizadas =
-                            s.mensagens.map { mensagem ->
-                                if (mensagem.id == minhaMensagem.id && transcricao != null) {
-                                    mensagem.copy(conteudo = transcricao)
-                                } else {
-                                    mensagem
+        val envio =
+            store.escopo.launch {
+                tentar { chamada() }
+                    .onSuccess { resposta ->
+                        val transcricao = resposta.transcricao?.takeIf { it.isNotBlank() }
+                        val iaMensagem =
+                            Mensagem(
+                                id = novoId("ia"),
+                                conteudo = resposta.resposta,
+                                ehDoUsuario = false,
+                                artefato = resposta.artefato,
+                                acoes = resposta.acoes,
+                            )
+                        atualizar { s ->
+                            val mensagensAtualizadas =
+                                s.mensagens.map { mensagem ->
+                                    if (mensagem.id == minhaMensagem.id && transcricao != null) {
+                                        mensagem.copy(conteudo = transcricao)
+                                    } else {
+                                        mensagem
+                                    }
                                 }
-                            }
-                        val respostas = s.respostasDaIa + 1
-                        val aviso = resposta.avisoDosAnexos?.let { listOf(mensagemDaIa(it)) } ?: emptyList()
-                        s.copy(
-                            mensagens = mensagensAtualizadas + aviso + iaMensagem,
-                            carregando = false,
-                            iniciouEmMillis = null,
-                            respostasDaIa = respostas,
-                            mensagemAnimandoId = iaMensagem.id,
-                        )
-                    }
-                }.onFailure { e -> registrarFalha(e, minhaMensagem.id, textoSeFalhar) }
-        }
+                            val respostas = s.respostasDaIa + 1
+                            val aviso = resposta.avisoDosAnexos?.let { listOf(mensagemDaIa(it)) } ?: emptyList()
+                            s.copy(
+                                mensagens = mensagensAtualizadas + aviso + iaMensagem,
+                                carregando = false,
+                                iniciouEmMillis = null,
+                                respostasDaIa = respostas,
+                                mensagemAnimandoId = iaMensagem.id,
+                            )
+                        }
+                    }.onFailure { e -> registrarFalha(e, minhaMensagem.id, textoSeFalhar) }
+            }
         store.envioEmAndamento = envio
         envio.invokeOnCompletion { if (store.envioEmAndamento === envio) store.envioEmAndamento = null }
     }
@@ -484,50 +486,51 @@ class ChatViewModel(
             )
         }
 
-        val envio = store.escopo.launch {
-            val iaId = novoId("ia")
-            val resposta = RespostaEmStream()
-            var chegouCompleta = false
-            tentar {
-                val pronta = preparar()
-                pronta.avisoDosAnexos?.let { aviso ->
-                    atualizar { it.copy(mensagens = it.mensagens + mensagemDaIa(aviso)) }
-                }
-                chatRepository
-                    .conversarStream(
-                        sessionId = store.estado.value.sessionId,
-                        pergunta = pronta.pergunta,
-                        userId = chatRepository.obterUsuarioId(),
-                    ).collect { evento ->
-                        when (evento) {
-                            is EventoIa.Erro -> {
-                                throw ErroDoStream(evento.mensagem)
-                            }
-
-                            is EventoIa.RespostaCompleta -> {
-                                chegouCompleta = true
-                                mostrarRespostaCompleta(iaId, evento.resposta)
-                            }
-
-                            is EventoIa.Fim -> {
-                                resposta.aplicar(evento)
-                                if (resposta.temConteudo) publicar(iaId, resposta)
-                                concluirResposta(iaId)
-                            }
-
-                            else -> if (resposta.aplicar(evento)) publicar(iaId, resposta)
-                        }
+        val envio =
+            store.escopo.launch {
+                val iaId = novoId("ia")
+                val resposta = RespostaEmStream()
+                var chegouCompleta = false
+                tentar {
+                    val pronta = preparar()
+                    pronta.avisoDosAnexos?.let { aviso ->
+                        atualizar { it.copy(mensagens = it.mensagens + mensagemDaIa(aviso)) }
                     }
-                if (!resposta.terminou && !chegouCompleta) throw ErroDoStream(TEXTO_RESPOSTA_INTERROMPIDA)
-            }.onFailure { e ->
-                // Passos que ainda giravam não podem ficar girando depois da falha.
-                if (resposta.temConteudo) {
-                    resposta.encerrarPassosPendentes()
-                    publicar(iaId, resposta)
+                    chatRepository
+                        .conversarStream(
+                            sessionId = store.estado.value.sessionId,
+                            pergunta = pronta.pergunta,
+                            userId = chatRepository.obterUsuarioId(),
+                        ).collect { evento ->
+                            when (evento) {
+                                is EventoIa.Erro -> {
+                                    throw ErroDoStream(evento.mensagem)
+                                }
+
+                                is EventoIa.RespostaCompleta -> {
+                                    chegouCompleta = true
+                                    mostrarRespostaCompleta(iaId, evento.resposta)
+                                }
+
+                                is EventoIa.Fim -> {
+                                    resposta.aplicar(evento)
+                                    if (resposta.temConteudo) publicar(iaId, resposta)
+                                    concluirResposta(iaId)
+                                }
+
+                                else -> if (resposta.aplicar(evento)) publicar(iaId, resposta)
+                            }
+                        }
+                    if (!resposta.terminou && !chegouCompleta) throw ErroDoStream(TEXTO_RESPOSTA_INTERROMPIDA)
+                }.onFailure { e ->
+                    // Passos que ainda giravam não podem ficar girando depois da falha.
+                    if (resposta.temConteudo) {
+                        resposta.encerrarPassosPendentes()
+                        publicar(iaId, resposta)
+                    }
+                    registrarFalha(e, minhaMensagem.id, textoSeFalhar = null)
                 }
-                registrarFalha(e, minhaMensagem.id, textoSeFalhar = null)
             }
-        }
         store.envioEmAndamento = envio
         envio.invokeOnCompletion { if (store.envioEmAndamento === envio) store.envioEmAndamento = null }
     }
@@ -658,7 +661,9 @@ class ChatViewModel(
         anexos.forEach { anexo ->
             anexo.arquivo.delete()
             // Cada anexo fica numa pasta própria dentro de cache/anexos; ela some junto com o arquivo.
-            anexo.arquivo.parentFile?.takeIf { it.parentFile?.name == PASTA_DE_ANEXOS }?.delete()
+            anexo.arquivo.parentFile
+                ?.takeIf { it.parentFile?.name == PASTA_DE_ANEXOS }
+                ?.delete()
         }
     }
 

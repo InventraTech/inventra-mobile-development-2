@@ -281,7 +281,8 @@ class ChatAcoesTest {
 
     @Test
     fun `saldo decimal sai com virgula e sem zeros sobrando`() {
-        val acao = proposta(parametros = """{"batchId":1,"quantity":"2.5"}""", antes = loteComSaldo("10.000")).paraAcao()
+        val acao =
+            proposta(parametros = """{"batchId":1,"quantity":"2.5"}""", antes = loteComSaldo("10.000")).paraAcao()
 
         assertEquals(MudancaDeSaldo(antes = "10 kg", depois = "7,5 kg"), acao.mudanca)
     }
@@ -289,9 +290,17 @@ class ChatAcoesTest {
     @Test
     fun `entrada soma e ajuste define a nova quantidade`() {
         val entrada =
-            proposta(operacao = "registrar_entrada", parametros = """{"batchId":1,"quantity":"5"}""", antes = loteComSaldo("20"))
+            proposta(
+                operacao = "registrar_entrada",
+                parametros = """{"batchId":1,"quantity":"5"}""",
+                antes = loteComSaldo("20"),
+            )
         val ajuste =
-            proposta(operacao = "ajustar_estoque", parametros = """{"batchId":1,"newQuantity":"12"}""", antes = loteComSaldo("20"))
+            proposta(
+                operacao = "ajustar_estoque",
+                parametros = """{"batchId":1,"newQuantity":"12"}""",
+                antes = loteComSaldo("20"),
+            )
 
         assertEquals("25 kg", entrada.paraAcao().mudanca?.depois)
         assertEquals("12 kg", ajuste.paraAcao().mudanca?.depois)

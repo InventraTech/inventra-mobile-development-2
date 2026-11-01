@@ -1,3 +1,6 @@
+// Os nomes seguem os campos do JSON da IA (snake_case).
+@file:Suppress("ConstructorParameterNaming")
+
 package com.inventraoficial.inventra.data.remote.api
 
 import kotlinx.serialization.Serializable

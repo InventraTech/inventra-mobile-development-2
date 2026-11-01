@@ -51,8 +51,7 @@ internal fun novaPastaDoAnexo(context: Context): File =
     File(File(context.cacheDir, PASTA_DE_ANEXOS), UUID.randomUUID().toString()).apply { mkdirs() }
 
 /** Onde a câmera vai gravar a foto (o FileProvider entrega essa pasta do cache à câmera). */
-fun novoArquivoDeFoto(context: Context): File =
-    File(novaPastaDoAnexo(context), "foto_${System.currentTimeMillis()}.jpg")
+fun novoArquivoDeFoto(context: Context) = File(novaPastaDoAnexo(context), "foto_${System.currentTimeMillis()}.jpg")
 
 fun uriDoArquivo(
     context: Context,
@@ -125,6 +124,7 @@ private fun nomeDoArquivo(
 }
 
 /** Copia [uri] para o cache. O nome que a IA recebe é [nomeParaIa] (pode levar o caminho da pasta). */
+@Suppress("SwallowedException")
 internal fun copiarParaCache(
     context: Context,
     uri: Uri,

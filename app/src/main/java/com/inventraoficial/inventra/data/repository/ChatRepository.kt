@@ -205,11 +205,9 @@ class NetworkChatRepository(
             )
         }
 
-    override suspend fun executarAcao(acaoId: String): AprovacaoDto =
-        comDetalheDoErro { chatApi.executarAcao(acaoId) }
+    override suspend fun executarAcao(acaoId: String): AprovacaoDto = comDetalheDoErro { chatApi.executarAcao(acaoId) }
 
-    override suspend fun consultarAcao(acaoId: String): AprovacaoDto =
-        comDetalheDoErro { chatApi.detalheDaAcao(acaoId) }
+    override suspend fun consultarAcao(acaoId: String) = comDetalheDoErro { chatApi.detalheDaAcao(acaoId) }
 
     override suspend fun encerrarSessao(sessionId: String): EncerrarSessaoResponse? =
         try {
@@ -249,7 +247,12 @@ class NetworkChatRepository(
     /** Lê o campo "detail" que a IA devolve nos erros (415, 422, 413, 502...). */
     private fun detalheDoErro(e: HttpException): String? =
         runCatching {
-            val corpo = e.response()?.errorBody()?.string().orEmpty()
+            val corpo =
+                e
+                    .response()
+                    ?.errorBody()
+                    ?.string()
+                    .orEmpty()
             val detalhe = (Json.parseToJsonElement(corpo) as? JsonObject)?.get("detail") as? JsonPrimitive
             detalhe?.contentOrNull
         }.getOrNull()?.takeIf { it.isNotBlank() }

@@ -37,6 +37,7 @@ class AudioRecorder(
     }
 
     /** Para a gravação e devolve o arquivo, ou null se não gravou nada aproveitável. */
+    @Suppress("ReturnCount", "SwallowedException", "TooGenericExceptionCaught")
     fun parar(): File? {
         val atual = recorder ?: return null
         val destino = arquivo
