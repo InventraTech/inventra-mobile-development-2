@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,10 +34,12 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryBut
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraProductRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWithFilter
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraFilterChipRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
+import com.inventraoficial.inventra.ui.theme.InventraGold
 import com.inventraoficial.inventra.ui.theme.InventraInk
 import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
@@ -58,6 +61,7 @@ fun StockListScreen(
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
     activeFilterCount: Int = 0,
+    offlineMessage: String? = null,
 ) {
     Column(
         modifier =
@@ -83,57 +87,78 @@ fun StockListScreen(
                 )
             },
         )
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(16.dp),
-        ) {
-            InventraSearchWithFilter(
-                query = searchQuery,
-                onQueryChange = onSearchQueryChange,
-                onFilterClick = onFilterIconClick,
-                placeholder = "Buscar produto...",
-                activeFilterCount = activeFilterCount,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
-            InventraFilterChipRow(
-                options = filterOptions,
-                selected = selectedFilter,
-                onSelect = onFilterSelect,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
-            when {
-                isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
-                errorMessage != null ->
-                    ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
-                products.isEmpty() ->
-                    Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Nenhum produto encontrado.",
-                            fontFamily = Montserrat,
-                            fontSize = 14.sp,
-                            color = InventraMuted,
-                        )
-                    }
-                else ->
-                    LazyColumn(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        items(products, key = { it.id }) { product ->
-                            InventraProductRow(
-                                painter = painterResource(product.imageRes),
-                                title = product.title,
-                                quantity = product.quantity,
-                                batchInfo = product.batchInfo,
-                                onClick = { onProductClick(product) },
+        InventraScreenContent {
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .padding(16.dp),
+            ) {
+                InventraSearchWithFilter(
+                    query = searchQuery,
+                    onQueryChange = onSearchQueryChange,
+                    onFilterClick = onFilterIconClick,
+                    placeholder = "Buscar produto...",
+                    activeFilterCount = activeFilterCount,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+                InventraFilterChipRow(
+                    options = filterOptions,
+                    selected = selectedFilter,
+                    onSelect = onFilterSelect,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+                offlineMessage?.let { OfflineBanner(message = it, modifier = Modifier.padding(bottom = 12.dp)) }
+                when {
+                    isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
+                    errorMessage != null ->
+                        ErrorState(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
+                    products.isEmpty() ->
+                        Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "Nenhum produto encontrado.",
+                                fontFamily = Montserrat,
+                                fontSize = 14.sp,
+                                color = InventraMuted,
                             )
                         }
-                    }
+                    else ->
+                        LazyColumn(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            items(products, key = { it.id }) { product ->
+                                InventraProductRow(
+                                    painter = painterResource(product.imageRes),
+                                    title = product.title,
+                                    quantity = product.quantity,
+                                    batchInfo = product.batchInfo,
+                                    onClick = { onProductClick(product) },
+                                )
+                            }
+                        }
+                }
             }
         }
     }
+}
+
+@Composable
+private fun OfflineBanner(
+    message: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = message,
+        fontFamily = Montserrat,
+        fontSize = 13.sp,
+        color = InventraInk,
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(InventraGold.copy(alpha = 0.18f), RoundedCornerShape(8.dp))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+    )
 }
 
 @Composable
@@ -195,6 +220,7 @@ fun StockListRoute(
         onRetryClick = viewModel::onRetryClick,
         activeFilterCount = uiState.filters.activeCount,
         modifier = modifier,
+        offlineMessage = uiState.offlineMessage,
     )
 
     uiState.draftFilters?.let { draft ->

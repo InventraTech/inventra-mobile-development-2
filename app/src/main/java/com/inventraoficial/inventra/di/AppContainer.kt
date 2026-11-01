@@ -14,9 +14,12 @@ import com.inventraoficial.inventra.data.local.DataStoreAppPreferences
 import com.inventraoficial.inventra.data.local.DataStoreSessionStorage
 import com.inventraoficial.inventra.data.local.FusedLocationProvider
 import com.inventraoficial.inventra.data.local.ImageCompressor
+import com.inventraoficial.inventra.data.local.InventraDatabase
 import com.inventraoficial.inventra.data.local.LocationProvider
 import com.inventraoficial.inventra.data.local.ProfilePhotoPreview
 import com.inventraoficial.inventra.data.local.SessionStorage
+import com.inventraoficial.inventra.data.local.SqliteStockCache
+import com.inventraoficial.inventra.data.local.StockCache
 import com.inventraoficial.inventra.data.remote.api.AlertApi
 import com.inventraoficial.inventra.data.remote.api.AuthApi
 import com.inventraoficial.inventra.data.remote.api.ChatApi
@@ -47,6 +50,7 @@ import com.inventraoficial.inventra.data.repository.NetworkChatRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenAccessRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenRepository
 import com.inventraoficial.inventra.data.repository.NetworkMembersRepository
+import com.inventraoficial.inventra.data.repository.NetworkPasswordResetRepository
 import com.inventraoficial.inventra.data.repository.NetworkPreListRepository
 import com.inventraoficial.inventra.data.repository.NetworkProductPhotoRepository
 import com.inventraoficial.inventra.data.repository.NetworkProductRepository
@@ -54,6 +58,7 @@ import com.inventraoficial.inventra.data.repository.NetworkProductSupplierReposi
 import com.inventraoficial.inventra.data.repository.NetworkRequisitionRepository
 import com.inventraoficial.inventra.data.repository.NetworkStockRepository
 import com.inventraoficial.inventra.data.repository.NetworkSupplierRepository
+import com.inventraoficial.inventra.data.repository.PasswordResetRepository
 import com.inventraoficial.inventra.data.repository.PreListRepository
 import com.inventraoficial.inventra.data.repository.ProductPhotoRepository
 import com.inventraoficial.inventra.data.repository.ProductRepository
@@ -82,6 +87,7 @@ import java.util.concurrent.TimeUnit
 
 interface AppContainer {
     val authRepository: AuthRepository
+    val passwordResetRepository: PasswordResetRepository
     val kitchenRepository: KitchenRepository
     val kitchenAccessRepository: KitchenAccessRepository
     val membersRepository: MembersRepository
@@ -105,6 +111,7 @@ interface AppContainer {
     val newAlertsChecker: NewAlertsChecker
     val accessRequestChecker: AccessRequestChecker
     val clickTracker: ClickTracker
+    val stockCache: StockCache
 }
 
 class DefaultAppContainer(
@@ -217,6 +224,10 @@ class DefaultAppContainer(
         )
     }
 
+    override val passwordResetRepository: PasswordResetRepository by lazy {
+        NetworkPasswordResetRepository(authApi, json)
+    }
+
     override val googleAuthClient: GoogleAuthClient by lazy {
         GoogleAuthClient(context, context.getString(R.string.default_web_client_id), FirebaseAuth.getInstance())
     }
@@ -281,6 +292,8 @@ class DefaultAppContainer(
             notifier = alertNotifier,
         )
     }
+
+    override val stockCache: StockCache by lazy { SqliteStockCache(InventraDatabase(context), json) }
 
     override val clickTracker: ClickTracker by lazy {
         BufferedClickTracker(

@@ -34,6 +34,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraInitialsAvat
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraConfirmDialog
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.feature.profile.photo.ui.ProfilePhotoHost
 import com.inventraoficial.inventra.feature.profile.photo.ui.ProfilePhotoViewModel
@@ -111,89 +112,91 @@ fun ProfileDetailsScreen(
                 )
             },
         )
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-        ) {
+        InventraScreenContent {
             Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .clip(CircleShape)
-                            .clickable(enabled = !isPhotoUploading, onClick = onChangePhotoClick),
-                    contentAlignment = Alignment.Center,
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    InventraInitialsAvatar(initials = initials, photoUrl = photoUrl, size = AVATAR_SIZE)
-                    if (isPhotoUploading) {
-                        CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                    Box(
+                        modifier =
+                            Modifier
+                                .clip(CircleShape)
+                                .clickable(enabled = !isPhotoUploading, onClick = onChangePhotoClick),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        InventraInitialsAvatar(initials = initials, photoUrl = photoUrl, size = AVATAR_SIZE)
+                        if (isPhotoUploading) {
+                            CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                        }
+                    }
+                    InventraTextLink(
+                        text = if (photoUrl == null) "Adicionar foto" else "Trocar foto",
+                        onClick = onChangePhotoClick,
+                    )
+                    photoErrorMessage?.let { message ->
+                        Text(
+                            text = message,
+                            fontFamily = Montserrat,
+                            fontSize = 13.sp,
+                            color = InventraDanger,
+                            textAlign = TextAlign.Center,
+                        )
                     }
                 }
-                InventraTextLink(
-                    text = if (photoUrl == null) "Adicionar foto" else "Trocar foto",
-                    onClick = onChangePhotoClick,
+                InventraLabeledField(
+                    label = "Nome completo",
+                    value = fullName,
+                    onValueChange = {},
+                    readOnly = true,
+                    placeholder = "",
+                    modifier = Modifier.fillMaxWidth(),
                 )
-                photoErrorMessage?.let { message ->
-                    Text(
-                        text = message,
-                        fontFamily = Montserrat,
-                        fontSize = 13.sp,
-                        color = InventraDanger,
-                        textAlign = TextAlign.Center,
-                    )
+                InventraLabeledField(
+                    label = "E-mail",
+                    value = email,
+                    onValueChange = {},
+                    readOnly = true,
+                    placeholder = "",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                InventraLabeledField(
+                    label = "Cargo",
+                    value = roleLabel,
+                    onValueChange = {},
+                    readOnly = true,
+                    placeholder = "",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                InventraLabeledField(
+                    label = "Cozinha",
+                    value = cozinhaName,
+                    onValueChange = {},
+                    readOnly = true,
+                    placeholder = "",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                if (leaveKitchen.canLeave) {
+                    LeaveKitchenLink(state = leaveKitchen, onClick = onLeaveKitchenClick)
                 }
             }
-            InventraLabeledField(
-                label = "Nome completo",
-                value = fullName,
-                onValueChange = {},
-                readOnly = true,
-                placeholder = "",
-                modifier = Modifier.fillMaxWidth(),
+            InventraDangerButton(
+                text = "Sair da conta",
+                onClick = onLogoutClick,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
             )
-            InventraLabeledField(
-                label = "E-mail",
-                value = email,
-                onValueChange = {},
-                readOnly = true,
-                placeholder = "",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            InventraLabeledField(
-                label = "Cargo",
-                value = roleLabel,
-                onValueChange = {},
-                readOnly = true,
-                placeholder = "",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            InventraLabeledField(
-                label = "Cozinha",
-                value = cozinhaName,
-                onValueChange = {},
-                readOnly = true,
-                placeholder = "",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            if (leaveKitchen.canLeave) {
-                LeaveKitchenLink(state = leaveKitchen, onClick = onLeaveKitchenClick)
-            }
         }
-        InventraDangerButton(
-            text = "Sair da conta",
-            onClick = onLogoutClick,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-        )
     }
 }
 

@@ -38,6 +38,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraConfirmDialog
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraChipGroup
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraFilterSection
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionType
 import com.inventraoficial.inventra.feature.requirements.label
@@ -73,17 +74,19 @@ fun RequisitionEditorScreen(
                 )
             },
         )
-        if (uiState.isLoading) {
-            Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = InventraPurple)
+        InventraScreenContent {
+            if (uiState.isLoading) {
+                Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = InventraPurple)
+                }
+            } else {
+                EditorContent(
+                    uiState = uiState,
+                    actions = actions,
+                    onDiscardClick = { confirmDiscard = true },
+                    modifier = Modifier.weight(1f),
+                )
             }
-        } else {
-            EditorContent(
-                uiState = uiState,
-                actions = actions,
-                onDiscardClick = { confirmDiscard = true },
-                modifier = Modifier.weight(1f),
-            )
         }
     }
     if (confirmDiscard) {

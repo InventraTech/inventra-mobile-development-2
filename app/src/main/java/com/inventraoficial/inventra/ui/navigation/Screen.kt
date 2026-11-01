@@ -12,6 +12,22 @@ sealed interface Screen : NavKey {
     data object Register : Screen
 
     @Serializable
+    data class ForgotPassword(
+        val email: String = "",
+    ) : Screen
+
+    @Serializable
+    data class ResetCode(
+        val email: String,
+    ) : Screen
+
+    @Serializable
+    data class NewPassword(
+        val email: String,
+        val resetToken: String,
+    ) : Screen
+
+    @Serializable
     data object CreateCozinha : Screen
 
     @Serializable
@@ -115,6 +131,9 @@ fun Screen.mostraMascote(): Boolean =
     when (this) {
         Screen.Login,
         Screen.Register,
+        is Screen.ForgotPassword,
+        is Screen.ResetCode,
+        is Screen.NewPassword,
         Screen.CreateCozinha,
         Screen.SelectCozinha,
         Screen.RequestSent,
@@ -133,5 +152,6 @@ fun Screen.mostraMascote(): Boolean =
 fun Screen.isFullBleed(): Boolean =
     when (this) {
         Screen.Login, Screen.Register, Screen.RequestSent -> true
+        is Screen.ForgotPassword, is Screen.ResetCode, is Screen.NewPassword -> true
         else -> false
     }

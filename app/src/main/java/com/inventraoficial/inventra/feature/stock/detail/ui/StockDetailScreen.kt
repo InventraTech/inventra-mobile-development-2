@@ -44,6 +44,7 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraDelivery
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatch
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatchesCard
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraHistorySection
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTotalCard
 import com.inventraoficial.inventra.ui.navigation.Navigator
@@ -90,12 +91,14 @@ fun StockDetailScreen(
                 }
             },
         )
-        when {
-            uiState.isLoading ->
-                CenteredBox(modifier = Modifier.weight(1f)) { CircularProgressIndicator(color = InventraPurple) }
-            uiState.errorMessage != null && uiState.productName.isEmpty() ->
-                ErrorState(uiState.errorMessage, actions.onRetryClick, Modifier.weight(1f))
-            else -> DetailContent(uiState, actions, Modifier.weight(1f))
+        InventraScreenContent {
+            when {
+                uiState.isLoading ->
+                    CenteredBox(modifier = Modifier.weight(1f)) { CircularProgressIndicator(color = InventraPurple) }
+                uiState.errorMessage != null && uiState.productName.isEmpty() ->
+                    ErrorState(uiState.errorMessage, actions.onRetryClick, Modifier.weight(1f))
+                else -> DetailContent(uiState, actions, Modifier.weight(1f))
+            }
         }
     }
 }

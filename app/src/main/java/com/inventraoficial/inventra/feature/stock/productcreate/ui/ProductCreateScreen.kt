@@ -37,6 +37,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButto
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPickerOption
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormActions
 import com.inventraoficial.inventra.feature.stock.productform.ProductFormFields
@@ -66,44 +67,51 @@ fun ProductCreateScreen(
             navigationIcon = { InventraBackButton(onClick = actions.onBackClick) },
             title = { Text("Novo produto", color = Color.White, fontFamily = Montserrat, fontSize = 17.sp) },
         )
-        val contentModifier = Modifier.weight(1f).fillMaxWidth()
-        val created = uiState.createdProduct
-        val existing = uiState.existingProduct
-        when {
-            uiState.isLoading ->
-                Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = InventraPurple)
-                }
-            uiState.errorMessage != null ->
-                Column(
-                    modifier = contentModifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(uiState.errorMessage, fontFamily = Montserrat, fontSize = 15.sp, textAlign = TextAlign.Center)
-                    InventraSecondaryButton(text = "Tentar novamente", onClick = actions.onRetryClick)
-                }
-            created != null ->
-                ProductResult(
-                    icon = Icons.Default.CheckCircle,
-                    iconTint = InventraSuccess,
-                    title = "Produto cadastrado",
-                    text = uiState.createdText(created.name),
-                    product = created,
-                    actions = actions,
-                    modifier = contentModifier,
-                )
-            existing != null ->
-                ProductResult(
-                    icon = Icons.Default.Inventory2,
-                    iconTint = InventraPurple,
-                    title = "Já está no catálogo",
-                    text = "Esse código já foi cadastrado como ${existing.name}.",
-                    product = existing,
-                    actions = actions,
-                    modifier = contentModifier,
-                )
-            else -> ProductForm(uiState = uiState, actions = actions, modifier = contentModifier)
+        InventraScreenContent {
+            val contentModifier = Modifier.weight(1f).fillMaxWidth()
+            val created = uiState.createdProduct
+            val existing = uiState.existingProduct
+            when {
+                uiState.isLoading ->
+                    Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = InventraPurple)
+                    }
+                uiState.errorMessage != null ->
+                    Column(
+                        modifier = contentModifier.padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            uiState.errorMessage,
+                            fontFamily = Montserrat,
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center,
+                        )
+                        InventraSecondaryButton(text = "Tentar novamente", onClick = actions.onRetryClick)
+                    }
+                created != null ->
+                    ProductResult(
+                        icon = Icons.Default.CheckCircle,
+                        iconTint = InventraSuccess,
+                        title = "Produto cadastrado",
+                        text = uiState.createdText(created.name),
+                        product = created,
+                        actions = actions,
+                        modifier = contentModifier,
+                    )
+                existing != null ->
+                    ProductResult(
+                        icon = Icons.Default.Inventory2,
+                        iconTint = InventraPurple,
+                        title = "Já está no catálogo",
+                        text = "Esse código já foi cadastrado como ${existing.name}.",
+                        product = existing,
+                        actions = actions,
+                        modifier = contentModifier,
+                    )
+                else -> ProductForm(uiState = uiState, actions = actions, modifier = contentModifier)
+            }
         }
     }
 }

@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.data.repository.AnexoParaEnvio
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -122,47 +123,49 @@ fun ChatScreen(
                 },
                 onInicioClick = onInicioClick,
             )
-            Box(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-            ) {
-                if (mensagens.isEmpty()) {
-                    ChatEmptyState(greeting = greeting)
+            InventraScreenContent {
+                Box(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                ) {
+                    if (mensagens.isEmpty()) {
+                        ChatEmptyState(greeting = greeting)
+                    } else {
+                        ChatMessageList(
+                            mensagens = mensagens,
+                            carregando = carregando,
+                            iniciouEmMillis = iniciouEmMillis,
+                            mensagemAnimandoId = mensagemAnimandoId,
+                            onDigitacaoTerminou = onDigitacaoTerminou,
+                            onAcaoAprovada = onAcaoAprovada,
+                            onAcaoRecusada = onAcaoRecusada,
+                            onAcaoExecutar = onAcaoExecutar,
+                        )
+                    }
+                }
+                if (conversaVisualizadaId != null) {
+                    BarraDeConversaEncerrada(
+                        temConversaEmAndamento = temConversaEmAndamento,
+                        onVoltarParaConversaAtual = onVoltarParaConversaAtual,
+                        onNovaConversaClick = onNovaConversaClick,
+                        modifier = Modifier.navigationBarsPadding(),
+                    )
                 } else {
-                    ChatMessageList(
-                        mensagens = mensagens,
+                    ChatComposer(
+                        value = inputValue,
+                        onValueChange = onInputChange,
+                        onSend = onSend,
+                        onAudioGravado = onAudioGravado,
                         carregando = carregando,
-                        iniciouEmMillis = iniciouEmMillis,
-                        mensagemAnimandoId = mensagemAnimandoId,
-                        onDigitacaoTerminou = onDigitacaoTerminou,
-                        onAcaoAprovada = onAcaoAprovada,
-                        onAcaoRecusada = onAcaoRecusada,
-                        onAcaoExecutar = onAcaoExecutar,
+                        onParar = onParar,
+                        modifier = Modifier.navigationBarsPadding(),
+                        onAnexosEscolhidos = onAnexosEscolhidos,
+                        anexosPendentes = anexosPendentes,
+                        onAnexoRemovido = onAnexoRemovido,
                     )
                 }
-            }
-            if (conversaVisualizadaId != null) {
-                BarraDeConversaEncerrada(
-                    temConversaEmAndamento = temConversaEmAndamento,
-                    onVoltarParaConversaAtual = onVoltarParaConversaAtual,
-                    onNovaConversaClick = onNovaConversaClick,
-                    modifier = Modifier.navigationBarsPadding(),
-                )
-            } else {
-                ChatComposer(
-                    value = inputValue,
-                    onValueChange = onInputChange,
-                    onSend = onSend,
-                    onAudioGravado = onAudioGravado,
-                    carregando = carregando,
-                    onParar = onParar,
-                    modifier = Modifier.navigationBarsPadding(),
-                    onAnexosEscolhidos = onAnexosEscolhidos,
-                    anexosPendentes = anexosPendentes,
-                    onAnexoRemovido = onAnexoRemovido,
-                )
             }
         }
     }

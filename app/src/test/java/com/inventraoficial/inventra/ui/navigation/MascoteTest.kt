@@ -23,10 +23,13 @@ class MascoteTest {
     }
 
     @Test
-    fun `mascote fica de fora de entrada, chat, leitor e formularios`() {
+    fun `mascote fica de fora de entrada, senha, chat, leitor e formularios`() {
         listOf(
             Screen.Login,
             Screen.Register,
+            Screen.ForgotPassword(),
+            Screen.ResetCode("a@b.com"),
+            Screen.NewPassword("a@b.com", "token"),
             Screen.CreateCozinha,
             Screen.SelectCozinha,
             Screen.RequestSent,
