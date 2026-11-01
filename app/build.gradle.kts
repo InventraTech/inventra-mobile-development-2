@@ -17,6 +17,7 @@ val localProperties =
         if (file.exists()) file.inputStream().use { load(it) }
     }
 val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY").orEmpty()
+val iaBaseUrl: String = localProperties.getProperty("ia.baseUrl", "http://10.0.2.2:8000/")
 val apiBaseUrl: String =
     localProperties.getProperty("API_BASE_URL")
         ?: System.getenv("API_BASE_URL")
@@ -40,7 +41,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
-        manifestPlaceholders["usesCleartextTraffic"] = apiBaseUrl.startsWith("http://").toString()
+        manifestPlaceholders["usesCleartextTraffic"] =
+            (apiBaseUrl.startsWith("http://") || iaBaseUrl.startsWith("http://")).toString()
+        buildConfigField("String", "IA_BASE_URL", "\"$iaBaseUrl\"")
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 

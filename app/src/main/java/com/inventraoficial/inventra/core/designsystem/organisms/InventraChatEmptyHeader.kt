@@ -25,7 +25,7 @@ fun InventraChatEmptyHeader(
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_inventra_logo),
