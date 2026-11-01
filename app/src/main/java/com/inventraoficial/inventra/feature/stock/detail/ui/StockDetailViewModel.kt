@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatch
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchStatus
@@ -72,7 +73,9 @@ class StockDetailViewModel(
     private fun load() {
         _uiState.update { it.copy(isLoading = it.productName.isEmpty(), errorMessage = null) }
         viewModelScope.launch {
-            val kitchenId = authRepository.currentUser.first()?.kitchenId
+            val user = authRepository.currentUser.first()
+            val kitchenId = user?.kitchenId
+            _uiState.update { it.copy(canEdit = user?.accessType == AccessType.SUPERVISOR) }
             val product = async { productRepository.product(productId) }
             val batches =
                 async {

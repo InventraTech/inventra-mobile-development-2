@@ -22,29 +22,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
-import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
-import com.inventraoficial.inventra.core.designsystem.atoms.InventraPickerField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPickerOption
-import com.inventraoficial.inventra.core.designsystem.organisms.InventraSearchPickerSheet
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.feature.stock.productform.ProductFormActions
+import com.inventraoficial.inventra.feature.stock.productform.ProductFormFields
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -118,16 +113,12 @@ fun ProductCreateScreen(
     }
 }
 
-private enum class OpenPicker { Unit, Category }
-
 @Composable
 private fun ProductForm(
     uiState: ProductCreateUiState,
     actions: ProductCreateActions,
     modifier: Modifier = Modifier,
 ) {
-    var openPicker by remember { mutableStateOf<OpenPicker?>(null) }
-
     Column(
         modifier =
             modifier
@@ -149,51 +140,17 @@ private fun ProductForm(
                         .padding(12.dp),
             )
         }
-        InventraLabeledField(
-            label = "Nome do produto",
-            value = uiState.name,
-            onValueChange = actions.onNameChange,
-            placeholder = "Ex.: Arroz branco 5kg",
-            modifier = Modifier.fillMaxWidth(),
-        )
-        InventraLabeledField(
-            label = "Marca (opcional)",
-            value = uiState.brand,
-            onValueChange = actions.onBrandChange,
-            placeholder = "Ex.: Tio João",
-            modifier = Modifier.fillMaxWidth(),
-        )
-        InventraPickerField(
-            label = "Unidade de medida",
-            value = uiState.unitLabel,
-            placeholder = "Escolha a unidade",
-            onClick = { openPicker = OpenPicker.Unit },
-            modifier = Modifier.fillMaxWidth(),
-        )
-        if (uiState.categories.isNotEmpty()) {
-            InventraPickerField(
-                label = "Categoria (opcional)",
-                value = uiState.categoryName,
-                placeholder = "Escolha a categoria",
-                onClick = { openPicker = OpenPicker.Category },
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-        InventraLabeledField(
-            label = "Estoque mínimo na cozinha (opcional)",
-            value = uiState.minStock,
-            onValueChange = actions.onMinStockChange,
-            keyboardType = KeyboardType.Decimal,
-            placeholder = "Avisamos quando ficar abaixo disso",
-            modifier = Modifier.fillMaxWidth(),
-        )
-        InventraLabeledField(
-            label = "Código de barras (opcional)",
-            value = uiState.barcode,
-            onValueChange = actions.onBarcodeChange,
-            keyboardType = KeyboardType.Number,
-            placeholder = "Só os números",
-            modifier = Modifier.fillMaxWidth(),
+        ProductFormFields(
+            form = uiState.form,
+            actions =
+                ProductFormActions(
+                    onNameChange = actions.onNameChange,
+                    onBrandChange = actions.onBrandChange,
+                    onBarcodeChange = actions.onBarcodeChange,
+                    onUnitSelect = actions.onUnitSelect,
+                    onCategorySelect = actions.onCategorySelect,
+                    onMinStockChange = actions.onMinStockChange,
+                ),
         )
         uiState.submitError?.let {
             Text(it, fontFamily = Montserrat, fontSize = 14.sp, color = InventraDanger)
@@ -204,27 +161,6 @@ private fun ProductForm(
             isLoading = uiState.isSubmitting,
             modifier = Modifier.fillMaxWidth(),
         )
-    }
-
-    when (openPicker) {
-        OpenPicker.Unit ->
-            InventraSearchPickerSheet(
-                title = "Unidade de medida",
-                options = uiState.units,
-                selectedId = uiState.unitId,
-                onSelect = actions.onUnitSelect,
-                onDismiss = { openPicker = null },
-            )
-        OpenPicker.Category ->
-            InventraSearchPickerSheet(
-                title = "Categoria",
-                options = uiState.categories,
-                selectedId = uiState.categoryId,
-                onSelect = actions.onCategorySelect,
-                onDismiss = { openPicker = null },
-                noneLabel = "Sem categoria",
-            )
-        null -> Unit
     }
 }
 

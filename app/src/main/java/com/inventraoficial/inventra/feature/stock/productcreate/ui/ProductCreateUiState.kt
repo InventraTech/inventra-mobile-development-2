@@ -1,6 +1,7 @@
 package com.inventraoficial.inventra.feature.stock.productcreate.ui
 
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPickerOption
+import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
 
 data class SavedProduct(
     val id: Int,
@@ -26,14 +27,12 @@ data class ProductCreateUiState(
     val createdProduct: SavedProduct? = null,
     val kitchenLinkFailed: Boolean = false,
 ) {
+    val form: ProductFormState
+        get() = ProductFormState(name, brand, barcode, units, unitId, categories, categoryId, minStock)
+
     val unitLabel: String?
-        get() = units.firstOrNull { it.id == unitId }?.label()
-
-    val categoryName: String?
-        get() = categories.firstOrNull { it.id == categoryId }?.title
+        get() = form.unitLabel
 }
-
-private fun InventraPickerOption.label(): String = subtitle?.let { "$title ($it)" } ?: title
 
 @Suppress("LongParameterList")
 data class ProductCreateActions(

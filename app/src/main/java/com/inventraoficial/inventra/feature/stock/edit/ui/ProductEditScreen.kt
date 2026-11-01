@@ -1,8 +1,8 @@
 package com.inventraoficial.inventra.feature.stock.edit.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,40 +11,38 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
-import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraPickerOption
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
+import com.inventraoficial.inventra.feature.stock.productform.ProductFormActions
+import com.inventraoficial.inventra.feature.stock.productform.ProductFormFields
+import com.inventraoficial.inventra.feature.stock.productform.ProductFormState
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
+import com.inventraoficial.inventra.ui.theme.InventraDanger
+import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
 fun ProductEditScreen(
-    productName: String,
-    onProductNameChange: (String) -> Unit,
-    category: String,
-    onCategoryChange: (String) -> Unit,
-    supplier: String,
-    onSupplierChange: (String) -> Unit,
-    storage: String,
-    onStorageChange: (String) -> Unit,
-    quantity: String,
-    onQuantityChange: (String) -> Unit,
-    onSaveClick: () -> Unit,
-    onCancelClick: () -> Unit,
-    onBackClick: () -> Unit,
+    uiState: ProductEditUiState,
+    actions: ProductEditActions,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -54,112 +52,86 @@ fun ProductEditScreen(
                 .background(InventraBackground),
     ) {
         InventraTopBar(
-            navigationIcon = {
-                InventraBackButton(onClick = onBackClick)
-            },
-            title = {
-                Text(
-                    "Editar Produto",
-                    color = Color.White,
-                    fontFamily = Montserrat,
-                    fontSize = 17.sp,
-                )
-            },
-            actions = {
-                Text(
-                    "Cancelar",
-                    color = Color.White,
-                    fontFamily = Montserrat,
-                    fontSize = 13.sp,
-                    modifier = Modifier.clickable(onClick = onCancelClick),
-                )
-            },
+            navigationIcon = { InventraBackButton(onClick = actions.onBackClick) },
+            title = { Text("Editar produto", color = Color.White, fontFamily = Montserrat, fontSize = 17.sp) },
         )
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .imePadding()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-        ) {
-            InventraLabeledField(
-                label = "Nome do produto",
-                value = productName,
-                onValueChange = onProductNameChange,
-                placeholder = "Insira o nome do produto",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            InventraLabeledField(
-                label = "Categoria",
-                value = category,
-                onValueChange = onCategoryChange,
-                placeholder = "Insira a categoria",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            InventraLabeledField(
-                label = "Fornecedor",
-                value = supplier,
-                onValueChange = onSupplierChange,
-                placeholder = "Insira o fornecedor",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            InventraLabeledField(
-                label = "Armazenamento",
-                value = storage,
-                onValueChange = onStorageChange,
-                placeholder = "Insira o local de armazenamento",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            InventraLabeledField(
-                label = "Quantidade total",
-                value = quantity,
-                onValueChange = onQuantityChange,
-                placeholder = "Insira a quantidade",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(top = 8.dp),
-            ) {
-                InventraSecondaryButton(
-                    text = "Cancelar",
-                    onClick = onCancelClick,
-                    modifier = Modifier.weight(1f),
-                )
-                InventraPrimaryButton(
-                    text = "Salvar",
-                    onClick = onSaveClick,
-                    modifier = Modifier.weight(1f),
-                )
-            }
+        val contentModifier = Modifier.weight(1f).fillMaxWidth()
+        when {
+            uiState.isLoading ->
+                Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = InventraPurple)
+                }
+            uiState.errorMessage != null ->
+                Column(
+                    modifier = contentModifier.padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(uiState.errorMessage, fontFamily = Montserrat, fontSize = 15.sp, textAlign = TextAlign.Center)
+                    InventraSecondaryButton(text = "Tentar novamente", onClick = actions.onRetryClick)
+                }
+            else ->
+                Column(
+                    modifier =
+                        contentModifier
+                            .imePadding()
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                ) {
+                    ProductFormFields(form = uiState.form, actions = actions.form)
+                    uiState.submitError?.let {
+                        Text(it, fontFamily = Montserrat, fontSize = 14.sp, color = InventraDanger)
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        InventraSecondaryButton(
+                            text = "Cancelar",
+                            onClick = actions.onBackClick,
+                            modifier = Modifier.weight(1f),
+                        )
+                        InventraPrimaryButton(
+                            text = "Salvar",
+                            onClick = actions.onSaveClick,
+                            isLoading = uiState.isSubmitting,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
         }
     }
 }
 
 @Composable
 fun ProductEditRoute(
+    productId: Int,
     navigator: Navigator,
-    viewModel: ProductEditViewModel = viewModel(),
+    viewModel: ProductEditViewModel =
+        viewModel(key = "product-edit-$productId", factory = ProductEditViewModel.factory(productId)),
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) navigator.back()
+    }
+
     ProductEditScreen(
-        productName = uiState.productName,
-        onProductNameChange = viewModel::onProductNameChange,
-        category = uiState.category,
-        onCategoryChange = viewModel::onCategoryChange,
-        supplier = uiState.supplier,
-        onSupplierChange = viewModel::onSupplierChange,
-        storage = uiState.storage,
-        onStorageChange = viewModel::onStorageChange,
-        quantity = uiState.quantity,
-        onQuantityChange = viewModel::onQuantityChange,
-        onSaveClick = viewModel::onSaveClick,
-        onCancelClick = { navigator.back() },
-        onBackClick = { navigator.back() },
+        uiState = uiState,
+        actions =
+            ProductEditActions(
+                form =
+                    ProductFormActions(
+                        onNameChange = viewModel::onNameChange,
+                        onBrandChange = viewModel::onBrandChange,
+                        onBarcodeChange = viewModel::onBarcodeChange,
+                        onUnitSelect = viewModel::onUnitSelect,
+                        onCategorySelect = viewModel::onCategorySelect,
+                        onMinStockChange = viewModel::onMinStockChange,
+                    ),
+                onSaveClick = viewModel::onSaveClick,
+                onRetryClick = viewModel::onRetryClick,
+                onBackClick = { navigator.back() },
+            ),
         modifier = modifier,
     )
 }
@@ -169,18 +141,25 @@ fun ProductEditRoute(
 @Composable
 private fun ProductEditScreenPreview() {
     ProductEditScreen(
-        productName = "Leite Integral",
-        onProductNameChange = {},
-        category = "Laticínios",
-        onCategoryChange = {},
-        supplier = "Seara Alimentos",
-        onSupplierChange = {},
-        storage = "Câmara fria 02",
-        onStorageChange = {},
-        quantity = "18 L",
-        onQuantityChange = {},
-        onSaveClick = {},
-        onCancelClick = {},
-        onBackClick = {},
+        uiState =
+            ProductEditUiState(
+                isLoading = false,
+                form =
+                    ProductFormState(
+                        name = "Ketchup",
+                        brand = "Heinz",
+                        barcode = "7896102000122",
+                        units = listOf(InventraPickerOption(id = 6, title = "Unidade", subtitle = "UN")),
+                        unitId = 6,
+                        minStock = "4",
+                    ),
+            ),
+        actions =
+            ProductEditActions(
+                form = ProductFormActions({}, {}, {}, {}, {}, {}),
+                onSaveClick = {},
+                onRetryClick = {},
+                onBackClick = {},
+            ),
     )
 }

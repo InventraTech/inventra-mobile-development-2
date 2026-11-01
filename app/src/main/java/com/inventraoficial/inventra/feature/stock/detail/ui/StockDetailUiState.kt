@@ -13,6 +13,7 @@ data class StockDetailUiState(
     val seeAllBatchesText: String? = null,
     val supplier: String = "",
     val history: HistoryState? = null,
+    val canEdit: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 )
@@ -44,6 +45,7 @@ data class StockDetailActions(
     val onExitsClick: () -> Unit = {},
     val onStockEntryClick: () -> Unit = {},
     val onStockOutClick: () -> Unit = {},
+    val onEditClick: () -> Unit = {},
     val onRetryClick: () -> Unit = {},
     val onBackClick: () -> Unit = {},
 )

@@ -6,8 +6,10 @@ import com.inventraoficial.inventra.data.remote.dto.product.BarcodeLookupRespons
 import com.inventraoficial.inventra.data.remote.dto.product.CategoryResponse
 import com.inventraoficial.inventra.data.remote.dto.product.CreateProductRequest
 import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersRequest
+import com.inventraoficial.inventra.data.remote.dto.product.KitchenParametersResponse
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.product.UnitResponse
+import com.inventraoficial.inventra.data.remote.dto.product.UpdateProductRequest
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 
@@ -24,10 +26,20 @@ interface ProductRepository {
 
     suspend fun create(request: CreateProductRequest): Result<ProductResponse>
 
+    suspend fun update(
+        productId: Int,
+        request: UpdateProductRequest,
+    ): Result<ProductResponse>
+
     suspend fun setKitchenParameters(
         productId: Int,
         request: KitchenParametersRequest,
     ): Result<Unit>
+
+    suspend fun kitchenParameters(
+        productId: Int,
+        kitchenId: Int,
+    ): Result<KitchenParametersResponse?>
 
     suspend fun units(): Result<List<UnitResponse>>
 
@@ -64,10 +76,23 @@ class NetworkProductRepository(
             productApi.create(request)
         }
 
+    override suspend fun update(
+        productId: Int,
+        request: UpdateProductRequest,
+    ): Result<ProductResponse> = apiCall(json) { productApi.update(productId, request) }
+
     override suspend fun setKitchenParameters(
         productId: Int,
         request: KitchenParametersRequest,
     ): Result<Unit> = apiCall(json) { productApi.setKitchenParameters(productId, request) }
+
+    override suspend fun kitchenParameters(
+        productId: Int,
+        kitchenId: Int,
+    ): Result<KitchenParametersResponse?> =
+        apiCall(json) {
+            productApi.kitchenParameters(productId).firstOrNull { it.kitchen.id == kitchenId }
+        }
 
     override suspend fun units(): Result<List<UnitResponse>> =
         cachedUnits?.let { Result.success(it) }

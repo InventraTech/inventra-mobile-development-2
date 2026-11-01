@@ -46,7 +46,9 @@ sealed interface Screen : NavKey {
     ) : Screen
 
     @Serializable
-    data object ProductEdit : Screen
+    data class ProductEdit(
+        val productId: Int,
+    ) : Screen
 
     @Serializable
     data class StockOut(
