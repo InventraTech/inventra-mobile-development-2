@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.data.repository
 
+import com.inventraoficial.inventra.data.remote.dto.supplier.CreateSupplierRequest
 import com.inventraoficial.inventra.data.remote.dto.supplier.SupplierResponse
 
 class FakeSupplierRepository(
@@ -19,11 +20,12 @@ class FakeSupplierRepository(
 
     var allCalls = 0
         private set
+    var otherSuppliers: List<SupplierResponse> = emptyList()
 
     override suspend fun allSuppliers(): Result<List<SupplierResponse>> {
         allCalls++
         error?.let { return Result.failure(it) }
-        return Result.success(suppliers)
+        return Result.success(suppliers + otherSuppliers)
     }
 
     override suspend fun supplier(id: Int): Result<SupplierResponse> {
@@ -33,7 +35,19 @@ class FakeSupplierRepository(
             ?: Result.failure(NoSuchElementException("Fornecedor não encontrado."))
     }
 
+    var createResult: Result<SupplierResponse>? = null
+    var created = mutableListOf<CreateSupplierRequest>()
+        private set
+
+    override suspend fun create(request: CreateSupplierRequest): Result<SupplierResponse> {
+        created += request
+        val supplier = SupplierResponse(id = NEW_ID, legalName = request.legalName, cnpj = request.cnpj)
+        return createResult ?: Result.success(supplier.copy(rating = request.rating))
+    }
+
     companion object {
+        const val NEW_ID = 77
+
         fun supplier(
             id: Int,
             name: String,

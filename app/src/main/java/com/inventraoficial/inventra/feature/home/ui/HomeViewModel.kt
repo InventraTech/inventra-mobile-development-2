@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraStatTone
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUrgency
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPriorityItem
@@ -115,7 +114,7 @@ private fun StockBatchResponse.daysLeft(today: LocalDate) = DAYS.between(today, 
 private fun StockBatchResponse.toPriorityItem(today: LocalDate): InventraPriorityItem {
     val days = daysLeft(today)
     return InventraPriorityItem(
-        imageRes = R.drawable.ic_inventra_logo,
+        photoUrl = product.photoUrl,
         title = product.name,
         statusText =
             when (days) {

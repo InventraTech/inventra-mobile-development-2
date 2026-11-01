@@ -10,7 +10,7 @@ import com.inventraoficial.inventra.InventraApplication
 import com.inventraoficial.inventra.data.local.ImageCompressor
 import com.inventraoficial.inventra.data.local.ProfilePhotoPreview
 import com.inventraoficial.inventra.data.repository.AuthRepository
-import com.inventraoficial.inventra.feature.profile.members.ui.initials
+import com.inventraoficial.inventra.feature.profile.team.ui.initials
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -64,6 +64,10 @@ class ProfilePhotoViewModel(
         }
     }
 
+    fun onCameraDenied() {
+        _uiState.update { it.copy(isSheetVisible = false, errorMessage = CAMERA_DENIED) }
+    }
+
     fun onRemoveClick() {
         preview.clear()
         _uiState.update { it.copy(isSheetVisible = false, isUploading = true, errorMessage = null) }
@@ -75,6 +79,8 @@ class ProfilePhotoViewModel(
     }
 
     companion object {
+        private const val CAMERA_DENIED = "Permita o uso da câmera para tirar a foto, ou escolha uma da galeria."
+
         val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {

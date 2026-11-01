@@ -7,10 +7,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,6 +43,12 @@ fun InventraLabeledField(
     keyboardType: KeyboardType = KeyboardType.Unspecified,
     placeholder: String,
 ) {
+    var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
+    val hidesText = isPassword && !isPasswordVisible
+    val fieldKeyboardType =
+        if (isPassword && keyboardType == KeyboardType.Unspecified) KeyboardType.Password else keyboardType
+    val visibilityIcon = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -50,8 +65,22 @@ fun InventraLabeledField(
             placeholder = { Text(text = placeholder, fontSize = 13.sp) },
             readOnly = readOnly,
             singleLine = !multiline,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            keyboardOptions = KeyboardOptions(keyboardType = fieldKeyboardType),
+            visualTransformation = if (hidesText) PasswordVisualTransformation() else VisualTransformation.None,
+            trailingIcon =
+                if (isPassword) {
+                    {
+                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                            Icon(
+                                imageVector = visibilityIcon,
+                                contentDescription = if (isPasswordVisible) "Esconder senha" else "Mostrar senha",
+                                tint = InventraPurple,
+                            )
+                        }
+                    }
+                } else {
+                    null
+                },
             shape = RoundedCornerShape(8.dp),
             colors =
                 TextFieldDefaults.colors(
@@ -80,5 +109,18 @@ private fun InventraLabeledFieldPreview() {
         value = "",
         onValueChange = {},
         placeholder = "insira seu Login",
+    )
+}
+
+@Suppress("UnusedPrivateMember")
+@Preview
+@Composable
+private fun InventraLabeledFieldPasswordPreview() {
+    InventraLabeledField(
+        label = "Senha",
+        value = "inventra123",
+        onValueChange = {},
+        isPassword = true,
+        placeholder = "insira sua senha",
     )
 }

@@ -89,6 +89,7 @@ fun LoginScreen(
         Image(
             painter = painterResource(id = R.drawable.bg_shape_purple_bottom),
             contentDescription = "Background shape yellow bottom",
+            alignment = Alignment.BottomStart,
             modifier =
                 Modifier
                     .align(Alignment.BottomStart)

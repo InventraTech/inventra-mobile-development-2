@@ -85,7 +85,8 @@ class StockEntryViewModelTest {
             assertEquals("L", state.unitSymbol)
             assertEquals(today, state.entryDate)
             assertEquals(listOf(SupplierOption(1, "Laticínios Bom Leite")), state.suppliers)
-            assertEquals(listOf(7), supplierRepository.kitchenCalls)
+            assertEquals(1, supplierRepository.allCalls)
+            assertTrue(supplierRepository.kitchenCalls.isEmpty())
         }
 
     @Test

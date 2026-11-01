@@ -129,7 +129,7 @@ class StockEntryViewModel(
             }
             val product = async { productRepository.product(productId) }
             // Fornecedor é opcional: se a lista não vier, o formulário segue sem ela.
-            val suppliers = async { supplierRepository.suppliers(kitchen).getOrDefault(emptyList()) }
+            val suppliers = async { supplierRepository.allSuppliers().getOrDefault(emptyList()) }
             val productResult = product.await()
             val supplierOptions =
                 suppliers

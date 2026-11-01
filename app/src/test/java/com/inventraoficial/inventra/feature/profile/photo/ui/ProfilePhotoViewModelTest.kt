@@ -178,4 +178,17 @@ class ProfilePhotoViewModelTest {
             assertEquals(1, repository.removePhotoCalls)
             assertFalse(viewModel.uiState.value.hasPhoto)
         }
+
+    @Test
+    fun `camera negada fecha as opcoes e explica como seguir`() =
+        runTest(testDispatcher) {
+            advanceUntilIdle()
+            viewModel.onAvatarClick()
+
+            viewModel.onCameraDenied()
+
+            val state = viewModel.uiState.value
+            assertFalse(state.isSheetVisible)
+            assertEquals("Permita o uso da câmera para tirar a foto, ou escolha uma da galeria.", state.errorMessage)
+        }
 }

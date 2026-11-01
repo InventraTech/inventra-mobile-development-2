@@ -2,7 +2,7 @@ package com.inventraoficial.inventra.feature.profile.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraMenuRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraImageViewer
 import com.inventraoficial.inventra.feature.profile.photo.ui.ProfilePhotoHost
 import com.inventraoficial.inventra.feature.profile.photo.ui.ProfilePhotoViewModel
 import com.inventraoficial.inventra.ui.navigation.Navigator
@@ -55,17 +59,18 @@ fun ProfileScreen(
     fullName: String,
     roleLabel: String,
     cozinhaName: String,
-    canManageMembers: Boolean,
+    canSeeTeam: Boolean,
     photoUrl: String?,
     isPhotoUploading: Boolean,
     photoErrorMessage: String?,
     onAvatarClick: () -> Unit,
     onProfileDetailsClick: () -> Unit,
-    onManageMembersClick: () -> Unit,
+    onTeamClick: () -> Unit,
     onAccountPreferencesClick: () -> Unit,
     onCozinhaInfoClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var isPhotoExpanded by rememberSaveable { mutableStateOf(false) }
     Column(
         modifier =
             modifier
@@ -89,6 +94,7 @@ fun ProfileScreen(
                 photoUrl = photoUrl,
                 isUploading = isPhotoUploading,
                 onClick = onAvatarClick,
+                onLongClick = { if (photoUrl != null) isPhotoExpanded = true },
                 modifier =
                     Modifier
                         .align(Alignment.TopCenter)
@@ -142,11 +148,11 @@ fun ProfileScreen(
                 label = "Dados do perfil",
                 onClick = onProfileDetailsClick,
             )
-            if (canManageMembers) {
+            if (canSeeTeam) {
                 InventraMenuRow(
                     icon = Icons.Default.Groups,
-                    label = "Gerenciar membros",
-                    onClick = onManageMembersClick,
+                    label = "Ver equipe",
+                    onClick = onTeamClick,
                 )
             }
             InventraMenuRow(
@@ -161,6 +167,9 @@ fun ProfileScreen(
             )
         }
     }
+    if (isPhotoExpanded && photoUrl != null) {
+        InventraImageViewer(photoUrl = photoUrl, onDismiss = { isPhotoExpanded = false })
+    }
 }
 
 @Composable
@@ -168,6 +177,7 @@ private fun ProfileAvatar(
     photoUrl: String?,
     isUploading: Boolean,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -177,7 +187,13 @@ private fun ProfileAvatar(
                 .clip(CircleShape)
                 .background(Color.Black)
                 .border(3.dp, Color.White, CircleShape)
-                .clickable(enabled = !isUploading, onClick = onClick),
+                .combinedClickable(
+                    enabled = !isUploading,
+                    onClickLabel = "Trocar foto",
+                    onLongClickLabel = "Ver foto",
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                ),
         contentAlignment = Alignment.Center,
     ) {
         if (photoUrl == null) {
@@ -224,13 +240,13 @@ fun ProfileRoute(
         fullName = uiState.fullName,
         roleLabel = uiState.roleLabel,
         cozinhaName = uiState.cozinhaName,
-        canManageMembers = uiState.canManageMembers,
+        canSeeTeam = uiState.canSeeTeam,
         photoUrl = photoState.photoUrl,
         isPhotoUploading = photoState.isUploading,
         photoErrorMessage = photoState.errorMessage,
         onAvatarClick = photoViewModel::onAvatarClick,
         onProfileDetailsClick = { navigator.navigate(Screen.ProfileDetails) },
-        onManageMembersClick = { navigator.navigate(Screen.ManageMembers) },
+        onTeamClick = { navigator.navigate(Screen.Team) },
         onAccountPreferencesClick = { navigator.navigate(Screen.AccountPreferences) },
         onCozinhaInfoClick = { navigator.navigate(Screen.CozinhaInfo) },
         modifier = modifier,
@@ -245,13 +261,13 @@ private fun ProfileScreenPreview() {
         fullName = "Jones Arakaki Kogake Passos Maldo",
         roleLabel = "Gerente",
         cozinhaName = "Sabor Filial Sul",
-        canManageMembers = true,
+        canSeeTeam = true,
         photoUrl = null,
         isPhotoUploading = false,
         photoErrorMessage = null,
         onAvatarClick = {},
         onProfileDetailsClick = {},
-        onManageMembersClick = {},
+        onTeamClick = {},
         onAccountPreferencesClick = {},
         onCozinhaInfoClick = {},
     )

@@ -11,24 +11,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBadge
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraStarRating
-import com.inventraoficial.inventra.core.designsystem.atoms.InventraThumbnail
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraSupplierImage
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
 
 @Composable
 fun InventraSupplierRow(
-    painter: Painter,
+    photoUrl: String?,
     name: String,
     rating: Int,
     badgeText: String,
@@ -44,12 +40,7 @@ fun InventraSupplierRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        InventraThumbnail(
-            painter = painter,
-            shape = RoundedCornerShape(10.dp),
-            size = 56.dp,
-            contentScale = ContentScale.Fit,
-        )
+        InventraSupplierImage(photoUrl = photoUrl)
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -73,7 +64,7 @@ fun InventraSupplierRow(
 @Composable
 private fun InventraSupplierRowPreview() {
     InventraSupplierRow(
-        painter = painterResource(R.drawable.ic_inventra_logo),
+        photoUrl = null,
         name = "Distribuidora QA Alimentos Ltda",
         rating = 4,
         badgeText = "11.222.333/0001-81",

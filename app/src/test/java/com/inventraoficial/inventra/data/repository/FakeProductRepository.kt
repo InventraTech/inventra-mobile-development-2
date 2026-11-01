@@ -93,6 +93,15 @@ class FakeProductRepository(
 
     override suspend fun categories(): Result<List<CategoryResponse>> = categoriesResult
 
+    var deactivateResult: Result<Unit> = Result.success(Unit)
+    var deactivated = mutableListOf<Int>()
+        private set
+
+    override suspend fun deactivate(id: Int): Result<Unit> {
+        deactivated += id
+        return deactivateResult
+    }
+
     companion object {
         val defaultUnits =
             listOf(

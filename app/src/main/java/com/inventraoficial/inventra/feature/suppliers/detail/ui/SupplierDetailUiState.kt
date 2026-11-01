@@ -1,7 +1,5 @@
 package com.inventraoficial.inventra.feature.suppliers.detail.ui
 
-import com.inventraoficial.inventra.R
-
 data class SupplierProduct(
     val name: String,
     val infoText: String,
@@ -13,8 +11,24 @@ data class DeliveryHistoryEntry(
     val quantityLabel: String,
 )
 
+data class SupplierPhotoState(
+    val url: String? = null,
+    val canEdit: Boolean = false,
+    val isSheetVisible: Boolean = false,
+    val isUploading: Boolean = false,
+    val errorMessage: String? = null,
+)
+
+data class SupplierPhotoActions(
+    val onPhotoClick: () -> Unit = {},
+    val onSheetDismiss: () -> Unit = {},
+    val onPickClick: () -> Unit = {},
+    val onCameraClick: () -> Unit = {},
+    val onRemoveClick: () -> Unit = {},
+)
+
 data class SupplierDetailUiState(
-    val imageRes: Int = R.drawable.ic_inventra_logo,
+    val photo: SupplierPhotoState = SupplierPhotoState(),
     val name: String = "",
     val rating: Int = 0,
     val badgeText: String = "",

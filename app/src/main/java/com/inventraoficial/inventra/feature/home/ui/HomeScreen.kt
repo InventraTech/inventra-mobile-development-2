@@ -30,7 +30,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraStatTone
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraUrgency
@@ -119,6 +118,16 @@ fun HomeScreen(
                                 .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
+                        if (stats.isNotEmpty()) {
+                            Text(
+                                text = "Resumo do estoque",
+                                fontFamily = Montserrat,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = InventraPurple,
+                            )
+                            InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp, bottom = 28.dp))
+                        }
                         InventraPriorityAlertsSection(items = priorityItems, onItemClick = onPriorityItemClick)
                         if (priorityItems.isEmpty()) {
                             Text(
@@ -128,17 +137,6 @@ fun HomeScreen(
                                 color = InventraPurple.copy(alpha = 0.6f),
                                 modifier = Modifier.padding(top = 12.dp),
                             )
-                        }
-                        if (stats.isNotEmpty()) {
-                            Text(
-                                text = "Resumo do estoque",
-                                fontFamily = Montserrat,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                modifier = Modifier.padding(top = 20.dp),
-                                color = InventraPurple,
-                            )
-                            InventraStatGrid(stats = stats, modifier = Modifier.padding(top = 20.dp))
                         }
                     }
             }
@@ -209,14 +207,14 @@ private fun HomeScreenPreview() {
         priorityItems =
             listOf(
                 InventraPriorityItem(
-                    imageRes = R.drawable.ic_inventra_logo,
+                    photoUrl = null,
                     title = "Arroz Camil",
                     statusText = "Vence em 2 dias",
                     urgency = InventraUrgency.Normal,
                     batch = "Lote 0001",
                 ),
                 InventraPriorityItem(
-                    imageRes = R.drawable.ic_inventra_logo,
+                    photoUrl = null,
                     title = "Arroz Camil",
                     statusText = "Vence em 2 dias",
                     urgency = InventraUrgency.Normal,

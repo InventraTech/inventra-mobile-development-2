@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.Inventory2
-import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -36,10 +35,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontFamily
@@ -51,10 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil3.compose.AsyncImage
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraProductImage
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraScanOverlay
@@ -62,6 +59,7 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraDanger
+import com.inventraoficial.inventra.ui.theme.InventraGold
 import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.InventraSuccess
@@ -93,7 +91,7 @@ fun ScanScreen(
     LaunchedEffect(uiState.result) {
         when (uiState.result) {
             is ScanResult.Found -> haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-            is ScanResult.NotRegistered -> haptic.performHapticFeedback(HapticFeedbackType.Reject)
+            is ScanResult.NotRegistered -> haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
             null -> Unit
         }
     }
@@ -132,7 +130,8 @@ fun ScanScreen(
             )
             val frameColor =
                 when {
-                    uiState.errorMessage != null || uiState.result is ScanResult.NotRegistered -> InventraDanger
+                    uiState.errorMessage != null -> InventraDanger
+                    uiState.result is ScanResult.NotRegistered -> InventraGold
                     uiState.result is ScanResult.Found -> InventraSuccess
                     else -> InventraPurple
                 }
@@ -239,26 +238,35 @@ private fun NotRegisteredPanel(
     uiState: ScanUiState,
     actions: ScanActions,
 ) {
-    Box(
-        modifier =
-            Modifier
-                .size(64.dp)
-                .background(InventraDanger.copy(alpha = 0.12f), CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            imageVector = Icons.Default.SearchOff,
-            contentDescription = null,
-            tint = InventraDanger,
-            modifier = Modifier.size(32.dp),
+    val photoUrl = result.photoUrl
+    if (photoUrl != null) {
+        InventraProductImage(
+            photoUrl = photoUrl,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.size(96.dp),
         )
+    } else {
+        Box(
+            modifier =
+                Modifier
+                    .size(64.dp)
+                    .background(InventraGold.copy(alpha = 0.16f), CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = Icons.Default.Inventory2,
+                contentDescription = null,
+                tint = InventraGold,
+                modifier = Modifier.size(32.dp),
+            )
+        }
     }
     Text(
-        "Código não encontrado",
+        "Produto novo por aqui",
         fontFamily = Montserrat,
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
-        color = InventraDanger,
+        color = InventraPurple,
     )
     Text(
         result.barcode,
@@ -268,10 +276,10 @@ private fun NotRegisteredPanel(
         letterSpacing = 2.sp,
         modifier =
             Modifier
-                .border(1.dp, InventraDanger.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                .border(1.dp, InventraMuted.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
                 .padding(horizontal = 16.dp, vertical = 8.dp),
     )
-    PanelText("Esse produto ainda não está no catálogo da cozinha.")
+    PanelText("Esse código ainda não foi cadastrado no catálogo desta cozinha.")
     result.suggestion?.let {
         Text("Parece ser: $it", fontFamily = Montserrat, fontSize = 14.sp, color = InventraMuted)
     }
@@ -304,25 +312,11 @@ private fun NotRegisteredPanel(
 
 @Composable
 private fun ProductThumbnail(photoUrl: String?) {
-    Box(
-        modifier =
-            Modifier
-                .size(56.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(InventraPurple.copy(alpha = 0.1f)),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (photoUrl != null) {
-            AsyncImage(
-                model = photoUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize(),
-            )
-        } else {
-            Icon(Icons.Default.Inventory2, contentDescription = null, tint = InventraPurple)
-        }
-    }
+    InventraProductImage(
+        photoUrl = photoUrl,
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.size(56.dp),
+    )
 }
 
 @Composable

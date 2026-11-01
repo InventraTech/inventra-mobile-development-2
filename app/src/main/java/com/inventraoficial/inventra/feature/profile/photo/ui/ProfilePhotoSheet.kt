@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraMenuRow
+import com.inventraoficial.inventra.feature.stock.productform.rememberProductCamera
 import com.inventraoficial.inventra.ui.theme.InventraBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,6 +91,11 @@ fun ProfilePhotoHost(
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             viewModel.onPhotoPicked(uri?.toString())
         }
+    val openCamera =
+        rememberProductCamera(
+            onPhotoTaken = viewModel::onPhotoPicked,
+            onPermissionDenied = viewModel::onCameraDenied,
+        )
 
     if (uiState.isSheetVisible) {
         ProfilePhotoSheet(
@@ -100,6 +106,10 @@ fun ProfilePhotoHost(
             },
             onRemoveClick = viewModel::onRemoveClick,
             onDismiss = viewModel::onSheetDismiss,
+            onCameraClick = {
+                viewModel.onSheetDismiss()
+                openCamera()
+            },
         )
     }
 }

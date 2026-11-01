@@ -1,4 +1,4 @@
-package com.inventraoficial.inventra.feature.stock.edit.ui
+package com.inventraoficial.inventra.feature.stock.productform
 
 import android.Manifest
 import android.content.Context

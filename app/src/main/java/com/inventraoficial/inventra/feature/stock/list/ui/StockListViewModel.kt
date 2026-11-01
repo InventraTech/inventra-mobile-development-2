@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.offlineMessage
 import com.inventraoficial.inventra.data.local.StockCache
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
@@ -213,7 +212,7 @@ private fun KitchenStockItemResponse.toProduct(): Product {
         }
     return Product(
         id = product.id,
-        imageRes = R.drawable.ic_inventra_logo,
+        photoUrl = product.photoUrl,
         title = product.name,
         quantity = "${quantityFormat.format(totalQuantity)} ${unit.symbol}",
         batchInfo = if (lowStock) "$batches · abaixo do mínimo" else batches,

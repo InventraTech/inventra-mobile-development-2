@@ -2,7 +2,7 @@ package com.inventraoficial.inventra.feature.suppliers.list.ui
 
 data class Supplier(
     val id: Int,
-    val imageRes: Int,
+    val photoUrl: String? = null,
     val name: String,
     val rating: Int,
     val badgeText: String,
