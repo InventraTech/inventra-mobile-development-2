@@ -196,26 +196,6 @@ fun ProfileDetailsScreen(
                         .fillMaxWidth()
                         .padding(16.dp),
             )
-            if (leaveKitchen.canLeave) {
-                LeaveKitchenLink(state = leaveKitchen, onClick = onLeaveKitchenClick)
-            }
-        }
-    }
-}
-
-@Composable
-private fun LeaveKitchenLink(
-    state: LeaveKitchenState,
-    onClick: () -> Unit,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        if (state.isLeaving) {
-            CircularProgressIndicator(color = InventraDanger, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
-        } else {
-            InventraTextLink(text = "Sair da cozinha", onClick = onClick, color = InventraDanger)
-        }
-        state.errorMessage?.let { message ->
-            Text(text = message, fontFamily = Montserrat, fontSize = 13.sp, color = InventraDanger)
         }
     }
 }
