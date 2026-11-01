@@ -62,7 +62,24 @@ fun ProfileDetailsScreen(
     onLogoutConfirm: () -> Unit,
     onLogoutDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    leaveKitchen: LeaveKitchenState = LeaveKitchenState(),
+    onLeaveKitchenClick: () -> Unit = {},
+    onLeaveKitchenConfirm: () -> Unit = {},
+    onLeaveKitchenDismiss: () -> Unit = {},
 ) {
+    if (leaveKitchen.isDialogVisible) {
+        InventraConfirmDialog(
+            title = "Sair da cozinha?",
+            message =
+                "Você deixa de ver o estoque e as requisições de $cozinhaName, e seus rascunhos de " +
+                    "requisição são cancelados. Sua conta continua ativa para entrar em outra cozinha.",
+            confirmText = "Sair da cozinha",
+            onConfirm = onLeaveKitchenConfirm,
+            onDismiss = onLeaveKitchenDismiss,
+            isDestructive = true,
+        )
+    }
+
     if (isLogoutDialogVisible) {
         InventraConfirmDialog(
             title = "Sair da conta?",
@@ -165,6 +182,9 @@ fun ProfileDetailsScreen(
                 placeholder = "",
                 modifier = Modifier.fillMaxWidth(),
             )
+            if (leaveKitchen.canLeave) {
+                LeaveKitchenLink(state = leaveKitchen, onClick = onLeaveKitchenClick)
+            }
         }
         InventraDangerButton(
             text = "Sair da conta",
@@ -174,6 +194,23 @@ fun ProfileDetailsScreen(
                     .fillMaxWidth()
                     .padding(16.dp),
         )
+    }
+}
+
+@Composable
+private fun LeaveKitchenLink(
+    state: LeaveKitchenState,
+    onClick: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (state.isLeaving) {
+            CircularProgressIndicator(color = InventraDanger, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
+        } else {
+            InventraTextLink(text = "Sair da cozinha", onClick = onClick, color = InventraDanger)
+        }
+        state.errorMessage?.let { message ->
+            Text(text = message, fontFamily = Montserrat, fontSize = 13.sp, color = InventraDanger)
+        }
     }
 }
 
@@ -189,6 +226,11 @@ fun ProfileDetailsRoute(
     ProfilePhotoHost(uiState = photoState, viewModel = photoViewModel)
     LaunchedEffect(uiState.isLoggedOut) {
         if (uiState.isLoggedOut) navigator.replaceStack(Screen.Login)
+    }
+    LaunchedEffect(uiState.leaveKitchen.hasLeft) {
+        if (uiState.leaveKitchen.hasLeft) {
+            navigator.replaceStack(if (uiState.leaveKitchen.isSupervisor) Screen.CreateCozinha else Screen.RequestSent)
+        }
     }
 
     ProfileDetailsScreen(
@@ -207,6 +249,10 @@ fun ProfileDetailsRoute(
         onLogoutConfirm = viewModel::onLogoutConfirm,
         onLogoutDismiss = viewModel::onLogoutDismiss,
         modifier = modifier,
+        leaveKitchen = uiState.leaveKitchen,
+        onLeaveKitchenClick = viewModel::onLeaveKitchenClick,
+        onLeaveKitchenConfirm = viewModel::onLeaveKitchenConfirm,
+        onLeaveKitchenDismiss = viewModel::onLeaveKitchenDismiss,
     )
 }
 
@@ -229,5 +275,6 @@ private fun ProfileDetailsScreenPreview() {
         onLogoutClick = {},
         onLogoutConfirm = {},
         onLogoutDismiss = {},
+        leaveKitchen = LeaveKitchenState(canLeave = true),
     )
 }

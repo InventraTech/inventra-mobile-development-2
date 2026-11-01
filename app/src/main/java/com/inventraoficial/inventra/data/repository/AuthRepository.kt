@@ -50,6 +50,8 @@ interface AuthRepository {
     suspend fun updatePhoto(image: ByteArray): Result<Unit>
 
     suspend fun removePhoto(): Result<Unit>
+
+    suspend fun leaveKitchen(): Result<Unit>
 }
 
 class NetworkAuthRepository(
@@ -125,6 +127,11 @@ class NetworkAuthRepository(
     override suspend fun removePhoto(): Result<Unit> =
         apiCall(json) {
             sessionStorage.updateUser(userApi.removePhoto().toSessionUser())
+        }
+
+    override suspend fun leaveKitchen(): Result<Unit> =
+        apiCall(json) {
+            sessionStorage.updateUser(userApi.leaveKitchen().toSessionUser())
         }
 
     private companion object {

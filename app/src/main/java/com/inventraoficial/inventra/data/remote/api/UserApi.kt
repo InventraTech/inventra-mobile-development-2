@@ -6,6 +6,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -25,6 +26,9 @@ interface UserApi {
 
     @DELETE("$PATH/me/photo")
     suspend fun removePhoto(): UserResponse
+
+    @POST("$PATH/me/leave-kitchen")
+    suspend fun leaveKitchen(): UserResponse
 
     @PATCH("$PATH/{id}/deactivate")
     suspend fun deactivate(

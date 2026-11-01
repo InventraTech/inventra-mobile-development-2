@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
+import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.repository.AuthRepository
 import com.inventraoficial.inventra.feature.profile.toLabel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,11 @@ class ProfileDetailsViewModel(
                         email = user?.email.orEmpty(),
                         roleLabel = user?.accessType?.toLabel().orEmpty(),
                         cozinhaName = user?.kitchenName ?: "Nenhuma cozinha vinculada",
+                        leaveKitchen =
+                            it.leaveKitchen.copy(
+                                canLeave = user?.kitchenId != null,
+                                isSupervisor = user?.accessType == AccessType.SUPERVISOR,
+                            ),
                     )
                 }
             }
@@ -50,6 +56,25 @@ class ProfileDetailsViewModel(
             authRepository.logout()
             _uiState.update { it.copy(isLoggedOut = true) }
         }
+    }
+
+    fun onLeaveKitchenClick() = updateLeave { it.copy(isDialogVisible = true, errorMessage = null) }
+
+    fun onLeaveKitchenDismiss() = updateLeave { it.copy(isDialogVisible = false) }
+
+    fun onLeaveKitchenConfirm() {
+        if (_uiState.value.leaveKitchen.isLeaving) return
+        updateLeave { it.copy(isDialogVisible = false, isLeaving = true, errorMessage = null) }
+        viewModelScope.launch {
+            authRepository
+                .leaveKitchen()
+                .onSuccess { updateLeave { it.copy(isLeaving = false, hasLeft = true) } }
+                .onFailure { error -> updateLeave { it.copy(isLeaving = false, errorMessage = error.message) } }
+        }
+    }
+
+    private fun updateLeave(transform: (LeaveKitchenState) -> LeaveKitchenState) {
+        _uiState.update { it.copy(leaveKitchen = transform(it.leaveKitchen)) }
     }
 
     companion object {

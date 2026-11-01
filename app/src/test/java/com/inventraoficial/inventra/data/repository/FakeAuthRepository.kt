@@ -100,6 +100,18 @@ class FakeAuthRepository(
         return photoResult
     }
 
+    var leaveKitchenResult: Result<Unit> = Result.success(Unit)
+    var leaveKitchenCalls = 0
+        private set
+
+    override suspend fun leaveKitchen(): Result<Unit> {
+        leaveKitchenCalls++
+        if (leaveKitchenResult.isSuccess) {
+            _currentUser.value = _currentUser.value?.copy(kitchenId = null, kitchenName = null)
+        }
+        return leaveKitchenResult
+    }
+
     var logoutCalls = 0
         private set
 
