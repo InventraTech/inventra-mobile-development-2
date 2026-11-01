@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -27,13 +28,19 @@ fun ProfilePhotoSheet(
     onPickClick: () -> Unit,
     onRemoveClick: () -> Unit,
     onDismiss: () -> Unit,
+    onCameraClick: (() -> Unit)? = null,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = InventraBackground,
     ) {
-        ProfilePhotoSheetContent(hasPhoto = hasPhoto, onPickClick = onPickClick, onRemoveClick = onRemoveClick)
+        ProfilePhotoSheetContent(
+            hasPhoto = hasPhoto,
+            onPickClick = onPickClick,
+            onRemoveClick = onRemoveClick,
+            onCameraClick = onCameraClick,
+        )
     }
 }
 
@@ -43,6 +50,7 @@ fun ProfilePhotoSheetContent(
     onPickClick: () -> Unit,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onCameraClick: (() -> Unit)? = null,
 ) {
     Column(
         modifier =
@@ -51,6 +59,13 @@ fun ProfilePhotoSheetContent(
                 .padding(start = 16.dp, end = 16.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        onCameraClick?.let {
+            InventraMenuRow(
+                icon = Icons.Default.PhotoCamera,
+                label = "Tirar foto",
+                onClick = it,
+            )
+        }
         InventraMenuRow(
             icon = Icons.Default.PhotoLibrary,
             label = "Escolher da galeria",
@@ -93,5 +108,5 @@ fun ProfilePhotoHost(
 @Preview(showBackground = true)
 @Composable
 private fun ProfilePhotoSheetContentPreview() {
-    ProfilePhotoSheetContent(hasPhoto = true, onPickClick = {}, onRemoveClick = {})
+    ProfilePhotoSheetContent(hasPhoto = true, onPickClick = {}, onRemoveClick = {}, onCameraClick = {})
 }
