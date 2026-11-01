@@ -34,7 +34,7 @@ fun InventraAuthHeader(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_inventra_logo),
-                contentDescription = "Inventra Logo",
+                contentDescription = null,
                 modifier = Modifier.size(logoSize),
             )
             Text(

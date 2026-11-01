@@ -29,7 +29,7 @@ fun InventraChatEmptyHeader(
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_inventra_logo),
-            contentDescription = "Inventra Logo",
+            contentDescription = "Logo do Inventra",
             modifier = Modifier.size(96.dp),
         )
         Text(greeting, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 20.sp)

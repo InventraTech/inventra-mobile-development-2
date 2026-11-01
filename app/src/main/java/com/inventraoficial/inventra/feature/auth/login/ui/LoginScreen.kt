@@ -79,7 +79,7 @@ fun LoginScreen(
         val bottomShapeHeight = (maxHeight * BOTTOM_SHAPE_HEIGHT_FRACTION).coerceAtMost(MaxBottomShapeHeight)
         Image(
             painter = painterResource(id = R.drawable.bg_shape_yellow_top),
-            contentDescription = "Background shape yellow top",
+            contentDescription = null,
             modifier =
                 Modifier
                     .align(Alignment.TopEnd)
@@ -88,7 +88,7 @@ fun LoginScreen(
         )
         Image(
             painter = painterResource(id = R.drawable.bg_shape_purple_bottom),
-            contentDescription = "Background shape yellow bottom",
+            contentDescription = null,
             alignment = Alignment.BottomStart,
             modifier =
                 Modifier
