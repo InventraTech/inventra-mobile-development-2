@@ -64,6 +64,10 @@ class ProfilePhotoViewModel(
         }
     }
 
+    fun onCameraDenied() {
+        _uiState.update { it.copy(isSheetVisible = false, errorMessage = CAMERA_DENIED) }
+    }
+
     fun onRemoveClick() {
         preview.clear()
         _uiState.update { it.copy(isSheetVisible = false, isUploading = true, errorMessage = null) }
@@ -75,6 +79,8 @@ class ProfilePhotoViewModel(
     }
 
     companion object {
+        private const val CAMERA_DENIED = "Permita o uso da câmera para tirar a foto, ou escolha uma da galeria."
+
         val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
