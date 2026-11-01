@@ -27,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraOfflineBanner
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraProductRow
@@ -127,7 +126,7 @@ fun StockListScreen(
                         ) {
                             items(products, key = { it.id }) { product ->
                                 InventraProductRow(
-                                photoUrl = product.photoUrl,
+                                    photoUrl = product.photoUrl,
                                     title = product.title,
                                     quantity = product.quantity,
                                     batchInfo = product.batchInfo,
