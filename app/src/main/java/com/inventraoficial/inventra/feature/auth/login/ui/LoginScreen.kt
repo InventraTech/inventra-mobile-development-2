@@ -176,7 +176,10 @@ fun LoginRoute(
         senha = uiState.password,
         onPasswordChange = viewModel::onPasswordChange,
         onLoginClick = clickTracker.tracked(UiClick.LoginSignIn, viewModel::onLoginClick),
-        onForgotPasswordClick = clickTracker.tracked(UiClick.LoginForgotPassword, viewModel::onForgotPasswordClick),
+        onForgotPasswordClick =
+            clickTracker.tracked(UiClick.LoginForgotPassword) {
+                navigator.navigate(Screen.ForgotPassword(uiState.login.trim()))
+            },
         onCreateAccountClick = { navigator.navigate(Screen.Register) },
         onGoogleClick = clickTracker.tracked(UiClick.LoginGoogle, rememberGoogleSignInClick(googleViewModel)),
         errorMessage = uiState.errorMessage ?: googleState.screenErrorMessage,
