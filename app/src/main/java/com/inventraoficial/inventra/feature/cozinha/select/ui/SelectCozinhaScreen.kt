@@ -40,6 +40,7 @@ import com.inventraoficial.inventra.core.designsystem.molecules.InventraCozinhaR
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraCozinhaRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWithFilter
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraCozinhaSheet
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.data.event.UiClick
 import com.inventraoficial.inventra.data.local.LOCATION_PERMISSIONS
@@ -127,58 +128,60 @@ fun SelectCozinhaScreen(
                 )
             },
         )
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(16.dp),
-        ) {
-            uiState.pendingCozinhaName?.let { name -> PendingRequestBanner(name, Modifier.padding(bottom = 12.dp)) }
-            InventraSearchWithFilter(
-                query = uiState.searchQuery,
-                onQueryChange = onSearchQueryChange,
-                onFilterClick = onFilterIconClick,
-                placeholder = "Buscar cozinha...",
-                modifier = Modifier.padding(bottom = 12.dp),
-            )
-            NearMeRow(
-                isNearMe = uiState.isNearMe,
-                isLocating = uiState.isLocating,
-                message = uiState.locationMessage,
-                onClick = onNearMeClick,
-                modifier = Modifier.padding(bottom = 12.dp),
-            )
-            ViewModeToggle(
-                selected = uiState.viewMode,
-                onSelect = onViewModeSelect,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
-            when {
-                uiState.isLoading && uiState.cozinhas.isEmpty() -> CenteredLoading(modifier = Modifier.weight(1f))
-                uiState.errorMessage != null ->
-                    ErrorState(
-                        message = uiState.errorMessage,
-                        onRetryClick = onRetryClick,
-                        modifier = Modifier.weight(1f),
-                    )
-                uiState.viewMode == CozinhaViewMode.List ->
-                    CozinhaList(
-                        cozinhas = uiState.cozinhas,
-                        isLoading = uiState.isLoading,
-                        onCozinhaClick = onCozinhaClick,
-                        modifier = Modifier.weight(1f),
-                    )
-                else ->
-                    CozinhaMap(
-                        cozinhas = uiState.cozinhas,
-                        userLocation = uiState.userLocation.takeIf { uiState.isNearMe },
-                        showMyLocation = uiState.hasLocationPermission,
-                        onCozinhaClick = onCozinhaClick,
-                        modifier =
-                            Modifier
-                                .weight(1f)
-                                .fillMaxWidth(),
-                    )
+        InventraScreenContent {
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .padding(16.dp),
+            ) {
+                uiState.pendingCozinhaName?.let { name -> PendingRequestBanner(name, Modifier.padding(bottom = 12.dp)) }
+                InventraSearchWithFilter(
+                    query = uiState.searchQuery,
+                    onQueryChange = onSearchQueryChange,
+                    onFilterClick = onFilterIconClick,
+                    placeholder = "Buscar cozinha...",
+                    modifier = Modifier.padding(bottom = 12.dp),
+                )
+                NearMeRow(
+                    isNearMe = uiState.isNearMe,
+                    isLocating = uiState.isLocating,
+                    message = uiState.locationMessage,
+                    onClick = onNearMeClick,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                )
+                ViewModeToggle(
+                    selected = uiState.viewMode,
+                    onSelect = onViewModeSelect,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+                when {
+                    uiState.isLoading && uiState.cozinhas.isEmpty() -> CenteredLoading(modifier = Modifier.weight(1f))
+                    uiState.errorMessage != null ->
+                        ErrorState(
+                            message = uiState.errorMessage,
+                            onRetryClick = onRetryClick,
+                            modifier = Modifier.weight(1f),
+                        )
+                    uiState.viewMode == CozinhaViewMode.List ->
+                        CozinhaList(
+                            cozinhas = uiState.cozinhas,
+                            isLoading = uiState.isLoading,
+                            onCozinhaClick = onCozinhaClick,
+                            modifier = Modifier.weight(1f),
+                        )
+                    else ->
+                        CozinhaMap(
+                            cozinhas = uiState.cozinhas,
+                            userLocation = uiState.userLocation.takeIf { uiState.isNearMe },
+                            showMyLocation = uiState.hasLocationPermission,
+                            onCozinhaClick = onCozinhaClick,
+                            modifier =
+                                Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth(),
+                        )
+                }
             }
         }
     }

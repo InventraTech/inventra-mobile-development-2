@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.feature.stock.list.ui
 
+import com.inventraoficial.inventra.data.local.FakeStockCache
 import com.inventraoficial.inventra.data.local.SessionUser
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.stock.StockUnit
@@ -37,11 +38,13 @@ class StockListViewModelTest {
             kitchenName = "Sabor Filial Sul",
         )
     private lateinit var stockRepository: FakeStockRepository
+    private lateinit var stockCache: FakeStockCache
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         stockRepository = FakeStockRepository()
+        stockCache = FakeStockCache()
         stockRepository.kitchenStock =
             listOf(
                 stockItem(1, "Arroz Camil", "Grãos", totalQuantity = 24.0, activeBatches = 2)
@@ -64,7 +67,9 @@ class StockListViewModelTest {
             StockListViewModel(
                 authRepository = FakeAuthRepository(initialUser = sessionUser),
                 stockRepository = stockRepository,
+                stockCache = stockCache,
                 today = { LocalDate.of(2026, 10, 12) },
+                clock = { SAVED_AT },
             )
         viewModel.onScreenVisible()
         return viewModel
@@ -316,4 +321,57 @@ class StockListViewModelTest {
             assertNull(viewModel.uiState.value.errorMessage)
             assertEquals(4, viewModel.titles().size)
         }
+
+    @Test
+    fun `lista que chegou da api fica salva no cache da cozinha`() =
+        runTest(testDispatcher) {
+            loadedViewModel()
+
+            val cached = stockCache.saved.getValue(7)
+            assertEquals(4, cached.items.size)
+            assertEquals(SAVED_AT, cached.savedAt)
+        }
+
+    @Test
+    fun `sem conexao mostra o estoque salvo com o aviso`() =
+        runTest(testDispatcher) {
+            loadedViewModel()
+            stockRepository.kitchenStockError = IOException("Sem conexão")
+
+            val offline = loadedViewModel()
+
+            val state = offline.uiState.value
+            assertNull(state.errorMessage)
+            assertEquals(4, offline.titles().size)
+            assertTrue(state.offlineMessage.orEmpty().startsWith("Sem conexão. Mostrando o estoque salvo em"))
+        }
+
+    @Test
+    fun `sem conexao e sem cache mostra o erro`() =
+        runTest(testDispatcher) {
+            stockRepository.kitchenStockError = IOException("Sem conexão")
+
+            val viewModel = loadedViewModel()
+
+            assertEquals("Sem conexão", viewModel.uiState.value.errorMessage)
+            assertNull(viewModel.uiState.value.offlineMessage)
+        }
+
+    @Test
+    fun `voltando a conexao o aviso de estoque salvo some`() =
+        runTest(testDispatcher) {
+            loadedViewModel()
+            stockRepository.kitchenStockError = IOException("Sem conexão")
+            val viewModel = loadedViewModel()
+
+            stockRepository.kitchenStockError = null
+            viewModel.onRetryClick()
+            advanceUntilIdle()
+
+            assertNull(viewModel.uiState.value.offlineMessage)
+        }
+
+    private companion object {
+        const val SAVED_AT = 1_793_000_000_000L
+    }
 }

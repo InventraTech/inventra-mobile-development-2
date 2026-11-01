@@ -31,6 +31,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraProductImage
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSectionLabel
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.feature.requirements.RequisitionsError
 import com.inventraoficial.inventra.feature.requirements.RequisitionsLoading
@@ -68,29 +69,31 @@ fun PreListDetailScreen(
                 )
             },
         )
-        when {
-            uiState.isLoading -> RequisitionsLoading(modifier = Modifier.weight(1f))
-            uiState.errorMessage != null ->
-                RequisitionsError(
-                    message = uiState.errorMessage,
-                    onRetryClick = onRetryClick,
-                    modifier = Modifier.weight(1f),
-                )
-            else -> {
-                PreListContent(uiState = uiState, modifier = Modifier.weight(1f))
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    uiState.convertErrorMessage?.let {
-                        Text(text = it, color = InventraDanger, fontFamily = Montserrat, fontSize = 13.sp)
-                    }
-                    InventraPrimaryButton(
-                        text = "Transformar em compra",
-                        onClick = onConvertClick,
-                        isLoading = uiState.isConverting,
-                        modifier = Modifier.fillMaxWidth(),
+        InventraScreenContent {
+            when {
+                uiState.isLoading -> RequisitionsLoading(modifier = Modifier.weight(1f))
+                uiState.errorMessage != null ->
+                    RequisitionsError(
+                        message = uiState.errorMessage,
+                        onRetryClick = onRetryClick,
+                        modifier = Modifier.weight(1f),
                     )
+                else -> {
+                    PreListContent(uiState = uiState, modifier = Modifier.weight(1f))
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        uiState.convertErrorMessage?.let {
+                            Text(text = it, color = InventraDanger, fontFamily = Montserrat, fontSize = 13.sp)
+                        }
+                        InventraPrimaryButton(
+                            text = "Transformar em compra",
+                            onClick = onConvertClick,
+                            isLoading = uiState.isConverting,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
         }

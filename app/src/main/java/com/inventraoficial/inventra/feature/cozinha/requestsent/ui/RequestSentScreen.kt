@@ -44,6 +44,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraSectionLabel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraTextLink
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraCozinhaRequestStatus
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraCozinhaRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.feature.cozinha.select.ui.CozinhaListItem
 import com.inventraoficial.inventra.ui.navigation.Navigator
@@ -85,44 +86,46 @@ fun RequestSentScreen(
                 )
             },
         )
-        val contentModifier = Modifier.weight(1f).fillMaxWidth()
-        when {
-            uiState.isLoading ->
-                Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = InventraPurple)
-                }
-            uiState.errorMessage != null ->
-                Column(
-                    modifier = contentModifier.padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-                ) {
-                    Text(
-                        uiState.errorMessage,
-                        fontFamily = Montserrat,
-                        fontSize = 15.sp,
-                        textAlign = TextAlign.Center,
-                    )
-                    InventraPrimaryButton(
-                        text = "Tentar novamente",
-                        onClick = onRetryClick,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    InventraTextLink(text = "Sair da conta", onClick = onLogoutClick)
-                }
-            else ->
-                PullToRefreshBox(
-                    isRefreshing = uiState.isRefreshing,
-                    onRefresh = onRefreshClick,
-                    modifier = contentModifier,
-                ) {
-                    RequestsContent(
-                        uiState = uiState,
-                        onRefreshClick = onRefreshClick,
-                        onSeeCozinhasClick = onSeeCozinhasClick,
-                        onLogoutClick = onLogoutClick,
-                    )
-                }
+        InventraScreenContent {
+            val contentModifier = Modifier.weight(1f).fillMaxWidth()
+            when {
+                uiState.isLoading ->
+                    Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = InventraPurple)
+                    }
+                uiState.errorMessage != null ->
+                    Column(
+                        modifier = contentModifier.padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                    ) {
+                        Text(
+                            uiState.errorMessage,
+                            fontFamily = Montserrat,
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center,
+                        )
+                        InventraPrimaryButton(
+                            text = "Tentar novamente",
+                            onClick = onRetryClick,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        InventraTextLink(text = "Sair da conta", onClick = onLogoutClick)
+                    }
+                else ->
+                    PullToRefreshBox(
+                        isRefreshing = uiState.isRefreshing,
+                        onRefresh = onRefreshClick,
+                        modifier = contentModifier,
+                    ) {
+                        RequestsContent(
+                            uiState = uiState,
+                            onRefreshClick = onRefreshClick,
+                            onSeeCozinhasClick = onSeeCozinhasClick,
+                            onLogoutClick = onLogoutClick,
+                        )
+                    }
+            }
         }
     }
 }

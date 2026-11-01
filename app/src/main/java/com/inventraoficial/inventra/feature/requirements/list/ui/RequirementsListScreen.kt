@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraPreListCard
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
 import com.inventraoficial.inventra.feature.prelist.PreListHighlight
@@ -60,43 +61,49 @@ fun RequirementsListScreen(
                 Text("Requisições", color = Color.White, fontFamily = Montserrat, fontSize = 17.sp)
             },
         )
-        RequisitionTabs(selectedIndex = 0, onSelect = { index -> if (index == 1) onHistoryClick() })
-        when {
-            isLoading -> RequisitionsLoading(modifier = Modifier.weight(1f))
-            errorMessage != null ->
-                RequisitionsError(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
-            else ->
-                LazyColumn(
-                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    preListCard?.let { card -> item(key = "pre-list") { card() } }
-                    if (requisitions.isEmpty()) {
-                        item(key = "empty") {
-                            RequisitionsEmpty(
-                                text =
-                                    if (isSupervisor) {
-                                        "Nenhuma requisição aguardando sua análise."
-                                    } else {
-                                        "Você não tem requisições abertas."
-                                    },
-                                modifier = Modifier.fillParentMaxHeight(EMPTY_HEIGHT_FRACTION),
-                            )
+        InventraScreenContent {
+            RequisitionTabs(selectedIndex = 0, onSelect = { index -> if (index == 1) onHistoryClick() })
+            when {
+                isLoading -> RequisitionsLoading(modifier = Modifier.weight(1f))
+                errorMessage != null ->
+                    RequisitionsError(
+                        message = errorMessage,
+                        onRetryClick = onRetryClick,
+                        modifier = Modifier.weight(1f),
+                    )
+                else ->
+                    LazyColumn(
+                        modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        preListCard?.let { card -> item(key = "pre-list") { card() } }
+                        if (requisitions.isEmpty()) {
+                            item(key = "empty") {
+                                RequisitionsEmpty(
+                                    text =
+                                        if (isSupervisor) {
+                                            "Nenhuma requisição aguardando sua análise."
+                                        } else {
+                                            "Você não tem requisições abertas."
+                                        },
+                                    modifier = Modifier.fillParentMaxHeight(EMPTY_HEIGHT_FRACTION),
+                                )
+                            }
+                        }
+                        items(requisitions, key = { it.id }) { requisition ->
+                            RequisitionCard(requisition = requisition, onClick = { onRequisitionClick(requisition) })
                         }
                     }
-                    items(requisitions, key = { it.id }) { requisition ->
-                        RequisitionCard(requisition = requisition, onClick = { onRequisitionClick(requisition) })
-                    }
-                }
+            }
+            InventraPrimaryButton(
+                text = "Nova requisição",
+                onClick = onNewClick,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+            )
         }
-        InventraPrimaryButton(
-            text = "Nova requisição",
-            onClick = onNewClick,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-        )
     }
 }
 

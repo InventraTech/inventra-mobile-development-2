@@ -29,6 +29,7 @@ import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryBut
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraConfirmDialog
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraMemberRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraPendingMemberRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.theme.InventraBackground
@@ -102,16 +103,18 @@ fun ManageMembersScreen(
                 )
             },
         )
-        when {
-            uiState.isLoading -> CenteredLoading()
-            uiState.errorMessage != null -> ErrorState(message = uiState.errorMessage, onRetryClick = onRetryClick)
-            else ->
-                MembersContent(
-                    uiState = uiState,
-                    onAcceptClick = onAcceptClick,
-                    onRejectClick = onRejectClick,
-                    onDeactivateClick = onDeactivateClick,
-                )
+        InventraScreenContent {
+            when {
+                uiState.isLoading -> CenteredLoading()
+                uiState.errorMessage != null -> ErrorState(message = uiState.errorMessage, onRetryClick = onRetryClick)
+                else ->
+                    MembersContent(
+                        uiState = uiState,
+                        onAcceptClick = onAcceptClick,
+                        onRejectClick = onRejectClick,
+                        onDeactivateClick = onDeactivateClick,
+                    )
+            }
         }
     }
 }

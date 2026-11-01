@@ -2,7 +2,7 @@ package com.inventraoficial.inventra.core.designsystem.molecules
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -36,7 +36,7 @@ fun InventraStatTile(
                 .clip(RoundedCornerShape(12.dp))
                 .border(1.dp, InventraPurple.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
                 .padding(14.dp)
-                .height(80.dp),
+                .heightIn(min = 80.dp),
     ) {
         InventraSectionLabel(text = label, modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 20.dp))
         Text(value, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 19.sp, color = valueColor)

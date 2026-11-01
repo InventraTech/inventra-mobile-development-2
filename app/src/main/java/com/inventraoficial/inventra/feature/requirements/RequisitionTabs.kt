@@ -3,7 +3,7 @@ package com.inventraoficial.inventra.feature.requirements
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -31,7 +31,7 @@ fun RequisitionTabs(
             modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .height(56.dp),
+                .heightIn(min = 56.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         tabs.forEachIndexed { index, tab ->
@@ -47,7 +47,7 @@ fun RequisitionTabs(
                         selectedLabelColor = Color.White,
                         labelColor = InventraPurple,
                     ),
-                modifier = Modifier.weight(1f).height(56.dp),
+                modifier = Modifier.weight(1f).heightIn(min = 56.dp),
             )
         }
     }

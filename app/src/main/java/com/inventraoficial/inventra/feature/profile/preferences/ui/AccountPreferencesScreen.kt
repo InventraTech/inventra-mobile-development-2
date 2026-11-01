@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraCloseButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSwitchRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.data.local.ThemeMode
 import com.inventraoficial.inventra.feature.notifications.rememberNotificationPermissionRequest
@@ -69,36 +70,38 @@ fun AccountPreferencesScreen(
                 )
             },
         )
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            SectionTitle(text = "Tema")
-            ThemeSelector(selected = theme, onSelect = onThemeSelect)
-            Text(
-                text = "Em \"Sistema\", o app acompanha o modo claro ou escuro do celular.",
-                fontFamily = Montserrat,
-                fontSize = 13.sp,
-                color = InventraMuted,
-            )
-            SectionTitle(text = "Notificações", modifier = Modifier.padding(top = 12.dp))
-            InventraSwitchRow(
-                label = "Avisos no celular",
-                checked = alertNotifications,
-                onCheckedChange = onAlertNotificationsChange,
-            )
-            Text(
-                text =
-                    "Estoque crítico, validade, requisições e pedidos da cozinha chegam mesmo com o app " +
-                        "fechado. O celular confere a cada 15 minutos, mais ou menos.",
-                fontFamily = Montserrat,
-                fontSize = 13.sp,
-                color = InventraMuted,
-            )
+        InventraScreenContent {
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                SectionTitle(text = "Tema")
+                ThemeSelector(selected = theme, onSelect = onThemeSelect)
+                Text(
+                    text = "Em \"Sistema\", o app acompanha o modo claro ou escuro do celular.",
+                    fontFamily = Montserrat,
+                    fontSize = 13.sp,
+                    color = InventraMuted,
+                )
+                SectionTitle(text = "Notificações", modifier = Modifier.padding(top = 12.dp))
+                InventraSwitchRow(
+                    label = "Avisos no celular",
+                    checked = alertNotifications,
+                    onCheckedChange = onAlertNotificationsChange,
+                )
+                Text(
+                    text =
+                        "Estoque crítico, validade, requisições e pedidos da cozinha chegam mesmo com o app " +
+                            "fechado. O celular confere a cada 15 minutos, mais ou menos.",
+                    fontFamily = Montserrat,
+                    fontSize = 13.sp,
+                    color = InventraMuted,
+                )
+            }
         }
     }
 }

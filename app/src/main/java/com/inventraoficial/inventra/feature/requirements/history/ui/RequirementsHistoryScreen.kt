@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraFilterChipRow
+import com.inventraoficial.inventra.core.designsystem.organisms.InventraScreenContent
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.data.remote.dto.requisition.RequisitionStatus
 import com.inventraoficial.inventra.feature.requirements.RequisitionCard
@@ -55,28 +56,34 @@ fun RequirementsHistoryScreen(
                 Text("Requisições", color = Color.White, fontFamily = Montserrat, fontSize = 17.sp)
             },
         )
-        RequisitionTabs(selectedIndex = 1, onSelect = { index -> if (index == 0) onRequirementsClick() })
-        InventraFilterChipRow(
-            options = HistoryFilter.entries.map { it.label },
-            selected = selectedFilter.label,
-            onSelect = { label -> HistoryFilter.entries.firstOrNull { it.label == label }?.let(onFilterSelect) },
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-        )
-        when {
-            isLoading -> RequisitionsLoading(modifier = Modifier.weight(1f))
-            errorMessage != null ->
-                RequisitionsError(message = errorMessage, onRetryClick = onRetryClick, modifier = Modifier.weight(1f))
-            requisitions.isEmpty() ->
-                RequisitionsEmpty(text = "Nenhuma requisição por aqui ainda.", modifier = Modifier.weight(1f))
-            else ->
-                LazyColumn(
-                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(requisitions, key = { it.id }) { requisition ->
-                        RequisitionCard(requisition = requisition, onClick = { onRequisitionClick(requisition) })
+        InventraScreenContent {
+            RequisitionTabs(selectedIndex = 1, onSelect = { index -> if (index == 0) onRequirementsClick() })
+            InventraFilterChipRow(
+                options = HistoryFilter.entries.map { it.label },
+                selected = selectedFilter.label,
+                onSelect = { label -> HistoryFilter.entries.firstOrNull { it.label == label }?.let(onFilterSelect) },
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            )
+            when {
+                isLoading -> RequisitionsLoading(modifier = Modifier.weight(1f))
+                errorMessage != null ->
+                    RequisitionsError(
+                        message = errorMessage,
+                        onRetryClick = onRetryClick,
+                        modifier = Modifier.weight(1f),
+                    )
+                requisitions.isEmpty() ->
+                    RequisitionsEmpty(text = "Nenhuma requisição por aqui ainda.", modifier = Modifier.weight(1f))
+                else ->
+                    LazyColumn(
+                        modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        items(requisitions, key = { it.id }) { requisition ->
+                            RequisitionCard(requisition = requisition, onClick = { onRequisitionClick(requisition) })
+                        }
                     }
-                }
+            }
         }
     }
 }
