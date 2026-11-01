@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.feature.stock.detail.ui
 
+import com.inventraoficial.inventra.data.local.FakeProductDetailCache
 import com.inventraoficial.inventra.data.local.SessionUser
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.stock.MovementBatch
@@ -46,6 +47,7 @@ class StockDetailViewModelTest {
         )
     private lateinit var productRepository: FakeProductRepository
     private lateinit var stockRepository: FakeStockRepository
+    private val detailCache = FakeProductDetailCache()
     private val productSupplierRepository = FakeProductSupplierRepository()
 
     @Before
@@ -124,7 +126,9 @@ class StockDetailViewModelTest {
                 stockRepository = stockRepository,
                 authRepository = FakeAuthRepository(initialUser = sessionUser),
                 productSupplierRepository = productSupplierRepository,
+                productDetailCache = detailCache,
                 zone = ZoneId.of("America/Sao_Paulo"),
+                clock = { SAVED_AT },
                 today = { LocalDate.of(2026, 10, 12) },
             )
         viewModel.onScreenVisible()
@@ -353,4 +357,47 @@ class StockDetailViewModelTest {
             assertTrue(stockRepository.batchesCalls.isEmpty())
             assertEquals("0 L", viewModel.uiState.value.totalValue)
         }
+
+    @Test
+    fun `detalhe que chegou da api fica salvo para abrir sem internet`() =
+        runTest(testDispatcher) {
+            createVisibleViewModel()
+            advanceUntilIdle()
+
+            val cached = detailCache.saved.getValue(7 to leiteId)
+            assertEquals("Leite Integral", cached.snapshot.product.name)
+            assertEquals(SAVED_AT, cached.savedAt)
+        }
+
+    @Test
+    fun `sem internet mostra o detalhe salvo com o aviso`() =
+        runTest(testDispatcher) {
+            createVisibleViewModel()
+            advanceUntilIdle()
+            productRepository.error = IOException("Sem conexão")
+
+            val offline = createVisibleViewModel()
+            advanceUntilIdle()
+
+            val state = offline.uiState.value
+            assertNull(state.errorMessage)
+            assertEquals("Leite Integral", state.productName)
+            assertEquals("Sem conexão. Mostrando os dados do produto salvos em 30/10 às 12:00.", state.offlineMessage)
+        }
+
+    @Test
+    fun `sem internet e sem nada salvo mostra o erro`() =
+        runTest(testDispatcher) {
+            productRepository.error = IOException("Sem conexão")
+
+            val viewModel = createVisibleViewModel()
+            advanceUntilIdle()
+
+            assertEquals("Sem conexão", viewModel.uiState.value.errorMessage)
+            assertNull(viewModel.uiState.value.offlineMessage)
+        }
+
+    private companion object {
+        const val SAVED_AT = 1_793_372_400_000L
+    }
 }

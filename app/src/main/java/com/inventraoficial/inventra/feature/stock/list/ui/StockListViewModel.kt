@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
 import com.inventraoficial.inventra.R
+import com.inventraoficial.inventra.core.designsystem.atoms.offlineMessage
 import com.inventraoficial.inventra.data.local.StockCache
 import com.inventraoficial.inventra.data.remote.dto.stock.KitchenStockItemResponse
 import com.inventraoficial.inventra.data.repository.AuthRepository
@@ -20,10 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit.DAYS
 import java.util.Locale
 
@@ -111,7 +109,7 @@ class StockListViewModel(
                     showItems(fresh)
                 }
                 cached != null -> {
-                    _uiState.update { it.copy(offlineMessage = cached.savedAt.toOfflineMessage()) }
+                    _uiState.update { it.copy(offlineMessage = offlineMessage("o estoque salvo", cached.savedAt)) }
                     showItems(cached.items)
                 }
                 else ->
@@ -177,13 +175,6 @@ class StockListViewModel(
 }
 
 private const val NO_CATEGORY = "Sem categoria"
-private val savedAtFormatter = DateTimeFormatter.ofPattern("dd/MM 'às' HH:mm")
-
-private fun Long.toOfflineMessage(): String {
-    val savedAt = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault())
-    return "Sem conexão. Mostrando o estoque salvo em ${savedAt.format(savedAtFormatter)}."
-}
-
 private const val EXPIRING_SOON_DAYS = 7
 
 private val quantityFormat = DecimalFormat("#,##0.###", DecimalFormatSymbols(Locale.forLanguageTag("pt-BR")))

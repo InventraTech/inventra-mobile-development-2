@@ -16,8 +16,10 @@ import com.inventraoficial.inventra.data.local.FusedLocationProvider
 import com.inventraoficial.inventra.data.local.ImageCompressor
 import com.inventraoficial.inventra.data.local.InventraDatabase
 import com.inventraoficial.inventra.data.local.LocationProvider
+import com.inventraoficial.inventra.data.local.ProductDetailCache
 import com.inventraoficial.inventra.data.local.ProfilePhotoPreview
 import com.inventraoficial.inventra.data.local.SessionStorage
+import com.inventraoficial.inventra.data.local.SqliteProductDetailCache
 import com.inventraoficial.inventra.data.local.SqliteStockCache
 import com.inventraoficial.inventra.data.local.StockCache
 import com.inventraoficial.inventra.data.remote.api.AlertApi
@@ -112,6 +114,7 @@ interface AppContainer {
     val accessRequestChecker: AccessRequestChecker
     val clickTracker: ClickTracker
     val stockCache: StockCache
+    val productDetailCache: ProductDetailCache
 }
 
 class DefaultAppContainer(
@@ -293,7 +296,11 @@ class DefaultAppContainer(
         )
     }
 
-    override val stockCache: StockCache by lazy { SqliteStockCache(InventraDatabase(context), json) }
+    private val database: InventraDatabase by lazy { InventraDatabase(context) }
+
+    override val stockCache: StockCache by lazy { SqliteStockCache(database, json) }
+
+    override val productDetailCache: ProductDetailCache by lazy { SqliteProductDetailCache(database, json) }
 
     override val clickTracker: ClickTracker by lazy {
         BufferedClickTracker(
