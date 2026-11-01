@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.inventraoficial.inventra.ui.theme.InventraPurple
 import com.inventraoficial.inventra.ui.theme.Montserrat
@@ -20,6 +21,7 @@ fun InventraSuggestionChip(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: Dp = 14.dp,
 ) {
     Box(
         modifier =
@@ -27,7 +29,7 @@ fun InventraSuggestionChip(
                 .clip(RoundedCornerShape(12.dp))
                 .border(1.5.dp, InventraPurple, RoundedCornerShape(12.dp))
                 .clickable(onClick = onClick)
-                .padding(14.dp),
+                .padding(contentPadding),
     ) {
         Text(text, color = InventraPurple, fontFamily = Montserrat, fontWeight = FontWeight.Medium)
     }

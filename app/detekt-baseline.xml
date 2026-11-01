@@ -2,6 +2,12 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
+    <ID>CyclomaticComplexMethod:ChatComposer.kt$@Suppress("TooGenericExceptionCaught") @Composable fun ChatComposer( value: String, onValueChange: (String) -&gt; Unit, onSend: () -&gt; Unit, onAudioGravado: (File) -&gt; Unit, carregando: Boolean, modifier: Modifier = Modifier, onParar: () -&gt; Unit = {}, onAnexosEscolhidos: (List&lt;AnexoParaEnvio&gt;, List&lt;String&gt;) -&gt; Unit = { _, _ -&gt; }, anexosPendentes: List&lt;AnexoParaEnvio&gt; = emptyList(), onAnexoRemovido: (AnexoParaEnvio) -&gt; Unit = {}, )</ID>
+    <ID>CyclomaticComplexMethod:ChatMessageList.kt$@Composable fun ChatMessageList( mensagens: List&lt;Mensagem&gt;, carregando: Boolean, modifier: Modifier = Modifier, mensagemAnimandoId: String? = null, iniciouEmMillis: Long? = null, onDigitacaoTerminou: (String) -&gt; Unit = {}, onAcaoAprovada: (String) -&gt; Unit = {}, onAcaoRecusada: (String) -&gt; Unit = {}, onAcaoExecutar: (String) -&gt; Unit = {}, )</ID>
+    <ID>CyclomaticComplexMethod:ChatMessageList.kt$@Composable private fun MensagemDaIa( texto: String, animar: Boolean, onTextoCresceu: () -&gt; Unit, onDigitacaoTerminou: () -&gt; Unit, artefato: Artefato? = null, acoes: List&lt;AcaoPendente&gt; = emptyList(), passos: List&lt;PassoIa&gt; = emptyList(), pensamento: String = "", emAndamento: Boolean = false, duracaoSegundos: Int? = null, onAcaoAprovada: (String) -&gt; Unit = {}, onAcaoRecusada: (String) -&gt; Unit = {}, onAcaoExecutar: (String) -&gt; Unit = {}, )</ID>
+    <ID>CyclomaticComplexMethod:EventoIa.kt$fun interpretarEventoIa( linha: String, json: Json, ): EventoIa?</ID>
+    <ID>CyclomaticComplexMethod:TrechoMarkdown.kt$internal fun interpretarMarkdown(markdown: String): List&lt;TrechoMarkdown&gt;</ID>
+    <ID>CyclomaticComplexMethod:TrechoMarkdown.kt$private fun inline( texto: String, negrito: Boolean = false, italico: Boolean = false, ): List&lt;TrechoMarkdown&gt;</ID>
     <ID>EmptyFunctionBlock:HomeViewModel.kt$HomeViewModel${ }</ID>
     <ID>EmptyFunctionBlock:LoginViewModel.kt$LoginViewModel${ }</ID>
     <ID>FunctionNaming:HomeScreen.kt$@Composable fun HomeRoute( viewModel: HomeViewModel = viewModel(), modifier: Modifier = Modifier, )</ID>
@@ -83,15 +89,20 @@
     <ID>FunctionNaming:ScanScreen.kt$@Composable fun ScanScreen( instruction: String, onBackClick: () -&gt; Unit, onFlashClick: () -&gt; Unit, onScan: () -&gt; Unit, onPermissionResult: (Boolean) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>FunctionNaming:ScanScreen.kt$@Preview @Composable private fun ScanScreenPreview()</ID>
     <ID>FunctionNaming:Theme.kt$@Composable fun Inventra_mobile_2Theme( darkTheme: Boolean = isSystemInDarkTheme(), // Dynamic color is available on Android 12+ dynamicColor: Boolean = true, content: @Composable () -&gt; Unit, )</ID>
+    <ID>LargeClass:ChatViewModel.kt$ChatViewModel : ViewModel</ID>
+    <ID>LargeClass:ChatViewModelTest.kt$ChatViewModelTest</ID>
     <ID>LongMethod:HomeScreen.kt$@Composable fun HomeScreen( userName: String, dateText: String, priorityItems: List&lt;InventraPriorityItem&gt;, stats: List&lt;InventraStat&gt;, onQrScanClick: () -&gt; Unit, onBellClick: () -&gt; Unit, onStockClick: () -&gt; Unit, onHistoryClick: () -&gt; Unit, onNotificationsClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>LongMethod:LoginScreen.kt$@Composable fun LoginScreen( login: String, onLoginChange: (String) -&gt; Unit, senha: String, onPasswordChange: (String) -&gt; Unit, onLoginClick: () -&gt; Unit, onForgotPasswordClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>LongMethod:ScanScreen.kt$@Composable fun ScanScreen( instruction: String, onBackClick: () -&gt; Unit, onFlashClick: () -&gt; Unit, onScan: () -&gt; Unit, onPermissionResult: (Boolean) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:TrechoMarkdown.kt$internal fun interpretarMarkdown(markdown: String): List&lt;TrechoMarkdown&gt;</ID>
     <ID>LongParameterList:HomeScreen.kt$( userName: String, dateText: String, priorityItems: List&lt;InventraPriorityItem&gt;, stats: List&lt;InventraStat&gt;, onQrScanClick: () -&gt; Unit, onBellClick: () -&gt; Unit, onStockClick: () -&gt; Unit, onHistoryClick: () -&gt; Unit, onNotificationsClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>LongParameterList:InventraLabeledField.kt$( label: String, value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, readOnly: Boolean = false, multiline: Boolean = false, isPassword: Boolean = false, placeholder: String, )</ID>
     <ID>LongParameterList:InventraPriorityRow.kt$( painter: Painter, title: String, statusText: String, urgency: InventraUrgency, modifier: Modifier = Modifier, batch: String, )</ID>
     <ID>LongParameterList:InventraSupplierRow.kt$( painter: Painter, name: String, rating: Int, badgeText: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>LongParameterList:LoginScreen.kt$( login: String, onLoginChange: (String) -&gt; Unit, senha: String, onPasswordChange: (String) -&gt; Unit, onLoginClick: () -&gt; Unit, onForgotPasswordClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>LongParameterList:ScanScreen.kt$( instruction: String, onBackClick: () -&gt; Unit, onFlashClick: () -&gt; Unit, onScan: () -&gt; Unit, onPermissionResult: (Boolean) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LoopWithTooManyJumpStatements:EventoIa.kt$while</ID>
+    <ID>LoopWithTooManyJumpStatements:TrechoMarkdown.kt$for</ID>
     <ID>MagicNumber:Color.kt$0xFF131018</ID>
     <ID>MagicNumber:Color.kt$0xFF21804C</ID>
     <ID>MagicNumber:Color.kt$0xFF4B0F91</ID>
@@ -133,6 +144,15 @@
     <ID>MaxLineLength:InventraTopBar.kt$Text("Quinta, 2 de julho de 2026", color = Color.White.copy(alpha = 0.8f), fontFamily = Montserrat, fontSize = 12.sp)</ID>
     <ID>MaxLineLength:InventraTopBar.kt$Text("Seja bem-vindo, Jones!", color = Color.White, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 18.sp)</ID>
     <ID>MaxLineLength:InventraTopBar.kt$title = { Text("Dar Baixa", color = Color.White, fontFamily = Montserrat, fontWeight = FontWeight.Bold, fontSize = 17.sp) }</ID>
+    <ID>TooManyFunctions:ChatAcoes.kt$com.inventraoficial.inventra.feature.assistant.ui.ChatAcoes.kt</ID>
+    <ID>TooManyFunctions:ChatAcoesUi.kt$com.inventraoficial.inventra.feature.assistant.ui.ChatAcoesUi.kt</ID>
+    <ID>TooManyFunctions:ChatArtefatos.kt$com.inventraoficial.inventra.feature.assistant.ui.ChatArtefatos.kt</ID>
+    <ID>TooManyFunctions:ChatArtefatosUi.kt$com.inventraoficial.inventra.feature.assistant.ui.ChatArtefatosUi.kt</ID>
+    <ID>TooManyFunctions:ChatLogica.kt$com.inventraoficial.inventra.feature.assistant.ui.ChatLogica.kt</ID>
+    <ID>TooManyFunctions:ChatMessageList.kt$com.inventraoficial.inventra.feature.assistant.ui.ChatMessageList.kt</ID>
+    <ID>TooManyFunctions:ChatRepository.kt$ChatRepository</ID>
+    <ID>TooManyFunctions:ChatRepository.kt$NetworkChatRepository : ChatRepository</ID>
+    <ID>TooManyFunctions:ChatViewModel.kt$ChatViewModel : ViewModel</ID>
     <ID>UnusedParameter:HomeScreen.kt$onHistoryClick: () -&gt; Unit</ID>
     <ID>UnusedParameter:HomeScreen.kt$onNotificationsClick: () -&gt; Unit</ID>
     <ID>UnusedParameter:HomeScreen.kt$onStockClick: () -&gt; Unit</ID>

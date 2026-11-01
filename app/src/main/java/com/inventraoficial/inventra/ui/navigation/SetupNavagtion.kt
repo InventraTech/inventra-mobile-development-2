@@ -147,7 +147,7 @@ private fun AppNavigation(
             }
         },
         floatingActionButton = {
-            if (selectedTab == InventraBottomDestination.Home) {
+            if (currentScreen.mostraMascote()) {
                 InventraMascotFab(
                     painter = painterResource(R.drawable.ic_mascote),
                     onClick = { navigator.navigate(Screen.Chat) },

@@ -122,6 +122,33 @@ sealed interface Screen : NavKey {
     ) : Screen
 }
 
+/**
+ * O mascote que abre o assistente aparece nas telas de navegação (listas, detalhes, perfil...).
+ * Fica de fora onde atrapalharia: entrada e cadastro, o próprio chat, o leitor de código e os
+ * formulários, que têm botões de ação embaixo.
+ */
+fun Screen.mostraMascote(): Boolean =
+    when (this) {
+        Screen.Login,
+        Screen.Register,
+        is Screen.ForgotPassword,
+        is Screen.ResetCode,
+        is Screen.NewPassword,
+        Screen.CreateCozinha,
+        Screen.SelectCozinha,
+        Screen.RequestSent,
+        Screen.Chat,
+        Screen.Scan,
+        is Screen.ProductCreate,
+        is Screen.ProductEdit,
+        is Screen.StockOut,
+        is Screen.StockEntry,
+        is Screen.RequisitionEditor,
+        -> false
+
+        else -> true
+    }
+
 fun Screen.isFullBleed(): Boolean =
     when (this) {
         Screen.Login, Screen.Register, Screen.RequestSent -> true

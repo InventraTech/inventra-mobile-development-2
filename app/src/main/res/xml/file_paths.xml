@@ -3,4 +3,8 @@
     <cache-path
         name="camera"
         path="camera/" />
+    <!-- Pasta do cache onde a câmera grava a foto antes de ela ser enviada para a IA (chat). -->
+    <cache-path
+        name="anexos"
+        path="anexos/" />
 </paths>

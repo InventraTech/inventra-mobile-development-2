@@ -22,6 +22,7 @@ import com.inventraoficial.inventra.data.local.SqliteStockCache
 import com.inventraoficial.inventra.data.local.StockCache
 import com.inventraoficial.inventra.data.remote.api.AlertApi
 import com.inventraoficial.inventra.data.remote.api.AuthApi
+import com.inventraoficial.inventra.data.remote.api.ChatApi
 import com.inventraoficial.inventra.data.remote.api.ClickEventApi
 import com.inventraoficial.inventra.data.remote.api.KitchenAccessApi
 import com.inventraoficial.inventra.data.remote.api.KitchenApi
@@ -35,14 +36,17 @@ import com.inventraoficial.inventra.data.remote.api.SupplierApi
 import com.inventraoficial.inventra.data.remote.api.UserApi
 import com.inventraoficial.inventra.data.remote.auth.google.GoogleAuthClient
 import com.inventraoficial.inventra.data.remote.interceptor.AuthInterceptor
+import com.inventraoficial.inventra.data.remote.interceptor.IaAuthInterceptor
 import com.inventraoficial.inventra.data.remote.interceptor.TokenAuthenticator
 import com.inventraoficial.inventra.data.repository.AlertRepository
 import com.inventraoficial.inventra.data.repository.AuthRepository
+import com.inventraoficial.inventra.data.repository.ChatRepository
 import com.inventraoficial.inventra.data.repository.KitchenAccessRepository
 import com.inventraoficial.inventra.data.repository.KitchenRepository
 import com.inventraoficial.inventra.data.repository.MembersRepository
 import com.inventraoficial.inventra.data.repository.NetworkAlertRepository
 import com.inventraoficial.inventra.data.repository.NetworkAuthRepository
+import com.inventraoficial.inventra.data.repository.NetworkChatRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenAccessRepository
 import com.inventraoficial.inventra.data.repository.NetworkKitchenRepository
 import com.inventraoficial.inventra.data.repository.NetworkMembersRepository
@@ -63,6 +67,7 @@ import com.inventraoficial.inventra.data.repository.RequisitionRepository
 import com.inventraoficial.inventra.data.repository.StockRepository
 import com.inventraoficial.inventra.data.repository.SupplierRepository
 import com.inventraoficial.inventra.data.session.SessionManager
+import com.inventraoficial.inventra.feature.assistant.ui.ChatSessionStore
 import com.inventraoficial.inventra.feature.notifications.background.AccessRequestChecker
 import com.inventraoficial.inventra.feature.notifications.background.DataStoreKnownAccessRequestStore
 import com.inventraoficial.inventra.feature.notifications.background.DataStoreLastNotifiedAlertStore
@@ -99,6 +104,8 @@ interface AppContainer {
     val googleAuthClient: GoogleAuthClient
     val imageCompressor: ImageCompressor
     val profilePhotoPreview: ProfilePhotoPreview
+    val chatRepository: ChatRepository
+    val chatSessionStore: ChatSessionStore
     val locationProvider: LocationProvider
     val alertNotifier: SystemAlertNotifier
     val newAlertsChecker: NewAlertsChecker
@@ -180,6 +187,33 @@ class DefaultAppContainer(
     private val backgroundScope =
         CoroutineScope(SupervisorJob() + Dispatchers.IO + CoroutineExceptionHandler { _, _ -> })
 
+    // Nível BASIC: o BODY despejava o áudio inteiro (binário) no Logcat.
+    private val iaLogging =
+        HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+        }
+
+    private val iaOkHttpClient: OkHttpClient by lazy {
+        OkHttpClient
+            .Builder()
+            .connectTimeout(IA_CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(IA_READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .addInterceptor(IaAuthInterceptor(sessionStorage))
+            .addInterceptor(iaLogging)
+            .build()
+    }
+
+    private val iaRetrofit: Retrofit by lazy {
+        Retrofit
+            .Builder()
+            .baseUrl(BuildConfig.IA_BASE_URL)
+            .client(iaOkHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
+
+    private val chatApi: ChatApi by lazy { iaRetrofit.create(ChatApi::class.java) }
+
     override val authRepository: AuthRepository by lazy {
         NetworkAuthRepository(
             authApi,
@@ -230,6 +264,11 @@ class DefaultAppContainer(
         NetworkRequisitionRepository(requisitionApi, json)
     }
 
+    override val chatRepository: ChatRepository by lazy { NetworkChatRepository(chatApi, userApi) }
+
+    // Guarda a conversa do chat enquanto o app está aberto, mesmo que o usuário saia da tela.
+    override val chatSessionStore: ChatSessionStore by lazy { ChatSessionStore() }
+
     override val preListRepository: PreListRepository by lazy { NetworkPreListRepository(preListApi, json) }
 
     override val alertNotifier: SystemAlertNotifier by lazy { SystemAlertNotifier(context) }
@@ -269,5 +308,9 @@ class DefaultAppContainer(
     companion object {
         private const val BASE_URL = BuildConfig.API_BASE_URL
         private const val TIMEOUT_SECONDS = 60L
+
+        // O Render "dorme" quando fica parado: a primeira conexão depois disso pode levar quase um minuto.
+        private const val IA_CONNECT_TIMEOUT_SECONDS = 60L
+        private const val IA_READ_TIMEOUT_SECONDS = 120L
     }
 }
