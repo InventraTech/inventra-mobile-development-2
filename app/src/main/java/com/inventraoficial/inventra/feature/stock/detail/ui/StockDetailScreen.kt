@@ -38,6 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.R
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraBackButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraLabeledField
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraOfflineBanner
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraPrimaryButton
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraDeliveryHistoryRow
@@ -116,6 +117,7 @@ private fun DetailContent(
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
+        uiState.offlineMessage?.let { InventraOfflineBanner(message = it) }
         Image(
             painter = painterResource(id = uiState.productImageRes),
             contentDescription = uiState.productName,

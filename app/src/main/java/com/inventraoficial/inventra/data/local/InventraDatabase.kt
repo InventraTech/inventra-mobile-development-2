@@ -20,6 +20,17 @@ class InventraDatabase(
             )
             """.trimIndent(),
         )
+        db.execSQL(
+            """
+            CREATE TABLE $PRODUCT_DETAIL_TABLE (
+                $KITCHEN_ID INTEGER NOT NULL,
+                $PRODUCT_ID INTEGER NOT NULL,
+                $PAYLOAD TEXT NOT NULL,
+                $SAVED_AT INTEGER NOT NULL,
+                PRIMARY KEY ($KITCHEN_ID, $PRODUCT_ID)
+            )
+            """.trimIndent(),
+        )
     }
 
     override fun onUpgrade(
@@ -28,13 +39,15 @@ class InventraDatabase(
         newVersion: Int,
     ) {
         db.execSQL("DROP TABLE IF EXISTS $STOCK_TABLE")
+        db.execSQL("DROP TABLE IF EXISTS $PRODUCT_DETAIL_TABLE")
         onCreate(db)
     }
 
     companion object {
         private const val NAME = "inventra.db"
-        private const val VERSION = 1
+        private const val VERSION = 2
         const val STOCK_TABLE = "kitchen_stock_cache"
+        const val PRODUCT_DETAIL_TABLE = "product_detail_cache"
         const val KITCHEN_ID = "kitchen_id"
         const val PRODUCT_ID = "product_id"
         const val POSITION = "position"

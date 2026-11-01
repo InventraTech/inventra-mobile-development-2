@@ -7,7 +7,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inventraoficial.inventra.InventraApplication
+import com.inventraoficial.inventra.core.designsystem.atoms.offlineMessage
 import com.inventraoficial.inventra.core.designsystem.organisms.InventraBatch
+import com.inventraoficial.inventra.data.local.ProductDetailCache
+import com.inventraoficial.inventra.data.local.ProductDetailSnapshot
 import com.inventraoficial.inventra.data.remote.dto.auth.AccessType
 import com.inventraoficial.inventra.data.remote.dto.product.ProductResponse
 import com.inventraoficial.inventra.data.remote.dto.stock.StockBatchResponse
@@ -42,7 +45,9 @@ class StockDetailViewModel(
     private val stockRepository: StockRepository,
     private val authRepository: AuthRepository,
     private val productSupplierRepository: ProductSupplierRepository,
+    private val productDetailCache: ProductDetailCache,
     private val zone: ZoneId = ZoneId.systemDefault(),
+    private val clock: () -> Long = { System.currentTimeMillis() },
     private val today: () -> LocalDate = { LocalDate.now(zone) },
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StockDetailUiState())
@@ -88,17 +93,27 @@ class StockDetailViewModel(
             val productResult = product.await()
             val batchesResult = batches.await()
             val error = productResult.exceptionOrNull() ?: batchesResult.exceptionOrNull()
-            if (error != null) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
+            val fresh =
+                if (error == null) {
+                    ProductDetailSnapshot(productResult.getOrThrow(), batchesResult.getOrThrow(), links.await())
+                } else {
+                    null
+                }
+            val cached = if (fresh == null) kitchenId?.let { productDetailCache.load(it, productId) } else null
+            val snapshot = fresh ?: cached?.snapshot
+            if (snapshot == null) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = error?.message) }
                 return@launch
             }
+            if (fresh != null && kitchenId != null) runCatching { productDetailCache.save(kitchenId, fresh, clock()) }
+            val offline = cached?.let { offlineMessage("os dados do produto salvos", it.savedAt, zone) }
+            _uiState.update { it.copy(offlineMessage = offline) }
             val linkedSupplier =
-                links
-                    .await()
+                snapshot.suppliers
                     .firstOrNull()
                     ?.supplier
                     ?.legalName
-            show(productResult.getOrThrow(), batchesResult.getOrThrow(), linkedSupplier)
+            show(snapshot.product, snapshot.batches, linkedSupplier)
         }
     }
 
@@ -191,6 +206,7 @@ class StockDetailViewModel(
                         stockRepository = application.container.stockRepository,
                         authRepository = application.container.authRepository,
                         productSupplierRepository = application.container.productSupplierRepository,
+                        productDetailCache = application.container.productDetailCache,
                     )
                 }
             }

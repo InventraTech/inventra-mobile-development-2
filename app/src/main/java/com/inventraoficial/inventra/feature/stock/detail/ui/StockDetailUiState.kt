@@ -16,6 +16,7 @@ data class StockDetailUiState(
     val canEdit: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val offlineMessage: String? = null,
 )
 
 data class HistoryState(

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.inventraoficial.inventra.R
+import com.inventraoficial.inventra.core.designsystem.atoms.InventraOfflineBanner
 import com.inventraoficial.inventra.core.designsystem.atoms.InventraSecondaryButton
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraProductRow
 import com.inventraoficial.inventra.core.designsystem.molecules.InventraSearchWithFilter
@@ -39,7 +39,6 @@ import com.inventraoficial.inventra.core.designsystem.organisms.InventraTopBar
 import com.inventraoficial.inventra.ui.navigation.Navigator
 import com.inventraoficial.inventra.ui.navigation.Screen
 import com.inventraoficial.inventra.ui.theme.InventraBackground
-import com.inventraoficial.inventra.ui.theme.InventraGold
 import com.inventraoficial.inventra.ui.theme.InventraInk
 import com.inventraoficial.inventra.ui.theme.InventraMuted
 import com.inventraoficial.inventra.ui.theme.InventraPurple
@@ -108,7 +107,7 @@ fun StockListScreen(
                     onSelect = onFilterSelect,
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
-                offlineMessage?.let { OfflineBanner(message = it, modifier = Modifier.padding(bottom = 12.dp)) }
+                offlineMessage?.let { InventraOfflineBanner(message = it, modifier = Modifier.padding(bottom = 12.dp)) }
                 when {
                     isLoading -> CenteredLoading(modifier = Modifier.weight(1f))
                     errorMessage != null ->
@@ -141,24 +140,6 @@ fun StockListScreen(
             }
         }
     }
-}
-
-@Composable
-private fun OfflineBanner(
-    message: String,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = message,
-        fontFamily = Montserrat,
-        fontSize = 13.sp,
-        color = InventraInk,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .background(InventraGold.copy(alpha = 0.18f), RoundedCornerShape(8.dp))
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-    )
 }
 
 @Composable
