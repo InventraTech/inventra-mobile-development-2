@@ -1,5 +1,6 @@
 package com.inventraoficial.inventra.data.repository
 
+import com.inventraoficial.inventra.data.local.SessionStorage
 import com.inventraoficial.inventra.data.remote.api.AprovacaoDto
 import com.inventraoficial.inventra.data.remote.api.ChatApi
 import com.inventraoficial.inventra.data.remote.api.ChatAudioResponse
@@ -17,6 +18,7 @@ import com.inventraoficial.inventra.data.remote.api.eventosIa
 import com.inventraoficial.inventra.data.remote.dto.user.UserResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -103,10 +105,16 @@ interface ChatRepository {
 class NetworkChatRepository(
     private val chatApi: ChatApi,
     private val userApi: UserApi,
+    private val sessionStorage: SessionStorage,
 ) : ChatRepository {
-    private var usuario: UserResponse? = null
+    /** O usuário e o token com que foi buscado: quem entra depois, com outro token, não herda os dados de quem saiu. */
+    private var usuario: Pair<String?, UserResponse>? = null
 
-    private suspend fun usuarioLogado(): UserResponse = usuario ?: userApi.me().also { usuario = it }
+    private suspend fun usuarioLogado(): UserResponse {
+        val token = sessionStorage.token.first()
+        usuario?.takeIf { it.first == token }?.let { return it.second }
+        return userApi.me().also { usuario = token to it }
+    }
 
     override suspend fun obterUsuarioId(): String = usuarioLogado().id
 
