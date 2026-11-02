@@ -2,14 +2,18 @@
 
 Aplicativo Android em Kotlin + Jetpack Compose para gestão de estoque, requisições, fornecedores e alertas em cozinhas industriais. Consome a [Inventra API](https://github.com/InventraTech/inventra-api-2).
 
-- Login por e-mail e senha ou com Google, com renovação automática do token e volta ao login quando a sessão expira
-- Escolha da cozinha num mapa, criação de cozinha e pedido de entrada, com aprovação por um supervisor
-- Estoque por cozinha com lotes, validade, entrada, baixa e edição de produto
-- Leitura de código de barras pela câmera (CameraX + ML Kit), com consulta ao catálogo e aviso de produto não cadastrado
+- Login por e-mail e senha ou com Google, redefinição de senha por código no e-mail, renovação automática do token e volta ao login quando a sessão expira
+- Escolha da cozinha num mapa, criação de cozinha, pedido de entrada e saída da cozinha
+- Estoque por cozinha com lotes, validade, entrada, baixa, cadastro, edição e desativação de produto, com foto pela galeria ou pela câmera
+- Leitura de código de barras pela câmera (CameraX + ML Kit), com consulta ao catálogo e sugestão do Open Food Facts (nome, marca e foto) para produto não cadastrado
+- Pré-lista de compras no topo de Requisições, transformada em compra com um toque
 - Requisições de compra, transferência e consumo, com histórico, detalhe, edição de itens, envio e aprovação
-- Fornecedores, alertas (estoque baixo e validade) e notificações no celular mesmo com o app fechado
-- Navegação e telas inicial por papel: `SUPERVISOR`, `ESTOQUISTA` e `COMPRADOR`
-- Tema claro, escuro ou do sistema, e design system próprio em atomic design
+- Fornecedores com foto, contato, produtos e histórico de entregas; o fornecedor novo é cadastrado pelo próprio cadastro de produto
+- Assistente de IA (chat) com respostas em tempo real, histórico de conversas, anexos e voz
+- Estoque e detalhe do produto salvos em SQLite, para consulta sem internet
+- Alertas (estoque baixo e validade) e notificações no celular mesmo com o app fechado
+- Navegação e tela inicial por papel: `SUPERVISOR`, `ESTOQUISTA` e `COMPRADOR`
+- Layout para celular e tablet, tema claro, escuro ou do sistema, e design system próprio em atomic design
 
 ## Sumário
 
@@ -68,16 +72,18 @@ Os valores abaixo ficam **fora do Git**. O `app/build.gradle.kts` lê cada um do
 | Chave          | Obrigatória | Para quê                                                                 | Padrão |
 |:---------------|:------------|:-------------------------------------------------------------------------|:-------|
 | `MAPS_API_KEY` | Para o mapa | Vira o `manifestPlaceholder` da chave do Google Maps                     | vazio (o mapa não carrega) |
-| `API_BASE_URL` | Não         | URL base da API, **terminada em `/`** e incluindo `/api/`                | `https://ms-inventra-api.onrender.com/api/` |
+| `API_BASE_URL` | Não         | URL base da API, **terminada em `/`** e incluindo `/api/`                | `http://34.201.182.193/api/` (AWS) |
+| `ia.baseUrl`   | Para o chat | URL base da IA da Inventra (assistente), **terminada em `/`**. Só lida do `local.properties` | `http://10.0.2.2:8000/` |
 
 **`local.properties` de exemplo:**
 
 ```properties
 MAPS_API_KEY=sua_chave_do_google_maps
 API_BASE_URL=http://10.0.2.2:8080/api/
+ia.baseUrl=http://10.0.2.2:8000/
 ```
 
-> `10.0.2.2` é o `localhost` da máquina vista de dentro do emulador Android. Com `API_BASE_URL` começando em `http://`, o build habilita tráfego em texto puro (`usesCleartextTraffic`) automaticamente. Com `https://` ele fica desligado.
+> `10.0.2.2` é o `localhost` da máquina vista de dentro do emulador Android. Se `API_BASE_URL` ou `ia.baseUrl` começar com `http://`, o build habilita tráfego em texto puro (`usesCleartextTraffic`) automaticamente. Com as duas em `https://`, ele fica desligado.
 
 Notas sobre o Firebase e o login com Google:
 
@@ -115,21 +121,23 @@ A barra inferior e a tela inicial mudam conforme o `accessType` do usuário (`bo
 
 | Papel         | Abas                                          | Tela inicial   |
 |:--------------|:----------------------------------------------|:---------------|
-| `SUPERVISOR`  | Início, Estoque, Fornecedores, Requisições, Perfil | Início    |
-| `ESTOQUISTA`  | Início, Estoque, Fornecedores, Perfil         | Início         |
+| `SUPERVISOR`  | Fornecedores, Estoque, Início, Requisições, Perfil | Início    |
+| `ESTOQUISTA`  | Estoque, Início, Perfil                       | Início         |
 | `COMPRADOR`   | Fornecedores, Requisições, Perfil             | Requisições    |
 
 | Área              | O que o app faz                                                                                          |
 |:------------------|:---------------------------------------------------------------------------------------------------------|
-| Autenticação      | Login, cadastro e login com Google. Token renovado pelo `TokenAuthenticator`; sessão expirada leva ao login |
-| Cozinha           | Descobrir cozinhas no mapa, criar a própria, pedir entrada, acompanhar o pedido e ver os dados da cozinha |
-| Início            | Resumo da cozinha e alertas prioritários                                                                 |
-| Estoque           | Lista com filtros, detalhe com lotes, cadastro e edição de produto, entrada de estoque e baixa            |
-| Leitura           | Câmera lê o código de barras, busca o produto e abre a entrada ou a baixa. Produto desconhecido gera aviso ao supervisor |
-| Fornecedores      | Lista com filtros e detalhe com os produtos de cada fornecedor                                           |
-| Requisições       | Lista por status, histórico, detalhe, editor de itens, envio para análise, aprovação, rejeição e cancelamento |
+| Autenticação      | Login, cadastro, login com Google e redefinição de senha por código enviado ao e-mail. Token renovado pelo `TokenAuthenticator`; sessão expirada leva ao login |
+| Cozinha           | Descobrir cozinhas no mapa, criar a própria, pedir entrada, acompanhar o pedido, ver os dados da cozinha e sair dela. O pedido de entrada não é aprovado pelo app |
+| Início            | Resumo do estoque (big numbers) em cima e produtos com prioridade embaixo                                |
+| Estoque           | Lista com filtros e detalhe com lotes, histórico e fornecedor (que abre o detalhe dele). Cadastro e edição de produto com foto, estoque mínimo e fornecedor obrigatório; desativação pelo supervisor. Entrada e baixa |
+| Sem internet      | A lista do estoque e o detalhe do produto ficam salvos em SQLite e abrem sem conexão, com o aviso de quando foram salvos |
+| Leitura           | Câmera lê o código de barras, busca o produto e abre a entrada ou a baixa. Código fora do catálogo mostra a sugestão do Open Food Facts; o supervisor cadastra com a foto sugerida e os demais avisam o supervisor |
+| Fornecedores      | Lista da cozinha com foto e filtros; detalhe com contato, produtos e histórico de entregas; o supervisor troca a foto. Na escolha do fornecedor do produto, os da cozinha vêm primeiro, depois os do sistema, ou um novo é cadastrado ali mesmo |
+| Requisições       | Pré-lista no topo, transformada em compra; lista por status, histórico, detalhe, editor de itens, envio para análise, aprovação, rejeição e cancelamento |
+| Assistente        | Chat com a IA da Inventra: respostas em tempo real, histórico de conversas, anexos e conversa por voz    |
 | Notificações      | Tela de alertas agrupados, marcar como lido e verificação em segundo plano a cada 15 minutos (WorkManager) |
-| Perfil            | Dados da conta, foto, gestão de membros (supervisor aprova, recusa e desativa) e preferências            |
+| Perfil            | Dados da conta, foto (galeria ou câmera; segurar a foto abre em tela cheia), Ver equipe (só leitura, com e-mail) e preferências |
 | Preferências      | Tema claro, escuro ou do sistema, e liga ou desliga os avisos de alerta no celular                       |
 
 ## API consumida
@@ -138,15 +146,22 @@ O app fala com a API REST por Retrofit + kotlinx.serialization. As interfaces fi
 
 | Interface             | Base path                    | Uso no app                                                      |
 |:----------------------|:-----------------------------|:----------------------------------------------------------------|
-| `AuthApi`             | `auth`                       | Login, cadastro, Google, refresh e logout                       |
-| `UserApi`             | `users`                      | Usuário logado, foto e desativação de membro                    |
+| `AuthApi`             | `auth`                       | Login, cadastro, Google, refresh, logout e redefinição de senha |
+| `UserApi`             | `users`                      | Usuário logado, foto e sair da cozinha                          |
 | `KitchenApi`          | `kitchens`                   | Descobrir, detalhar, criar e editar cozinha                     |
-| `KitchenAccessApi`    | `kitchen-access-requests`    | Pedir entrada, listar os próprios pedidos, aprovar e rejeitar   |
-| `ProductApi`          | `products`, `units`, `categories` | Produto, consulta por código de barras, unidades e categorias |
-| `StockApi`            | `stock-batches`, `stock-movements`, `kitchens/{id}/stock` | Estoque da cozinha, baixa, vencendo e estoque baixo, movimentações |
-| `SupplierApi`         | `suppliers`                  | Lista e detalhe de fornecedores                                 |
+| `KitchenAccessApi`    | `kitchen-access-requests`    | Pedir entrada e listar os próprios pedidos                      |
+| `ProductApi`          | `products`, `units`, `categories` | Produto, consulta por código de barras, unidades, categorias e estoque mínimo da cozinha |
+| `ProductSupplierApi`  | `products/{id}/suppliers`    | Fornecedor do produto e preço de referência                     |
+| `ProductPhotoApi`     | `products/{id}/photo`        | Enviar e remover a foto do produto                              |
+| `ProductStatusApi`    | `products/{id}/deactivate`   | Desativar o produto                                             |
+| `StockApi`            | `stock-batches`, `stock-movements`, `kitchens/{id}/stock` | Estoque da cozinha, entrada, baixa, vencendo e estoque baixo, movimentações |
+| `SupplierApi`         | `suppliers`                  | Lista, detalhe e cadastro de fornecedores                       |
+| `SupplierPhotoApi`    | `suppliers/{id}/photo`       | Enviar e remover a foto do fornecedor                           |
+| `PreListApi`          | `pre-lists`                  | Pré-listas de compra da cozinha                                 |
 | `RequisitionApi`      | `requisitions`               | Requisições, itens e transições de status                       |
 | `AlertApi`            | `alerts`                     | Alertas, marcar como lido e produto não cadastrado              |
+| `ClickEventApi`       | `events/clicks`              | Contagem de cliques do app, enviada em lote                     |
+| `ChatApi`             | `chat`, `arquivos`, `approvals` (na URL `ia.baseUrl`) | Conversas com o assistente em streaming, áudio, anexos e aprovação de ações |
 
 Todas as chamadas, menos as de autenticação, levam o header `Authorization: Bearer <token>` colocado pelo `AuthInterceptor`. Quando a API responde `401`, o `TokenAuthenticator` tenta renovar o token uma vez; se não conseguir, a sessão é encerrada e o usuário volta ao login. Erros da API (`application/problem+json`) viram mensagens de tela por meio do `ApiCall`.
 
@@ -157,7 +172,7 @@ A referência dos endpoints, com payloads e regras de autorização, está na [d
 Arquitetura em camadas, com fluxo de dados unidirecional:
 
 ```
-Composable (Screen)  →  ViewModel (StateFlow<UiState>)  →  Repository (interface)  →  Retrofit API / DataStore
+Composable (Screen)  →  ViewModel (StateFlow<UiState>)  →  Repository (interface)  →  Retrofit API / DataStore / SQLite
         ▲                                                          │
         └──────────────────── UiState imutável ◄───────────────────┘
 ```
@@ -166,6 +181,7 @@ Composable (Screen)  →  ViewModel (StateFlow<UiState>)  →  Repository (inter
 - **Repositórios:** cada um é uma interface com uma implementação `Network*Repository`. Nos testes entram `Fake*Repository`, sem rede.
 - **Injeção de dependência manual:** o `AppContainer` (criado na `InventraApplication`) monta OkHttp, Retrofit, repositórios, sessão e verificadores de segundo plano, sem Hilt ou Dagger.
 - **Sessão:** o `SessionManager` guarda tokens e usuário no DataStore e avisa a navegação quando a sessão expira.
+- **Persistência local:** o `InventraDatabase` (SQLite, com `SQLiteOpenHelper`) guarda a lista do estoque e o detalhe de cada produto por cozinha. Sem internet, as telas abrem com esses dados e um aviso de quando foram salvos.
 - **Navegação:** Navigation 3 com um `Navigator` próprio, que mantém a pilha de telas ao girar o aparelho (salva por `NavigatorSaver`) e escolhe abas e tela inicial pelo papel.
 - **Segundo plano:** o `AlertCheckWorker` consulta pedidos de entrada e alertas novos a cada 15 minutos (o mínimo do Android, que pode atrasar em economia de bateria) e dispara a notificação do sistema.
 - **Design system:** componentes em `core/designsystem`, separados em `atoms`, `molecules` e `organisms`, sobre o tema em `ui/theme`.
@@ -179,7 +195,7 @@ app/src/main/java/com/inventraoficial/inventra/
 ├── core/
 │   └── designsystem/           # atoms, molecules, organisms (componentes Inventra*)
 ├── data/
-│   ├── local/                  # DataStore (sessão e preferências), localização, compressão de imagem
+│   ├── local/                  # DataStore (sessão e preferências), SQLite (cache do estoque), localização, compressão de imagem
 │   ├── remote/
 │   │   ├── api/                # interfaces Retrofit
 │   │   ├── dto/                # modelos de request/response por domínio
@@ -189,16 +205,17 @@ app/src/main/java/com/inventraoficial/inventra/
 │   └── session/                # SessionManager
 ├── di/                         # AppContainer
 ├── feature/
-│   ├── assistant/              # chat (apenas interface por enquanto)
-│   ├── auth/                   # login, cadastro, Google
+│   ├── assistant/              # chat com a IA: mensagens, anexos e voz
+│   ├── auth/                   # login, cadastro, Google e redefinição de senha
 │   ├── cozinha/                # selecionar, criar, pedido enviado, informações
 │   ├── home/
 │   ├── notifications/          # tela e verificação em segundo plano
-│   ├── profile/                # dados, foto, membros, preferências
+│   ├── prelist/                # pré-lista de compras e conversão em compra
+│   ├── profile/                # dados, foto, equipe, preferências
 │   ├── requirements/           # requisições: lista, histórico, detalhe, editor
 │   ├── scan/                   # leitura de código de barras
 │   ├── stock/                  # lista, detalhe, edição, cadastro, entrada, baixa
-│   └── suppliers/              # lista e detalhe
+│   └── suppliers/              # lista, detalhe e cadastro
 └── ui/
     ├── navigation/             # Navigator, destinos por papel, SetupNavigation
     └── theme/                  # cores, tipografia e tema
@@ -271,7 +288,7 @@ Para gerar o valor do keystore em base64:
 base64 -w0 release.keystore
 ```
 
-Sem os secrets de assinatura o CD falha de propósito, em vez de publicar um APK sem assinatura. O APK de release usa a `API_BASE_URL` padrão do `build.gradle.kts`, porque o `cd.yaml` não passa o parâmetro `api-base-url`.
+Sem os secrets de assinatura o CD falha de propósito, em vez de publicar um APK sem assinatura. O APK de release usa a `API_BASE_URL` padrão do `build.gradle.kts`, porque o `cd.yaml` não passa o parâmetro `api-base-url`. O mesmo vale para o `ia.baseUrl`: como ele só é lido do `local.properties`, o APK publicado pelo CD usa o padrão `http://10.0.2.2:8000/`, e o chat só funciona em builds feitas com o `local.properties` configurado.
 
 ## Fluxo de contribuição
 
@@ -283,11 +300,12 @@ Sem os secrets de assinatura o CD falha de propósito, em vez de publicar um APK
 
 ## Limitações conhecidas
 
-- **Assistente (chat):** a tela existe, mas ainda não envia mensagens a nenhum serviço. O `ChatViewModel` só limpa o campo de texto. A integração com a IA da Inventra (`inventra-artificial-intelligence-2`) ainda não foi feita.
+- **Pré-lista:** é gerada fora do app, pelo RPA. A conversão em compra cria o rascunho e adiciona os itens um a um, porque a API ainda não tem um endpoint de conversão; se algum item falhar, o rascunho é cancelado.
+- **Sem internet, só leitura:** o estoque e o detalhe do produto abrem pelo SQLite, mas entrada, baixa e cadastro precisam de conexão.
 - **Build de release sem otimização:** o `release` está com `optimization.enable = false`, ou seja, sem minificação nem ofuscação.
 - **Testes instrumentados:** existe só o `ExampleInstrumentedTest`. Os fluxos de tela são cobertos pelos testes de ViewModel, não por testes de interface.
 - **Notificações em segundo plano:** o Android executa o `WorkManager` no mínimo a cada 15 minutos e pode atrasar a verificação em modo de economia de bateria, então o aviso não é instantâneo.
-- **Backup do Android:** `allowBackup` está ligado, com regras em `res/xml/backup_rules.xml` e `data_extraction_rules.xml`.
+- **Backup do Android:** `allowBackup` está ligado e as regras em `res/xml/backup_rules.xml` e `data_extraction_rules.xml` ainda são as padrão, então o token de login entra no backup do Google. Excluir o arquivo da sessão do backup é uma melhoria conhecida.
 
 ## Time
 
