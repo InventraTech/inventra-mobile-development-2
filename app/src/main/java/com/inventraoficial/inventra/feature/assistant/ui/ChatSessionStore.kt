@@ -28,6 +28,9 @@ class ChatSessionStore(
     var donoId: String? = null
 
     fun reiniciar() {
+        envioEmAndamento?.cancel()
+        envioEmAndamento = null
+        sessoesParaEncerrar.clear()
         estado.value = ChatUiState(sessionId = novaSessaoId())
         donoId = null
     }

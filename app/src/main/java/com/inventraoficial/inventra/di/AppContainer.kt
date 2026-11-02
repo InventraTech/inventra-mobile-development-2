@@ -232,7 +232,11 @@ class DefaultAppContainer(
             userApi,
             json,
             sessionStorage,
-            clearExternalSession = { googleAuthClient.signOut() },
+            clearExternalSession = {
+                googleAuthClient.signOut()
+                // A conversa do chat é de quem estava logado: não pode aparecer para o próximo usuário.
+                chatSessionStore.reiniciar()
+            },
         )
     }
 
@@ -289,7 +293,7 @@ class DefaultAppContainer(
         NetworkRequisitionRepository(requisitionApi, json)
     }
 
-    override val chatRepository: ChatRepository by lazy { NetworkChatRepository(chatApi, userApi) }
+    override val chatRepository: ChatRepository by lazy { NetworkChatRepository(chatApi, userApi, sessionStorage) }
 
     // Guarda a conversa do chat enquanto o app está aberto, mesmo que o usuário saia da tela.
     override val chatSessionStore: ChatSessionStore by lazy { ChatSessionStore() }
