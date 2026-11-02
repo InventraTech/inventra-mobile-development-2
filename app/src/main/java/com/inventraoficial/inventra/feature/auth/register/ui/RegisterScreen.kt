@@ -81,7 +81,7 @@ fun RegisterScreen(
     ) {
         Image(
             painter = painterResource(id = R.drawable.bg_shape_yellow_top),
-            contentDescription = "Background shape yellow top",
+            contentDescription = null,
             modifier =
                 Modifier
                     .align(Alignment.TopEnd)

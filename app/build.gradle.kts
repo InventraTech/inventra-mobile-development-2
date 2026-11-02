@@ -78,7 +78,26 @@ kover {
                     "androidx.compose.runtime.Composable",
                     "androidx.compose.ui.tooling.preview.Preview",
                 )
-                classes("*.BuildConfig", "*ComposableSingletons*")
+                classes(
+                    "*.BuildConfig",
+                    "*ComposableSingletons*",
+                    "com.inventraoficial.inventra.MainActivity",
+                    "com.inventraoficial.inventra.InventraApplication",
+                    "com.inventraoficial.inventra.di.*",
+                    "com.inventraoficial.inventra.ui.theme.*",
+                    "*.AndroidImageCompressor",
+                    "*.FusedLocationProvider",
+                    "*.GoogleAuthClient*",
+                    "*.InventraDatabase*",
+                    "*.SqliteStockCache*",
+                    "*.SqliteProductDetailCache*",
+                    "*.SystemAlertNotifier",
+                    "*.AlertCheckWorker*",
+                    "*.AudioRecorder*",
+                    "*.VozAoVivo*",
+                    "*.LeitorDePasta*",
+                    "*.AnexosPastaKt*",
+                )
             }
         }
     }
