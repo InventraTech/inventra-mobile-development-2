@@ -1,3 +1,4 @@
+import java.net.URI
 import java.util.Properties
 
 plugins {
@@ -17,11 +18,15 @@ val localProperties =
         if (file.exists()) file.inputStream().use { load(it) }
     }
 val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY").orEmpty()
-val iaBaseUrl: String = localProperties.getProperty("ia.baseUrl", "http://10.0.2.2:8000/")
 val apiBaseUrl: String =
     localProperties.getProperty("API_BASE_URL")
         ?: System.getenv("API_BASE_URL")
         ?: "http://34.201.182.193/api/"
+val iaBaseUrl: String =
+    localProperties.getProperty("ia.baseUrl")
+        ?: localProperties.getProperty("IA_BASE_URL")
+        ?: System.getenv("IA_BASE_URL")
+        ?: URI(apiBaseUrl).let { "${it.scheme}://${it.host}:8000/" }
 
 android {
     namespace = "com.inventraoficial.inventra"
