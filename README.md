@@ -73,7 +73,7 @@ Os valores abaixo ficam **fora do Git**. O `app/build.gradle.kts` lê cada um do
 |:---------------|:------------|:-------------------------------------------------------------------------|:-------|
 | `MAPS_API_KEY` | Para o mapa | Vira o `manifestPlaceholder` da chave do Google Maps                     | vazio (o mapa não carrega) |
 | `API_BASE_URL` | Não         | URL base da API, **terminada em `/`** e incluindo `/api/`                | `http://34.201.182.193/api/` (AWS) |
-| `ia.baseUrl`   | Para o chat | URL base da IA da Inventra (assistente), **terminada em `/`**. Só lida do `local.properties` | `http://10.0.2.2:8000/` |
+| `ia.baseUrl` ou `IA_BASE_URL` | Não | URL base da IA da Inventra (assistente do chat), **terminada em `/`** | mesmo endereço da `API_BASE_URL`, na porta `8000` (ex.: `http://34.201.182.193:8000/`) |
 
 **`local.properties` de exemplo:**
 
@@ -82,6 +82,8 @@ MAPS_API_KEY=sua_chave_do_google_maps
 API_BASE_URL=http://10.0.2.2:8080/api/
 ia.baseUrl=http://10.0.2.2:8000/
 ```
+
+> Sem `ia.baseUrl`, o chat usa o mesmo endereço da API na porta `8000`. Para usar uma IA rodando na sua máquina pelo emulador, defina `ia.baseUrl=http://10.0.2.2:8000/`.
 
 > `10.0.2.2` é o `localhost` da máquina vista de dentro do emulador Android. Se `API_BASE_URL` ou `ia.baseUrl` começar com `http://`, o build habilita tráfego em texto puro (`usesCleartextTraffic`) automaticamente. Com as duas em `https://`, ele fica desligado.
 
@@ -288,7 +290,7 @@ Para gerar o valor do keystore em base64:
 base64 -w0 release.keystore
 ```
 
-Sem os secrets de assinatura o CD falha de propósito, em vez de publicar um APK sem assinatura. O APK de release usa a `API_BASE_URL` padrão do `build.gradle.kts`, porque o `cd.yaml` não passa o parâmetro `api-base-url`. O mesmo vale para o `ia.baseUrl`: como ele só é lido do `local.properties`, o APK publicado pelo CD usa o padrão `http://10.0.2.2:8000/`, e o chat só funciona em builds feitas com o `local.properties` configurado.
+Sem os secrets de assinatura o CD falha de propósito, em vez de publicar um APK sem assinatura. O APK de release usa a `API_BASE_URL` padrão do `build.gradle.kts`, porque o `cd.yaml` não passa o parâmetro `api-base-url`. O chat usa a URL da IA derivada dessa mesma `API_BASE_URL` (porta `8000`), porque o workflow da organização não repassa o `IA_BASE_URL`.
 
 ## Fluxo de contribuição
 
