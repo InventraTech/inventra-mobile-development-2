@@ -248,7 +248,7 @@ Para corrigir o estilo automaticamente:
 ./gradlew ktlintFormat
 ```
 
-O relatório de cobertura (Kover) exclui funções `@Composable`, `@Preview`, `BuildConfig` e as classes geradas do Compose. Os relatórios ficam em `app/build/reports/`.
+O relatório de cobertura (Kover) exclui funções `@Composable`, `@Preview`, `BuildConfig`, as classes geradas do Compose e o código que só roda no Android (container de DI, tema, `MainActivity`, adaptadores de plataforma como câmera, GPS, notificações e login com Google, o SQLite e o áudio do chat). A cobertura de linhas fica acima de 80%. Os relatórios ficam em `app/build/reports/`.
 
 ## CI/CD
 
@@ -307,7 +307,7 @@ Sem os secrets de assinatura o CD falha de propósito, em vez de publicar um APK
 - **Build de release sem otimização:** o `release` está com `optimization.enable = false`, ou seja, sem minificação nem ofuscação.
 - **Testes instrumentados:** existe só o `ExampleInstrumentedTest`. Os fluxos de tela são cobertos pelos testes de ViewModel, não por testes de interface.
 - **Notificações em segundo plano:** o Android executa o `WorkManager` no mínimo a cada 15 minutos e pode atrasar a verificação em modo de economia de bateria, então o aviso não é instantâneo.
-- **Backup do Android:** `allowBackup` está ligado e as regras em `res/xml/backup_rules.xml` e `data_extraction_rules.xml` ainda são as padrão, então o token de login entra no backup do Google. Excluir o arquivo da sessão do backup é uma melhoria conhecida.
+- **Backup do Android:** `allowBackup` está ligado para as preferências, mas o arquivo da sessão (`datastore/auth.preferences_pb`, com os tokens) fica fora do backup na nuvem e da transferência entre aparelhos. Num celular novo, é preciso fazer login de novo.
 
 ## Time
 
